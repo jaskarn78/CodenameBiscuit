@@ -23,12 +23,6 @@ public class SigninActivity extends AsyncTask<String, Void, String> {
     public SigninActivity (int flag) { get_post_flag = flag;}
 
     @Override
-    protected void onPostExecute(String s) {
-        super.onPostExecute(s);
-    }
-
-
-    @Override
     protected String doInBackground(String... strings) {
         String link = strings[0];
         String identifier = strings[1];
@@ -76,5 +70,10 @@ public class SigninActivity extends AsyncTask<String, Void, String> {
             Log.e("FacebookEmailRequest: ", "Could not pull user email from Facebook");
         }
         return null;
+    }
+
+    @Override
+    protected void onPostExecute(String result) {
+        Log.v("SUCCESS: ", result);
     }
 }

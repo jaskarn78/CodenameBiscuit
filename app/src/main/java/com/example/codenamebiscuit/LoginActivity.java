@@ -56,9 +56,9 @@ public class LoginActivity extends FragmentActivity{
         mLoginButton.registerCallback(mCallbackManager, new FacebookCallback<LoginResult>() {
             @Override
             public void onSuccess(LoginResult loginResult) {
-                getUserFacebookEmail(); // pull email from facebook
+                //getUserFacebookEmail(); // pull email from facebook
                 checkIfProfileExists(); // check if user exists on database
-                nextActivity();
+                //nextActivity();
             }
 
             @Override
@@ -165,7 +165,6 @@ public class LoginActivity extends FragmentActivity{
     // Check if the user profile exists on the database, if not create one
     private void checkIfProfileExists() {
         String userId = AccessToken.getCurrentAccessToken().getUserId();
-
         new SigninActivity(0).execute(DATABASE_CONNECTION_LINK, DATABASE_ID_FIELD_NAME, userId);
     }
 
