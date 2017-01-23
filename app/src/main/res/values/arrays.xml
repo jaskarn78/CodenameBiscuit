@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <array name="pref_distance_option_labels">
+        <item>@string/pref_distance_twenty_five_label</item>
+        <item>@string/pref_distance_fifty_label</item>
+        <item>@string/pref_distance_one_hundred_label</item>
+    </array>
+
+    <array name="pref_distance_label_values">
+        <item>@string/pref_distance_twenty_five_value</item>
+        <item>@string/pref_distance_fifty_value</item>
+        <item>@string/pref_distance_one_hundred_value</item>
+    </array>
+
+    <array name="pref_cost_option_labels">
+        <item>@string/pref_cost_free_label</item>
+        <item>@string/pref_cost_money_label</item>
+    </array>
+
+    <array name="pref_cost_values">
+        <item>@string/pref_cost_free_value</item>
+        <item>@string/pref_cost_money_value</item>
+    </array>
+
+    <array name="pref_age_option_labels">
+        <item>@string/pref_age_all_ages_label</item>
+        <item>@string/pref_age_eighteen_label</item>
+        <item>@string/pref_age_twenty_one_label</item>
+    </array>
+
+    <array name="pref_age_values">
+        <item>@string/pref_age_all_ages_value</item>
+        <item>@string/pref_age_eighteen_value</item>
+        <item>@string/pref_age_twenty_one_value</item>
+    </array>
+</resources>

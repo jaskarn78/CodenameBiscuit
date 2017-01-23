@@ -1,0 +1,73 @@
+<resources>
+    <!-- Application Name -->
+    <string name="app_name">CodenameBiscuit</string>
+
+    <!-- Facebook App ID -->
+    <string name="facebook_app_id">173299886485207</string>
+
+    <!-- Prefence Keys, Labels, and values -->
+
+    <!-- Distance Preference -->
+    <string name="pref_distance_label">Distance</string>
+    <string name="pref_distance_key" translatable="false">list_distances</string>
+
+    <string name="pref_distance_twenty_five_label">25 Miles</string>
+    <string name="pref_distance_twenty_five_value" translatable="false">twenty_five_miles</string>
+
+    <string name="pref_distance_fifty_label">50 Miles</string>
+    <string name="pref_distance_fifty_value" translatable="false">fifty_miles</string>
+
+    <string name="pref_distance_one_hundred_label">100 Miles</string>
+    <string name="pref_distance_one_hundred_value" translatable="false">one_hundred_miles</string>
+
+    <!-- Affordability Preference -->
+    <string name="pref_cost_label">Cost</string>
+    <string name="pref_cost_key" translatable="false">list_costs</string>
+
+    <string name="pref_cost_free_label">Free</string>
+    <string name="pref_cost_free_value" translatable="false">free_cost</string>
+
+    <string name="pref_cost_money_label">$$$</string>
+    <string name="pref_cost_money_value" translatable="false">money_cost</string>
+
+    <!-- Age Range Preference -->
+    <string name="pref_age_label">Age Range</string>
+    <string name="pref_age_key" translatable="false">list_age_range</string>
+
+    <string name="pref_age_all_ages_label">All Ages</string>
+    <string name="pref_age_all_ages_value" translatable="false">all_ages_age</string>
+
+    <string name="pref_age_eighteen_label">18+</string>
+    <string name="pref_age_eighteen_value" translatable="false">eighteen_plus_age</string>
+
+    <string name="pref_age_twenty_one_label">21+</string>
+    <string name="pref_age_twenty_one_value" translatable="false">twenty_one_plus_age</string>
+
+    <!-- Genre/Type Preferences -->
+    <string name="pref_music_title">Music</string>
+    <string name="pref_music_key" translatable="false">prefer_music</string>
+
+    <string name="pref_food_drink_title">Food and Drink</string>
+    <string name="pref_food_drink_key" translatable="false">prefer_food_drink</string>
+
+    <string name="pref_sports_title">Sports</string>
+    <string name="pref_sports_key" translatable="false">prefer_sports</string>
+
+    <string name="pref_outdoor_title">Outdoor</string>
+    <string name="pref_outdoor_key" translatable="false">prefer_outdoor</string>
+
+    <string name="pref_health_fitness_title">Health and Fitness</string>
+    <string name="pref_health_fitness_key" translatable="false">prefer_health_fitness</string>
+
+    <string name="pref_family_friendly_title">Family Friendly</string>
+    <string name="pref_family_friendly_key" translatable="false">prefer_family_friendly</string>
+
+    <string name="pref_retail_title">Retail</string>
+    <string name="pref_retail_key" translatable="false">prefer_retail</string>
+
+    <string name="pref_performing_arts_title">Performing Arts</string>
+    <string name="pref_performing_arts_key" translatable="false">prefer_performing_arts</string>
+
+    <string name="pref_entertainment_title">Entertainment</string>
+    <string name="pref_entertainment_key" translatable="false">prefer_entertainment</string>
+</resources>

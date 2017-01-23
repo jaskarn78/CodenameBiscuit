@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Genre/Type Preference Bools -->
+    <bool name="pref_music_value">false</bool>
+    <bool name="pref_food_drink_value">false</bool>
+    <bool name="pref_sports_value">false</bool>
+    <bool name="pref_outdoor_value">false</bool>
+    <bool name="pref_health_fitness_value">false</bool>
+    <bool name="pref_family_friendly_value">false</bool>
+    <bool name="pref_retail_value">false</bool>
+    <bool name="pref_performing_arts_value">false</bool>
+    <bool name="pref_entertainment_value">false</bool>
+</resources>
