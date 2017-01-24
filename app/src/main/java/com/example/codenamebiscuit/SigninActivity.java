@@ -3,6 +3,10 @@ package com.example.codenamebiscuit;
 import android.os.AsyncTask;
 import android.util.Log;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -29,8 +33,9 @@ public class SigninActivity extends AsyncTask<String, Void, String> {
         String userId = strings[2];
 
         if (!userId.equals("")) {
-            if (get_post_flag == 0) {  }
-            else {
+            if (get_post_flag == 0) {
+
+            } else {
                 try {
                     String data = URLEncoder.encode(identifier, "UTF-8")
                             + "=" + URLEncoder.encode(userId, "UTF-8");
@@ -52,28 +57,35 @@ public class SigninActivity extends AsyncTask<String, Void, String> {
 
                     // Read Server Response
                     while((line = reader.readLine()) != null) {
+                        Log.v("PrintLine", line);
                         sb.append(line);
-                        break;
                     }
 
-                    return sb.toString();
+                    JSONArray jsonArray = new JSONArray(sb.toString());
+                    JSONObject jsonObject = new JSONObject(jsonArray.getString(1));
+
+                    return jsonObject.getString("user_name");
+                    //JSONArray jArray = new jObj.getJSONArray("");
 
                 } catch (MalformedURLException e) {
-                    Log.e("MalformedURL: ", e.toString());
+                    Log.e("MalformedURL", e.toString());
                 } catch (UnsupportedEncodingException e) {
-                    Log.e("UnsupportedEncoding: ", e.toString());
+                    Log.e("UnsupportedEncoding", e.toString());
                 } catch (IOException e) {
-                    Log.e("IOException: ", e.toString());
+                    Log.e("IOException", e.toString());
+                } catch (JSONException e) {
+                    Log.e("JSONException", e.toString());
                 }
             }
         } else {
-            Log.e("FacebookEmailRequest: ", "Could not pull user email from Facebook");
+            Log.e("FacebookEmailRequest", "Could not pull user email from Facebook");
         }
         return null;
     }
 
     @Override
     protected void onPostExecute(String result) {
-        Log.v("SUCCESS: ", result);
+        if (result != null)
+            Log.v("SUCCESS", result);
     }
 }

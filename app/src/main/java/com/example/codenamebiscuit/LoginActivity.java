@@ -107,6 +107,7 @@ public class LoginActivity extends FragmentActivity{
         super.onResume();
         //Facebook login
         nextActivity();
+        //checkIfProfileExists();
     }
 
     @Override

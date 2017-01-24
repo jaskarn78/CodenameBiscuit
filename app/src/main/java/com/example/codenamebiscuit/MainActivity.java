@@ -11,6 +11,10 @@ import com.facebook.AccessToken;
 import com.facebook.FacebookSdk;
 
 public class MainActivity extends AppCompatActivity {
+    private static final String DATABASE_CONNECTION_LINK =
+            "http://athena.ecs.csus.edu/~teamone/php/query.php";
+    private static final String DATABASE_ID_FIELD_NAME = "user_id";
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -20,6 +24,8 @@ public class MainActivity extends AppCompatActivity {
         if (AccessToken.getCurrentAccessToken() == null) {
             Intent intent = new Intent(MainActivity.this, LoginActivity.class);
             startActivity(intent);
+        } else {
+            checkIfProfileExists();
         }
     }
 
@@ -44,5 +50,12 @@ public class MainActivity extends AppCompatActivity {
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+
+    // Check if the user profile exists on the database, if not create one
+    private void checkIfProfileExists() {
+        String userId = AccessToken.getCurrentAccessToken().getUserId();
+        new SigninActivity(1).execute(DATABASE_CONNECTION_LINK, DATABASE_ID_FIELD_NAME, userId);
     }
 }
