@@ -11,15 +11,10 @@ import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
 import com.facebook.FacebookSdk;
-import com.facebook.GraphRequest;
-import com.facebook.GraphResponse;
 import com.facebook.Profile;
 import com.facebook.ProfileTracker;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
-
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.util.Arrays;
 import java.util.List;
@@ -136,28 +131,7 @@ public class LoginActivity extends FragmentActivity{
     /**********************************************************************************************
      Request Facebook Info
      **********************************************************************************************/
-    private void getUserFacebookEmail() {
-        GraphRequest request = GraphRequest.newMeRequest(
-                AccessToken.getCurrentAccessToken(),
-                new GraphRequest.GraphJSONObjectCallback() {
-                    @Override
-                    public void onCompleted(
-                            JSONObject object,
-                            GraphResponse response) {
-                        try {
-                            mUserEmail = object.getString("email");
-                            Log.v("Response: ", object.getString("email"));
-                        } catch (JSONException e) {
-                            Log.e("GraphRequest: ", e.toString());
-                        }
-                    }
-                });
 
-        Bundle parameters = new Bundle();
-        parameters.putString("fields", "email");
-        request.setParameters(parameters);
-        request.executeAsync();
-    }
 
     /**********************************************************************************************
          Profile Checking
@@ -166,7 +140,7 @@ public class LoginActivity extends FragmentActivity{
     // Check if the user profile exists on the database, if not create one
     private void checkIfProfileExists() {
         String userId = AccessToken.getCurrentAccessToken().getUserId();
-        new SigninActivity(0).execute(DATABASE_CONNECTION_LINK, DATABASE_ID_FIELD_NAME, userId);
+        new SigninActivity().execute(DATABASE_CONNECTION_LINK, DATABASE_ID_FIELD_NAME, userId);
     }
 
     // If there is an active AccessToken, go to the MainActivity

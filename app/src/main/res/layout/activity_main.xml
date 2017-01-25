@@ -1,16 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.example.codenamebiscuit.MainActivity">
 
-    <TextView
-        android:id="@+id/event_id"
-        android:layout_width="wrap_content"
+    <!--<include
+        android:layout="@layout/event_layout"/>-->
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="EVENTS SHOW UP HERE"
-        android:layout_gravity="center"
-        android:textSize="30sp"/>
-</FrameLayout>
+        android:layout_gravity="bottom">
+        <Button
+            style="?android:button"
+            android:text="Remove"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_gravity="start"
+            android:layout_weight="1"/>
+        <Button
+            style="?android:button"
+            android:text="Save"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_gravity="end"
+            android:layout_weight="1"/>
+    </LinearLayout>
+</LinearLayout>
