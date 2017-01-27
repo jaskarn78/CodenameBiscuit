@@ -36,12 +36,12 @@ public class MainActivity extends AppCompatActivity {
             Intent intent = new Intent(MainActivity.this, LoginActivity.class);
             startActivity(intent);
         } else {
-            getUserFacebookEmail();
+            //getUserFacebookEmail();
         }
     }
 
     /**********************************************************************************************
-        Create Menu
+     Facebook Methods
      **********************************************************************************************/
 
     private void getUserFacebookEmail() {
@@ -54,8 +54,10 @@ public class MainActivity extends AppCompatActivity {
                             GraphResponse response) {
                         try {
                             mUserEmail = object.getString("email");
+
                             SigninActivity userSignin = new SigninActivity(); // check if user exists on database
                             userSignin.execute(DATABASE_CONNECTION_LINK, mUserEmail);
+
                             Log.v("Response: ", object.getString("email"));
                         } catch (JSONException e) {
                             Log.e("GraphRequest: ", e.toString());
@@ -69,6 +71,9 @@ public class MainActivity extends AppCompatActivity {
         request.executeAsync();
     }
 
+    /**********************************************************************************************
+     Create Menu
+     **********************************************************************************************/
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater menuInflater = getMenuInflater();

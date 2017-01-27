@@ -1,5 +1,6 @@
 package com.example.codenamebiscuit;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
@@ -11,20 +12,27 @@ import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
 import com.facebook.FacebookSdk;
+import com.facebook.GraphRequest;
+import com.facebook.GraphResponse;
 import com.facebook.Profile;
 import com.facebook.ProfileTracker;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 
 public class LoginActivity extends FragmentActivity{
     private CallbackManager mCallbackManager;
     private AccessTokenTracker mAccessTokenTracker;
     private ProfileTracker mProfileTracker;
     private LoginButton mLoginButton;
+    private ProgressDialog mProgressDialog;
     private String mUserEmail;
 
     private static final String DATABASE_CONNECTION_LINK =
@@ -48,41 +56,101 @@ public class LoginActivity extends FragmentActivity{
 
         // Set permissions and register the callback
         mLoginButton.setReadPermissions(mPermissions);
+
         mLoginButton.registerCallback(mCallbackManager, new FacebookCallback<LoginResult>() {
+
             @Override
             public void onSuccess(LoginResult loginResult) {
-                //getUserFacebookEmail(); // pull email from facebook
-                SigninActivity userSignin = new SigninActivity(); // check if user exists on database
-                userSignin.execute(DATABASE_CONNECTION_LINK);
 
-                try {
-                    userSignin.get();
-                    nextActivity();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                } catch (ExecutionException e) {
-                    e.printStackTrace();
-                }
+                System.out.println("onSuccess");
+                mProgressDialog = new ProgressDialog(LoginActivity.this);
+                mProgressDialog.setMessage("Processing data...");
+                mProgressDialog.show();
+                String accessToken = loginResult.getAccessToken().getToken();
+                Log.i("accessToken", accessToken);
 
+                GraphRequest request = GraphRequest.newMeRequest(loginResult.getAccessToken(),
+                        new GraphRequest.GraphJSONObjectCallback() {
+
+                    @Override
+                    public void onCompleted(JSONObject object, GraphResponse response) {
+                        Log.i("LoginActivity", response.toString());
+                        // Get facebook data from login
+                        Bundle bFacebookData = getFacebookData(object);
+                        try {
+                            Log.v("DATA BITCH", bFacebookData.toString());
+                        } catch (NullPointerException e) {
+                            Log.e("ERRR", e.toString());
+                        }
+                    }
+                });
+                Bundle parameters = new Bundle();
+                parameters.putString("fields","id,first_name,last_name,email,gender,birthday,location");
+                request.setParameters(parameters);
+                request.executeAsync();
             }
 
             @Override
             public void onCancel() {
-                Log.v("FacebookLogin: ", "Login Cancelled");
+                System.out.println("onCancel");
             }
 
             @Override
-            public void onError(FacebookException error) {
-                Log.e("FacebookLogin: ", error.toString());
+            public void onError(FacebookException exception) {
+                System.out.println("onError");
+                Log.v("LoginActivity", exception.getCause().toString());
             }
         });
     }
+
+
+
+    private Bundle getFacebookData(JSONObject object) {
+
+        try {
+            Bundle bundle = new Bundle();
+            String id = object.getString("id");
+
+            try {
+                URL profile_pic = new URL("https://graph.facebook.com/" + id + "/picture?width=200&height=150");
+                Log.i("profile_pic", profile_pic + "");
+                bundle.putString("profile_pic", profile_pic.toString());
+
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+                return null;
+            }
+
+            bundle.putString("idFacebook", id);
+            if (object.has("first_name"))
+                bundle.putString("first_name", object.getString("first_name"));
+            if (object.has("last_name"))
+                bundle.putString("last_name", object.getString("last_name"));
+            if (object.has("email"))
+                bundle.putString("email", object.getString("email"));
+            if (object.has("gender"))
+                bundle.putString("gender", object.getString("gender"));
+            if (object.has("birthday"))
+                bundle.putString("birthday", object.getString("birthday"));
+            if (object.has("location"))
+                bundle.putString("location", object.getJSONObject("location").getString("name"));
+
+            return bundle;
+        }
+        catch(JSONException e) {
+            Log.d("JSONException", e.toString());
+            return null;
+        }
+    }
+
+
 
     /**
      * initializeTokens initializes the AccessToken, AccessTokenTracker, and ProfileTracker.
      *
      */
     private void initializeTokens() {
+        // Initialize AccessToken Tracker
         mAccessTokenTracker = new AccessTokenTracker() {
             @Override
             protected void onCurrentAccessTokenChanged(
@@ -112,7 +180,6 @@ public class LoginActivity extends FragmentActivity{
         super.onResume();
         //Facebook login
         nextActivity();
-        //checkIfProfileExists();
     }
 
     @Override
