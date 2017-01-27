@@ -36,7 +36,7 @@ public class LoginActivity extends FragmentActivity{
     private String mUserEmail;
 
     private static final String DATABASE_CONNECTION_LINK =
-            "http://athena.ecs.csus.edu/~teamone/php/query.php";
+            "http://athena.ecs.csus.edu/~teamone/php/user_insert.php";
 
     // Login requests permission to access user's email and friends list
     private final List<String> mPermissions = Arrays.asList("email", "user_friends");
@@ -79,6 +79,14 @@ public class LoginActivity extends FragmentActivity{
                         Bundle bFacebookData = getFacebookData(object);
                         try {
                             Log.v("DATA BITCH", bFacebookData.toString());
+
+                            // Update Database
+                            SigninActivity userSignin = new SigninActivity();
+                            userSignin.execute(DATABASE_CONNECTION_LINK,
+                                    bFacebookData.getString("email"));
+
+                            nextActivity();
+
                         } catch (NullPointerException e) {
                             Log.e("ERRR", e.toString());
                         }
