@@ -22,11 +22,7 @@ public class MainActivity extends AppCompatActivity {
     private String mUserEmail;
 
     private static final String DATABASE_CONNECTION_LINK =
-            "http://athena.ecs.csus.edu/~teamone/php";
-    private static final String DATABASE_CHECK_USER_LINK = "post_fb_id.php";
-    private static final String DATABASE_CREATE_USER_LINK = "test.php";
-    private static final String DATABASE_ID_FIELD_NAME = "user_id";
-
+            "http://athena.ecs.csus.edu/~teamone/php/user_insert.php";
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -41,8 +37,6 @@ public class MainActivity extends AppCompatActivity {
             startActivity(intent);
         } else {
             getUserFacebookEmail();
-            checkIfProfileExists();
-            //createLayout();
         }
     }
 
@@ -60,6 +54,8 @@ public class MainActivity extends AppCompatActivity {
                             GraphResponse response) {
                         try {
                             mUserEmail = object.getString("email");
+                            SigninActivity userSignin = new SigninActivity(); // check if user exists on database
+                            userSignin.execute(DATABASE_CONNECTION_LINK, mUserEmail);
                             Log.v("Response: ", object.getString("email"));
                         } catch (JSONException e) {
                             Log.e("GraphRequest: ", e.toString());
@@ -90,21 +86,5 @@ public class MainActivity extends AppCompatActivity {
             return true;
         }
         return super.onOptionsItemSelected(item);
-    }
-/*
-    private void createLayout() {
-        View eventLayout = findViewById(R.id.event_view_linear_layout);
-        LinearLayout event = findViewById(R.layout.event_layout);
-    }
-*/
-
-    // Check if the user profile exists on the database, if not create one
-    private void checkIfProfileExists() {
-        // Grab the user id
-        String userId = AccessToken.getCurrentAccessToken().getUserId();
-        // Create a SigninActivity to sign the user in
-        SigninActivity userSignin = new SigninActivity();
-        userSignin.execute(DATABASE_CONNECTION_LINK, DATABASE_CHECK_USER_LINK,
-                DATABASE_CREATE_USER_LINK, DATABASE_ID_FIELD_NAME, userId, mUserEmail);
     }
 }

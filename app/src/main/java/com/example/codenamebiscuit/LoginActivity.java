@@ -18,6 +18,7 @@ import com.facebook.login.widget.LoginButton;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 public class LoginActivity extends FragmentActivity{
     private CallbackManager mCallbackManager;
@@ -28,7 +29,6 @@ public class LoginActivity extends FragmentActivity{
 
     private static final String DATABASE_CONNECTION_LINK =
             "http://athena.ecs.csus.edu/~teamone/php/query.php";
-    private static final String DATABASE_ID_FIELD_NAME = "user_id";
 
     // Login requests permission to access user's email and friends list
     private final List<String> mPermissions = Arrays.asList("email", "user_friends");
@@ -52,8 +52,18 @@ public class LoginActivity extends FragmentActivity{
             @Override
             public void onSuccess(LoginResult loginResult) {
                 //getUserFacebookEmail(); // pull email from facebook
-                checkIfProfileExists(); // check if user exists on database
-                //nextActivity();
+                SigninActivity userSignin = new SigninActivity(); // check if user exists on database
+                userSignin.execute(DATABASE_CONNECTION_LINK);
+
+                try {
+                    userSignin.get();
+                    nextActivity();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                } catch (ExecutionException e) {
+                    e.printStackTrace();
+                }
+
             }
 
             @Override
@@ -129,19 +139,8 @@ public class LoginActivity extends FragmentActivity{
     }
 
     /**********************************************************************************************
-     Request Facebook Info
-     **********************************************************************************************/
-
-
-    /**********************************************************************************************
          Profile Checking
      **********************************************************************************************/
-
-    // Check if the user profile exists on the database, if not create one
-    private void checkIfProfileExists() {
-        String userId = AccessToken.getCurrentAccessToken().getUserId();
-        new SigninActivity().execute(DATABASE_CONNECTION_LINK, DATABASE_ID_FIELD_NAME, userId);
-    }
 
     // If there is an active AccessToken, go to the MainActivity
     private void nextActivity() {
