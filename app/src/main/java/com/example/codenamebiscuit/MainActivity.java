@@ -13,6 +13,7 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.example.codenamebiscuit.login.FacebookLoginActivity;
+import com.example.codenamebiscuit.rv.EventAdapter;
 import com.facebook.AccessToken;
 import com.facebook.FacebookSdk;
 import com.facebook.Profile;

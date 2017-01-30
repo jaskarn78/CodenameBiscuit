@@ -6,7 +6,6 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -55,6 +54,8 @@ public class UserSettingsActivity
         }
 
         initializeLogoutButton();
+
+        setupSharedPreferences();
     }
 
     /**
@@ -101,12 +102,22 @@ public class UserSettingsActivity
     }
 
     private void setupSharedPreferences() {
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        // Get all of the values from shared preferences to set it up
+        SharedPreferences sharedPreferences =
+                android.support.v7.preference.PreferenceManager.getDefaultSharedPreferences(this);
+
+        sharedPreferences.registerOnSharedPreferenceChangeListener(this);
     }
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-
+        if (key.equals(getString(R.string.pref_music_key))) {
+            if(sharedPreferences.getBoolean(getString(R.string.pref_music_key),
+                    getResources().getBoolean(R.bool.pref_music_value)))
+                Log.v("PREFERENCE", "Likes Music");
+            else
+                Log.v("PREFERENCE", "Doesn't Like Music");
+        }
     }
 
     /**
