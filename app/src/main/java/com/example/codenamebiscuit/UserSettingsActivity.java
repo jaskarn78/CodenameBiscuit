@@ -18,6 +18,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.codenamebiscuit.helper.RoundedImageView;
+import com.example.codenamebiscuit.login.FacebookLoginActivity;
 import com.facebook.AccessToken;
 import com.facebook.FacebookSdk;
 import com.facebook.Profile;

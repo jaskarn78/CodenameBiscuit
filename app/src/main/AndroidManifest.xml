@@ -31,7 +31,7 @@
                 android:value=".MainActivity" />
         </activity>
 
-        <activity android:name=".FacebookLoginActivity">
+        <activity android:name=".login.FacebookLoginActivity">
             <intent-filter>
                 <action android:name="android.intent.action.USER_INITIALIZE"/>
             </intent-filter>

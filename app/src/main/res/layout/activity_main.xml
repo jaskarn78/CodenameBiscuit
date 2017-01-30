@@ -7,26 +7,8 @@
     android:layout_height="match_parent"
     tools:context="com.example.codenamebiscuit.MainActivity">
 
-    <!--<include
-        android:layout="@layout/event_layout"/>-->
-    <LinearLayout
-        android:orientation="horizontal"
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/recyclerview_events"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom">
-        <Button
-            style="?android:button"
-            android:text="Remove"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_gravity="start"
-            android:layout_weight="1"/>
-        <Button
-            style="?android:button"
-            android:text="Save"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_gravity="end"
-            android:layout_weight="1"/>
-    </LinearLayout>
+        android:layout_height="match_parent"/>
 </LinearLayout>
