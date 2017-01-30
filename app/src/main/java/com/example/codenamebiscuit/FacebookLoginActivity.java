@@ -27,16 +27,11 @@ import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
 
-public class LoginActivity extends FragmentActivity{
+public class FacebookLoginActivity extends FragmentActivity{
     private CallbackManager mCallbackManager;
     private AccessTokenTracker mAccessTokenTracker;
     private ProfileTracker mProfileTracker;
-    private LoginButton mLoginButton;
     private ProgressDialog mProgressDialog;
-    private String mUserEmail;
-
-    private static final String DATABASE_CONNECTION_LINK =
-            "http://athena.ecs.csus.edu/~teamone/php/user_insert.php";
 
     // Login requests permission to access user's email and friends list
     private final List<String> mPermissions = Arrays.asList("email", "user_friends");
@@ -52,7 +47,7 @@ public class LoginActivity extends FragmentActivity{
         initializeTokens();
 
         // Initialize Facebook LoginButton
-        mLoginButton = (LoginButton)findViewById(R.id.facebook_login_button);
+        LoginButton mLoginButton = (LoginButton)findViewById(R.id.facebook_login_button);
 
         // Set permissions and register the callback
         mLoginButton.setReadPermissions(mPermissions);
@@ -63,7 +58,7 @@ public class LoginActivity extends FragmentActivity{
             public void onSuccess(LoginResult loginResult) {
 
                 System.out.println("onSuccess");
-                mProgressDialog = new ProgressDialog(LoginActivity.this);
+                mProgressDialog = new ProgressDialog(FacebookLoginActivity.this);
                 mProgressDialog.setMessage("Processing data...");
                 mProgressDialog.show();
                 String accessToken = loginResult.getAccessToken().getToken();
@@ -74,16 +69,15 @@ public class LoginActivity extends FragmentActivity{
 
                     @Override
                     public void onCompleted(JSONObject object, GraphResponse response) {
-                        Log.i("LoginActivity", response.toString());
+                        Log.i("FacebookLoginActivity", response.toString());
                         // Get facebook data from login
-                        Bundle bFacebookData = getFacebookData(object);
+                        JSONObject bFacebookData = getFacebookData(object);
                         try {
                             Log.v("DATA BITCH", bFacebookData.toString());
 
                             // Update Database
                             SigninActivity userSignin = new SigninActivity();
-                            userSignin.execute(DATABASE_CONNECTION_LINK,
-                                    bFacebookData.getString("email"));
+                            userSignin.execute(bFacebookData);
 
                             nextActivity();
 
@@ -106,44 +100,53 @@ public class LoginActivity extends FragmentActivity{
             @Override
             public void onError(FacebookException exception) {
                 System.out.println("onError");
-                Log.v("LoginActivity", exception.getCause().toString());
+                Log.v("FacebookLoginActivity", exception.getCause().toString());
             }
         });
     }
 
+    /**********************************************************************************************
+     Facebook Methods
+     **********************************************************************************************/
 
-
-    private Bundle getFacebookData(JSONObject object) {
+    /**
+     * getFacebookData(JSONObject object)
+     *  Takes a JSONObject full of the user's facebook information, and converts it to a normalized
+     *  version of the data to be used with the CodenameBiscuit application.
+     * @param object
+     * @return normalizedObj
+     */
+    private JSONObject getFacebookData(JSONObject object) {
 
         try {
-            Bundle bundle = new Bundle();
+            JSONObject normalizedObj = new JSONObject();
             String id = object.getString("id");
 
             try {
                 URL profile_pic = new URL("https://graph.facebook.com/" + id + "/picture?width=200&height=150");
                 Log.i("profile_pic", profile_pic + "");
-                bundle.putString("profile_pic", profile_pic.toString());
+                normalizedObj.put("profile_pic", profile_pic.toString());
 
             } catch (MalformedURLException e) {
                 e.printStackTrace();
                 return null;
             }
 
-            bundle.putString("idFacebook", id);
+            normalizedObj.put("user_id", id);
             if (object.has("first_name"))
-                bundle.putString("first_name", object.getString("first_name"));
+                normalizedObj.put("first_name", object.getString("first_name"));
             if (object.has("last_name"))
-                bundle.putString("last_name", object.getString("last_name"));
+                normalizedObj.put("last_name", object.getString("last_name"));
             if (object.has("email"))
-                bundle.putString("email", object.getString("email"));
+                normalizedObj.put("email", object.getString("email"));
             if (object.has("gender"))
-                bundle.putString("gender", object.getString("gender"));
+                normalizedObj.put("gender", object.getString("gender"));
             if (object.has("birthday"))
-                bundle.putString("birthday", object.getString("birthday"));
+                normalizedObj.put("birthday", object.getString("birthday"));
             if (object.has("location"))
-                bundle.putString("location", object.getJSONObject("location").getString("name"));
+                normalizedObj.put("location", object.getJSONObject("location").getString("name"));
 
-            return bundle;
+            return normalizedObj;
         }
         catch(JSONException e) {
             Log.d("JSONException", e.toString());
@@ -155,7 +158,6 @@ public class LoginActivity extends FragmentActivity{
 
     /**
      * initializeTokens initializes the AccessToken, AccessTokenTracker, and ProfileTracker.
-     *
      */
     private void initializeTokens() {
         // Initialize AccessToken Tracker
@@ -187,7 +189,7 @@ public class LoginActivity extends FragmentActivity{
     protected void onResume() {
         super.onResume();
         //Facebook login
-        nextActivity();
+        //nextActivity();
     }
 
     @Override
@@ -220,7 +222,7 @@ public class LoginActivity extends FragmentActivity{
     // If there is an active AccessToken, go to the MainActivity
     private void nextActivity() {
         if (AccessToken.getCurrentAccessToken() != null) {
-            Intent main = new Intent(LoginActivity.this, MainActivity.class);
+            Intent main = new Intent(FacebookLoginActivity.this, MainActivity.class);
             startActivity(main);
         }
     }

@@ -82,7 +82,7 @@ public class UserSettingsActivity
             @Override
             public void onClick(View view) {
                 LoginManager.getInstance().logOut();
-                Intent login = new Intent(UserSettingsActivity.this, LoginActivity.class);
+                Intent login = new Intent(UserSettingsActivity.this, FacebookLoginActivity.class);
                 startActivity(login);
                 finish();
             }

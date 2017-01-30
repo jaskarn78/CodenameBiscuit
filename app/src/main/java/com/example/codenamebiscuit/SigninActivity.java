@@ -3,9 +3,6 @@ package com.example.codenamebiscuit;
 import android.os.AsyncTask;
 import android.util.Log;
 
-import com.facebook.Profile;
-
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
@@ -20,33 +17,25 @@ import java.net.URLConnection;
  * Created by Tommy on /23/17.
  */
 
-public class SigninActivity extends AsyncTask<String, Void, Boolean> {
-    /* DATABASE VARIABLE NAMES FOR USERS TABLE */
-    private static final String USER_NAME_FIELD    = "user_name";
-    private static final String USER_EMAIL_FIELD   = "user_email";
-    private static final String USER_ID_FIELD      = "user_id";
-
-    private String mUserEmail;
+public class SigninActivity extends AsyncTask<JSONObject, Void, Boolean> {
+    private static final String DATABASE_CONNECTION_LINK =
+            "http://athena.ecs.csus.edu/~teamone/php/user_insert.php";
 
     @Override
-    protected Boolean doInBackground(String... strings) {
-        String link = strings[0];
-        mUserEmail = strings[1];
+    protected Boolean doInBackground(JSONObject... objs) {
+        JSONObject userInfo = objs[0];
 
         OutputStreamWriter wr = null;
         BufferedReader reader = null;
         try {
-            // Create User JSONObject
-            JSONObject obj = createUserJSON();
-
             String data;
-            if (obj != null)
-                data = obj.toString();  // data is the JSONObject being sent to the php server
+            if (userInfo != null)
+                data = userInfo.toString();  // data is the JSONObject being sent to the php server
             else
                 return false;
 
             // Connect to the URL
-            URL url = new URL(link);
+            URL url = new URL(DATABASE_CONNECTION_LINK);
             URLConnection conn = url.openConnection();
 
             conn.setDoOutput(true);
@@ -77,35 +66,6 @@ public class SigninActivity extends AsyncTask<String, Void, Boolean> {
         } catch (IOException e) {
             Log.e("IOException", e.toString());
             return false;
-        }
-    }
-
-
-    /**
-     * createUserJSON
-     *  Creates a JSONObject with the user's information stored inside of it.
-     *  Returns null if user profile does not exist
-     * @return JSONObject: JSONObject {"user_id", "user_name", "user_email"}
-     */
-    private JSONObject createUserJSON() {
-        // Grab the current user's facebook profile information
-        Profile userProfile = Profile.getCurrentProfile();
-        if (userProfile == null) {
-            return null;
-        }
-
-        try {
-            // grab the user information, if it does not exist it will be NULL
-            JSONObject jsonUser = new JSONObject();
-            jsonUser.put(USER_NAME_FIELD, userProfile.getName());
-            jsonUser.put(USER_ID_FIELD, userProfile.getId());
-            jsonUser.put(USER_EMAIL_FIELD, mUserEmail);
-
-            return jsonUser;
-
-        } catch (JSONException e) {
-            e.printStackTrace();
-            return null;
         }
     }
 }
