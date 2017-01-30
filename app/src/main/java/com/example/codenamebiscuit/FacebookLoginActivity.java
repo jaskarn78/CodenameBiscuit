@@ -138,13 +138,18 @@ public class FacebookLoginActivity extends FragmentActivity{
             if (object.has("last_name"))
                 normalizedObj.put("last_name", object.getString("last_name"));
             if (object.has("email"))
-                normalizedObj.put("email", object.getString("email"));
+                normalizedObj.put("user_email", object.getString("email"));
             if (object.has("gender"))
                 normalizedObj.put("gender", object.getString("gender"));
             if (object.has("birthday"))
                 normalizedObj.put("birthday", object.getString("birthday"));
             if (object.has("location"))
                 normalizedObj.put("location", object.getJSONObject("location").getString("name"));
+
+
+            /** For Now... **/
+            normalizedObj.put("user_name", object.getString("first_name")
+                    + " " + object.getString("last_name"));
 
             return normalizedObj;
         }
