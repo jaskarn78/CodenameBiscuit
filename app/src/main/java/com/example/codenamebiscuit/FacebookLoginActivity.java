@@ -71,9 +71,11 @@ public class FacebookLoginActivity extends FragmentActivity{
                     public void onCompleted(JSONObject object, GraphResponse response) {
                         Log.i("FacebookLoginActivity", response.toString());
                         // Get facebook data from login
-                        JSONObject bFacebookData = getFacebookData(object);
+                        JSONObject bFacebookData = createNormalizedJSONObject(object);
                         try {
-                            Log.v("DATA BITCH", bFacebookData.toString());
+                            if (bFacebookData != null) {
+                                Log.v("DATA BITCH", bFacebookData.toString());
+                            }
 
                             // Update Database
                             SigninActivity userSignin = new SigninActivity();
@@ -116,7 +118,7 @@ public class FacebookLoginActivity extends FragmentActivity{
      * @param object
      * @return normalizedObj
      */
-    private JSONObject getFacebookData(JSONObject object) {
+    private JSONObject createNormalizedJSONObject(JSONObject object) {
 
         try {
             JSONObject normalizedObj = new JSONObject();
