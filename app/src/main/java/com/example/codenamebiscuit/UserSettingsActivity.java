@@ -247,7 +247,7 @@ public class UserSettingsActivity
             JSONObject preferenceJSON = new JSONObject();
 
             preferenceJSON.put("user_id", AccessToken.getCurrentAccessToken().getUserId());
-            preferenceJSON.put("pref_id", "2");
+            preferenceJSON.put("pref_id", mPreferenceString);
 
             return preferenceJSON;
         }

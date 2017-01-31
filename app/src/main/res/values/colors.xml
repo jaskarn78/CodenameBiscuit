@@ -3,4 +3,6 @@
     <color name="colorPrimary">#3F51B5</color>
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#5694f7</color>
+    <color name="livinWhite">#ffffff</color>
+    <color name="livinBlack">#000000</color>
 </resources>
