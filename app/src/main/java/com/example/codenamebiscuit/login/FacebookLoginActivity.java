@@ -151,10 +151,6 @@ public class FacebookLoginActivity extends FragmentActivity{
                 normalizedObj.put("location", object.getJSONObject("location").getString("name"));
 
 
-            /** For Now... **/
-            normalizedObj.put("user_name", object.getString("first_name")
-                    + " " + object.getString("last_name"));
-
             return normalizedObj;
         }
         catch(JSONException e) {

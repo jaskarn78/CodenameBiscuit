@@ -72,8 +72,8 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
         String eventName = null;
         String eventLoc  = null;
         try {
-            eventName = mEventData.get(position).getString("event_Name");
-            eventLoc  = mEventData.get(position).getString("event_Location");
+            eventName = mEventData.get(position).getString("event_name");
+            eventLoc  = mEventData.get(position).getString("event_location");
         } catch (JSONException e) {
             e.printStackTrace();
         }

@@ -16,7 +16,6 @@ import com.example.codenamebiscuit.login.FacebookLoginActivity;
 import com.example.codenamebiscuit.rv.EventAdapter;
 import com.facebook.AccessToken;
 import com.facebook.FacebookSdk;
-import com.facebook.Profile;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -36,9 +35,7 @@ import static android.R.attr.data;
 public class MainActivity extends AppCompatActivity {
     private RecyclerView mRecyclerView;
     private EventAdapter mEventAdapter;
-    private Profile mUserProfile;
-    private String mUserEmail;
-    private ArrayList<JSONObject> mEventList;
+
 
     private static final String DATABASE_CONNECTION_LINK =
             "http://athena.ecs.csus.edu/~teamone/php/user_insert.php";
@@ -48,8 +45,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         FacebookSdk.sdkInitialize(getApplicationContext());
         setContentView(R.layout.activity_main);
-
-        mUserProfile = Profile.getCurrentProfile();
 
         if (AccessToken.getCurrentAccessToken() == null) {
             Intent intent = new Intent(MainActivity.this, FacebookLoginActivity.class);
@@ -146,8 +141,8 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(ArrayList<JSONObject> objs) {
             if (objs != null) {
-                mEventList = objs;
-                mEventAdapter.setEventData(mEventList);
+                ArrayList<JSONObject> eventList = objs;
+                mEventAdapter.setEventData(eventList);
                 mRecyclerView.setVisibility(View.VISIBLE);
             }
         }
