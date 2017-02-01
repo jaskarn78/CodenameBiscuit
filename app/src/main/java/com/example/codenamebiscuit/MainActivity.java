@@ -66,8 +66,9 @@ public class MainActivity extends AppCompatActivity {
             Intent intent = new Intent(MainActivity.this, FacebookLoginActivity.class);
             startActivity(intent);
         }
+
         try {
-            currentUserId.put("user_id", AccessToken.getCurrentAccessToken().getUserId().toString());
+            currentUserId.put("user_id", AccessToken.getCurrentAccessToken().getUserId());
             Log.v("PrintLine", AccessToken.getCurrentAccessToken().getUserId());
 
         } catch (JSONException e) {
@@ -88,22 +89,28 @@ public class MainActivity extends AppCompatActivity {
      * background method to get the weather data in the background.
      */
     private void loadEventData() {
-        new pushUserId().execute(currentUserId);
         mRecyclerView.setVisibility(View.VISIBLE);
-        new QueryEventsList().execute();
+        new QueryEventsList().execute(currentUserId);
     }
 
-    public class QueryEventsList extends AsyncTask<Void, Void, ArrayList<JSONObject>> {
+    public class QueryEventsList extends AsyncTask<JSONObject, Void, ArrayList<JSONObject>> {
         private static final String DATABASE_MAIN_EVENTS_PULLER =
                 "http://athena.ecs.csus.edu/~teamone/php/pull_main_events_list.php";
 
 
         @Override
-        protected ArrayList<JSONObject> doInBackground(Void... voids) {
+        protected ArrayList<JSONObject> doInBackground(JSONObject... objs) {
+            JSONObject userJSON = objs[0];
 
             OutputStreamWriter wr = null;
             BufferedReader reader = null;
             try {
+                String data;
+                if (userJSON != null)
+                    data = userJSON.toString();  // data is the JSONObject being sent to the php server
+                else
+                    return null;
+
                 // Connect to the URL
                 URL url = new URL(DATABASE_MAIN_EVENTS_PULLER);
                 URLConnection conn = url.openConnection();
