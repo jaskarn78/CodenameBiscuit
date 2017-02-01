@@ -1,16 +1,11 @@
 package com.example.codenamebiscuit;
 
-import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
-import android.content.pm.Signature;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Base64;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -33,8 +28,6 @@ import java.io.OutputStreamWriter;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 
 import static android.R.attr.data;
@@ -42,6 +35,7 @@ import static android.R.attr.data;
 public class MainActivity extends AppCompatActivity {
     private RecyclerView mRecyclerView;
     private EventAdapter mEventAdapter;
+    private JSONObject currentUserId = new JSONObject();
 
 
     private static final String DATABASE_CONNECTION_LINK =
@@ -53,6 +47,7 @@ public class MainActivity extends AppCompatActivity {
         FacebookSdk.sdkInitialize(getApplicationContext());
         setContentView(R.layout.activity_main);
         mRecyclerView = (RecyclerView) findViewById(R.id.recyclerview_events);
+
 
         LinearLayoutManager layoutManager
                 = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
@@ -71,6 +66,13 @@ public class MainActivity extends AppCompatActivity {
             Intent intent = new Intent(MainActivity.this, FacebookLoginActivity.class);
             startActivity(intent);
         }
+        try {
+            currentUserId.put("user_id", AccessToken.getCurrentAccessToken().getUserId().toString());
+            Log.v("PrintLine", AccessToken.getCurrentAccessToken().getUserId());
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
 
 
     }
@@ -86,6 +88,7 @@ public class MainActivity extends AppCompatActivity {
      * background method to get the weather data in the background.
      */
     private void loadEventData() {
+        new pushUserId().execute(currentUserId);
         mRecyclerView.setVisibility(View.VISIBLE);
         new QueryEventsList().execute();
     }
@@ -93,6 +96,7 @@ public class MainActivity extends AppCompatActivity {
     public class QueryEventsList extends AsyncTask<Void, Void, ArrayList<JSONObject>> {
         private static final String DATABASE_MAIN_EVENTS_PULLER =
                 "http://athena.ecs.csus.edu/~teamone/php/pull_main_events_list.php";
+
 
         @Override
         protected ArrayList<JSONObject> doInBackground(Void... voids) {

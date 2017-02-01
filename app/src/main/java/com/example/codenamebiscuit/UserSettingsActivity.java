@@ -37,7 +37,6 @@ public class UserSettingsActivity
 
     private TextView mNameView; // User's name
 
-    private String mPreferenceString;
 
     private boolean mMusicPreference;
     private boolean mFoodDrinkPreference;
@@ -72,7 +71,11 @@ public class UserSettingsActivity
         }
 
         initializeLogoutButton();
-        setupSharedPreferences();
+        try {
+            setupSharedPreferences();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -122,7 +125,7 @@ public class UserSettingsActivity
         return super.onOptionsItemSelected(item);
     }
 
-    private void setupSharedPreferences() {
+    private void setupSharedPreferences() throws JSONException {
         // Get all of the values from shared preferences to set it up
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 
@@ -144,9 +147,18 @@ public class UserSettingsActivity
                 getResources().getBoolean(R.bool.pref_performing_arts_value));
         mEntertainmentPreference = sharedPreferences.getBoolean(getString(R.string.pref_entertainment_key),
                 getResources().getBoolean(R.bool.pref_entertainment_value));
+        pref.put("pref_id1", mMusicPreference);
+        pref.put("pref_id2", mFoodDrinkPreference);
+        pref.put("pref_id3", mSportsPreference);
+        pref.put("pref_id4", mOutdoorPreference);
+        pref.put("pref_id5", mHealthFitnessPreference);
+        pref.put("pref_id6", mFamilyFriendlyPreference);
+        pref.put("pref_id7", mRetailPreference);
+        pref.put("pref_id8", mPerformingArtsPreference);
+        pref.put("pref_id9", mEntertainmentPreference);
+
 
         sharedPreferences.registerOnSharedPreferenceChangeListener(this);
-        //createPreferenceString();
     }
 
     @Override
@@ -158,7 +170,6 @@ public class UserSettingsActivity
             if (mMusicPreference) {
                 try {
                     pref.put("pref_id1", mMusicPreference);
-
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
