@@ -4,20 +4,13 @@ package com.example.codenamebiscuit;
  * Created by jaskarnjagpal on 1/31/17.
  */
 import android.app.Activity;
-import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.LinearLayoutCompat;
-import android.view.View;
-import android.view.Window;
-import android.widget.LinearLayout;
 import android.widget.ProgressBar;
-import android.widget.RelativeLayout;
-import android.widget.Toast;
+
 
 public class SplashScreen extends Activity {
     //Splash screen timer

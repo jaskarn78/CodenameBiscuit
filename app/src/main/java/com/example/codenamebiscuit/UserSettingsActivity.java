@@ -1,5 +1,6 @@
 package com.example.codenamebiscuit;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
@@ -47,6 +48,7 @@ public class UserSettingsActivity
     private boolean mRetailPreference;
     private boolean mPerformingArtsPreference;
     private boolean mEntertainmentPreference;
+    private JSONObject pref = new JSONObject();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,15 +77,16 @@ public class UserSettingsActivity
 
     /**
      * initializeProfileInfo
-     *  Takes a Bundle, and uses information in Bundle to create the ImageView and TextView
+     * Takes a Bundle, and uses information in Bundle to create the ImageView and TextView
+     *
      * @param profile
      */
     private void initializeProfileInfo(Profile profile) {
         String name = profile.getFirstName();
         String surname = profile.getLastName();
-        String imageUrl = profile.getProfilePictureUri(200,200).toString();
+        String imageUrl = profile.getProfilePictureUri(200, 200).toString();
 
-        new DownloadImage((RoundedImageView)findViewById(R.id.pref_user_image)).execute(imageUrl);
+        new DownloadImage((RoundedImageView) findViewById(R.id.pref_user_image)).execute(imageUrl);
 
         mNameView = (TextView) findViewById(R.id.pref_user_name);
         mNameView.setText(name + " " + surname);
@@ -112,6 +115,9 @@ public class UserSettingsActivity
         // When the home button is pressed, take the user back to the VisualizerActivity
         if (id == android.R.id.home) {
             NavUtils.navigateUpFromSameTask(this);
+            Intent intent = new Intent(this, MainActivity.class);
+            finish();
+            startActivity(intent);
         }
         return super.onOptionsItemSelected(item);
     }
@@ -140,43 +146,184 @@ public class UserSettingsActivity
                 getResources().getBoolean(R.bool.pref_entertainment_value));
 
         sharedPreferences.registerOnSharedPreferenceChangeListener(this);
-        createPreferenceString();
+        //createPreferenceString();
     }
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+
         if (key.equals(getString(R.string.pref_music_key))) {
             mMusicPreference = sharedPreferences.getBoolean(getString(R.string.pref_music_key),
                     getResources().getBoolean(R.bool.pref_music_value));
-        } else if (key.equals(getString(R.string.pref_food_drink_key))) {
+            if (mMusicPreference) {
+                try {
+                    pref.put("pref_id1", mMusicPreference);
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            } else {
+                try {
+                    pref.put("pref_id1", 0);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+
+        }
+        if (key.equals(getString(R.string.pref_food_drink_key))) {
             mFoodDrinkPreference = sharedPreferences.getBoolean(getString(R.string.pref_food_drink_key),
                     getResources().getBoolean(R.bool.pref_food_drink_value));
-        } else if (key.equals(getString(R.string.pref_sports_key))) {
+            if (mFoodDrinkPreference) {
+                try {
+                    pref.put("pref_id2", mFoodDrinkPreference);
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            } else {
+                try {
+                    pref.put("pref_id2", 0);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        if (key.equals(getString(R.string.pref_sports_key))) {
             mSportsPreference = sharedPreferences.getBoolean(getString(R.string.pref_sports_key),
                     getResources().getBoolean(R.bool.pref_sports_value));
-        } else if (key.equals(getString(R.string.pref_food_drink_key))) {
+            if (mSportsPreference) {
+                try {
+                    pref.put("pref_id3", mSportsPreference);
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            } else {
+                try {
+                    pref.put("pref_id3", 0);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        if (key.equals(getString(R.string.pref_outdoor_key))) {
             mOutdoorPreference = sharedPreferences.getBoolean(getString(R.string.pref_outdoor_key),
                     getResources().getBoolean(R.bool.pref_outdoor_value));
-        } else if (key.equals(getString(R.string.pref_food_drink_key))) {
+            if (mOutdoorPreference) {
+                try {
+                    pref.put("pref_id4", mOutdoorPreference);
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            } else {
+                try {
+                    pref.put("pref_id4", 0);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        if (key.equals(getString(R.string.pref_health_fitness_key))) {
             mHealthFitnessPreference = sharedPreferences.getBoolean(getString(R.string.pref_health_fitness_key),
                     getResources().getBoolean(R.bool.pref_health_fitness_value));
-        } else if (key.equals(getString(R.string.pref_food_drink_key))) {
+            if (mHealthFitnessPreference) {
+                try {
+                    pref.put("pref_id5", mHealthFitnessPreference);
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            } else {
+                try {
+                    pref.put("pref_id5", 0);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        if (key.equals(getString(R.string.pref_family_friendly_key))) {
             mFamilyFriendlyPreference = sharedPreferences.getBoolean(getString(R.string.pref_family_friendly_key),
                     getResources().getBoolean(R.bool.pref_family_friendly_value));
-        } else if (key.equals(getString(R.string.pref_food_drink_key))) {
+            if (mFamilyFriendlyPreference) {
+                try {
+                    pref.put("pref_id6", mFamilyFriendlyPreference);
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            } else {
+                try {
+                    pref.put("pref_id6", 0);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        if (key.equals(getString(R.string.pref_retail_key))) {
             mRetailPreference = sharedPreferences.getBoolean(getString(R.string.pref_retail_key),
                     getResources().getBoolean(R.bool.pref_retail_value));
-        } else if (key.equals(getString(R.string.pref_food_drink_key))) {
+            if (mRetailPreference) {
+                try {
+                    pref.put("pref_id7", mRetailPreference);
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            } else {
+                try {
+                    pref.put("pref_id7", 0);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        if (key.equals(getString(R.string.pref_performing_arts_key))) {
             mPerformingArtsPreference = sharedPreferences.getBoolean(getString(R.string.pref_performing_arts_key),
                     getResources().getBoolean(R.bool.pref_performing_arts_value));
+            if (mPerformingArtsPreference) {
+                try {
+                    pref.put("pref_id8", mPerformingArtsPreference);
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            } else {
+                try {
+                    pref.put("pref_id8", 0);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
         } else if (key.equals(getString(R.string.pref_food_drink_key))) {
             mEntertainmentPreference = sharedPreferences.getBoolean(getString(R.string.pref_entertainment_key),
                     getResources().getBoolean(R.bool.pref_entertainment_value));
+            if (mEntertainmentPreference) {
+                try {
+                    pref.put("pref_id9", mEntertainmentPreference);
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            } else {
+                try {
+                    pref.put("pref_id9", 0);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        try {
+            pref.put("user_id", AccessToken.getCurrentAccessToken().getUserId());
+        } catch (JSONException e) {
+            e.printStackTrace();
         }
 
-        createPreferenceString();
-        new ChangePreferences().execute(createUserPreferencesJSON());
+        new ChangePreferences().execute(pref);
     }
+
+
 
     /**
      * DownloadImage class runs background process to find user's facebook image
@@ -210,55 +357,5 @@ public class UserSettingsActivity
             }
         }
     }
-
-
-    /**
-     * createPreferenceJSONObject
-     */
-    private void createPreferenceString () {
-
-        String preferences = "";
-
-        if (mMusicPreference)
-            preferences += getResources().getInteger(R.integer.pref_music_identifier);
-        if (mFoodDrinkPreference)
-            preferences += getResources().getInteger(R.integer.pref_food_drink_identifier);
-        if (mSportsPreference)
-            preferences += getResources().getInteger(R.integer.pref_sports_identifier);
-        if (mOutdoorPreference)
-            preferences += getResources().getInteger(R.integer.pref_outdoor_identifier);
-        if (mHealthFitnessPreference)
-            preferences += getResources().getInteger(R.integer.pref_health_fitness_identifier);
-        if (mFamilyFriendlyPreference)
-            preferences += getResources().getInteger(R.integer.pref_family_friendly_identifier);
-        if (mRetailPreference)
-            preferences += getResources().getInteger(R.integer.pref_retail_identifier);
-        if (mPerformingArtsPreference)
-            preferences += getResources().getInteger(R.integer.pref_performing_arts_identifier);
-        if (mEntertainmentPreference)
-            preferences += getResources().getInteger(R.integer.pref_entertainment_identifier);
-
-        mPreferenceString = preferences;
-    }
-
-    private JSONObject createUserPreferencesJSON () {
-
-        try {
-            JSONObject preferenceJSON = new JSONObject();
-
-            preferenceJSON.put("user_id", AccessToken.getCurrentAccessToken().getUserId());
-            preferenceJSON.put("pref_id", mPreferenceString);
-
-            return preferenceJSON;
-        }
-        catch(JSONException e) {
-            Log.d("JSONException", e.toString());
-            return null;
-        }
-    }
-
-    public String getPreferenceString() {
-        createPreferenceString();
-        return mPreferenceString;
-    }
 }
+

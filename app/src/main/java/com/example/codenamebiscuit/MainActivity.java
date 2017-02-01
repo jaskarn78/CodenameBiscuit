@@ -1,11 +1,16 @@
 package com.example.codenamebiscuit;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
+import android.content.pm.Signature;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Base64;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -28,6 +33,8 @@ import java.io.OutputStreamWriter;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 
 import static android.R.attr.data;
@@ -45,17 +52,11 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         FacebookSdk.sdkInitialize(getApplicationContext());
         setContentView(R.layout.activity_main);
-
-        if (AccessToken.getCurrentAccessToken() == null) {
-            Intent intent = new Intent(MainActivity.this, FacebookLoginActivity.class);
-            startActivity(intent);
-        }
-
         mRecyclerView = (RecyclerView) findViewById(R.id.recyclerview_events);
-
 
         LinearLayoutManager layoutManager
                 = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
+
 
         mRecyclerView.setLayoutManager(layoutManager);
 
@@ -64,8 +65,20 @@ public class MainActivity extends AppCompatActivity {
         mEventAdapter = new EventAdapter();
 
         mRecyclerView.setAdapter(mEventAdapter);
-
         loadEventData();
+
+        if (AccessToken.getCurrentAccessToken() == null) {
+            Intent intent = new Intent(MainActivity.this, FacebookLoginActivity.class);
+            startActivity(intent);
+        }
+
+
+    }
+    @Override
+    public void onResume() {  // After a pause OR at startup
+        super.onResume();
+        loadEventData();
+        //Refresh your stuff here
     }
 
     /**
@@ -144,8 +157,11 @@ public class MainActivity extends AppCompatActivity {
                 ArrayList<JSONObject> eventList = objs;
                 mEventAdapter.setEventData(eventList);
                 mRecyclerView.setVisibility(View.VISIBLE);
+
             }
+
         }
+
     }
 
 
@@ -170,4 +186,5 @@ public class MainActivity extends AppCompatActivity {
         }
         return super.onOptionsItemSelected(item);
     }
+
 }
