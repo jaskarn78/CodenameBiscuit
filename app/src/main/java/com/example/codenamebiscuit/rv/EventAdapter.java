@@ -1,37 +1,69 @@
 package com.example.codenamebiscuit.rv;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.codenamebiscuit.R;
-
+import com.squareup.picasso.Picasso;
+import com.squareup.picasso.Target;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.IOException;
 import java.util.ArrayList;
 
 public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapterViewHolder> {
     private ArrayList<JSONObject> mEventData;
 
     public EventAdapter() {
-
     }
 
     /**
      * Cache of the children views for a forecast list item.
      */
     public class EventAdapterViewHolder extends RecyclerView.ViewHolder {
-        public final TextView mEventNameTV;
+        //public final TextView mEventNameTV;
+        public final TextView mEventPreferenceTV;
         public final TextView mEventLocationTV;
+        public final ImageView mEventImage;
+        Target target = new Target() {
+            @Override
+            public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+                mEventImage.setImageBitmap(bitmap);
+
+            }
+
+            @Override
+            public void onBitmapFailed(Drawable errorDrawable) {
+                mEventImage.setImageResource(R.drawable.error);
+
+            }
+
+            @Override
+            public void onPrepareLoad(Drawable placeHolderDrawable) {
+                mEventImage.setImageResource(R.drawable.placeholder);
+                Toast.makeText(mEventImage.getContext(),
+                        "Loading Event Images...", Toast.LENGTH_SHORT).show();
+
+            }
+        };
 
         public EventAdapterViewHolder(View view) {
             super(view);
-            mEventNameTV = (TextView) view.findViewById(R.id.tv_event_name);
-            mEventLocationTV = (TextView) view.findViewById(R.id.tv_event_location);
+           // mEventNameTV = (TextView) view.findViewById(R.id.tv_event_name);
+            mEventPreferenceTV = (TextView) view.findViewById(R.id.tv_event_preference);
+            mEventLocationTV = (TextView)view.findViewById(R.id.tv_event_location);
+            mEventImage = (ImageView)view.findViewById(R.id.iv_event_image);
         }
     }
 
@@ -67,20 +99,48 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
      *                                  contents of the item at the given position in the data set.
      * @param position                  The position of the item within the adapter's data set.
      */
+
     @Override
-    public void onBindViewHolder(EventAdapterViewHolder eventAdapterViewHolder, int position) {
-        String eventName = null;
-        String eventLoc  = null;
+    public void onBindViewHolder(final EventAdapterViewHolder eventAdapterViewHolder, int position) {
+        String eventLocation = null;
+        String eventPref  = null;
+        String eventPath = null;
+        final Target target = new Target() {
+            @Override
+            public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+                eventAdapterViewHolder.mEventImage.setImageBitmap(bitmap);
+                Log.v("Success", "image created from url");
+            }
+
+            @Override
+            public void onBitmapFailed(Drawable errorDrawable) {
+                eventAdapterViewHolder.mEventImage.setImageResource(R.drawable.error);
+                Log.e("Error", "Bitmap not created from URL");
+            }
+
+            @Override
+            public void onPrepareLoad(Drawable placeHolderDrawable) {
+                eventAdapterViewHolder.mEventImage.setImageResource(R.drawable.placeholder);
+
+            }
+        };
         try {
-            eventName = mEventData.get(position).getString("event_name");
-            eventLoc  = mEventData.get(position).getString("preference_name");
+            eventLocation = mEventData.get(position).getString("event_location");
+            eventPref  = mEventData.get(position).getString("preference_name");
+            eventPath  = mEventData.get(position).getString("img_path");
         } catch (JSONException e) {
             e.printStackTrace();
         }
 
-        eventAdapterViewHolder.mEventNameTV.setText(eventName);
-        eventAdapterViewHolder.mEventLocationTV.setText(eventLoc);
+        //eventAdapterViewHolder.mEventNameTV.setText(eventName);
+        eventAdapterViewHolder.mEventPreferenceTV.setText(eventPref);
+        eventAdapterViewHolder.mEventLocationTV.setText(eventLocation);
+        Picasso.with(eventAdapterViewHolder.mEventImage.getContext()).
+                load(getImageURL(eventPath)).into(target);
+
+
     }
+
 
     /**
      * This method simply returns the number of items to display. It is used behind the scenes
@@ -103,5 +163,8 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
     public void setEventData(ArrayList<JSONObject> eventData) {
         mEventData = eventData;
         notifyDataSetChanged();
+    }
+    public String getImageURL(String path){
+        return "http://athena.ecs.csus.edu/~teamone/AndroidUploadImage/uploads/"+path;
     }
 }
