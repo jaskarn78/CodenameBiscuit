@@ -3,6 +3,7 @@ package com.example.codenamebiscuit;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -11,6 +12,9 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.example.codenamebiscuit.helper.QueryEventList;
@@ -24,21 +28,13 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLConnection;
-import java.util.ArrayList;
-
-import static android.R.attr.data;
 
 public class MainActivity extends AppCompatActivity {
     private RecyclerView mRecyclerView;
     private EventAdapter mEventAdapter;
     private JSONObject currentUserId = new JSONObject();
+    private SwipeRefreshLayout swipeContainer;
+    private ImageView iv;
 
 
     private static final String DATABASE_CONNECTION_LINK =
@@ -48,9 +44,28 @@ public class MainActivity extends AppCompatActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         FacebookSdk.sdkInitialize(getApplicationContext());
+
+        //Remove title bar
+        this.requestWindowFeature(Window.FEATURE_NO_TITLE);
+
+        //Remove notification bar
+        this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+
         setContentView(R.layout.activity_main);
         mRecyclerView = (RecyclerView) findViewById(R.id.recyclerview_events);
-
+        swipeContainer = (SwipeRefreshLayout)findViewById(R.id.swipeContainer);
+        iv=(ImageView)findViewById(R.id.full_screen_image);
+        swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                loadEventData();
+                swipeContainer.setRefreshing(false);
+            }
+        });
+        swipeContainer.setColorSchemeResources(android.R.color.holo_blue_bright,
+                android.R.color.holo_green_light,
+                android.R.color.holo_orange_light,
+                android.R.color.holo_red_light);
 
 
         LinearLayoutManager layoutManager
@@ -61,14 +76,14 @@ public class MainActivity extends AppCompatActivity {
 
         mEventAdapter = new EventAdapter();
         mRecyclerView.setAdapter(mEventAdapter);
-
         mRecyclerView.addOnItemTouchListener(new RecyclerItemClickListener(
                 getApplicationContext(), mRecyclerView, new RecyclerItemClickListener.OnItemClickListener(){
 
             @Override
-            public void onItemClick(View view, int position) {
+            public void onItemClick(View v, int position) throws JSONException {
                 Log.v("input", String.valueOf(position));
                 Toast.makeText(getApplicationContext(), "Click on item "+position+"", Toast.LENGTH_SHORT).show();
+
             }
             @Override
             public void onLongItemClick(View view, int position) {
@@ -76,12 +91,10 @@ public class MainActivity extends AppCompatActivity {
             }
         }));
 
-
         if (AccessToken.getCurrentAccessToken() == null) {
             Intent intent = new Intent(MainActivity.this, FacebookLoginActivity.class);
             startActivity(intent);
         }
-
         try {
             currentUserId.put("user_id", AccessToken.getCurrentAccessToken().getUserId());
             Log.v("PrintLine", AccessToken.getCurrentAccessToken().getUserId());
@@ -99,13 +112,19 @@ public class MainActivity extends AppCompatActivity {
         //Refresh your stuff here
     }
 
+
     /**
      * This method will get the user's preferred location for weather, and then tell some
      * background method to get the weather data in the background.
      */
     private void loadEventData() {
-        mRecyclerView.setVisibility(View.VISIBLE);
         new QueryEventList(mEventAdapter, mRecyclerView).execute(currentUserId);
+        mRecyclerView.setVisibility(View.VISIBLE);
+
+    }
+    public void showImageActivity(){
+
+
     }
 
 

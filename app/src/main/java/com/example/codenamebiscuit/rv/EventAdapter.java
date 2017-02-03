@@ -21,6 +21,7 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapterViewHolder> {
     private ArrayList<JSONObject> mEventData;
@@ -28,9 +29,7 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
     public EventAdapter() {
     }
 
-    /**
-     * Cache of the children views for a forecast list item.
-     */
+
     public class EventAdapterViewHolder extends RecyclerView.ViewHolder {
         //public final TextView mEventNameTV;
         public final TextView mEventPreferenceTV;
@@ -154,6 +153,8 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
         return mEventData.size();
     }
 
+
+
     /**
      * This method is used to set the event data if we haven't set it yet. This is handy when we
      * get new data from the web but don't want to create a new EventAdapter to display it.
@@ -166,5 +167,18 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
     }
     public String getImageURL(String path){
         return "http://athena.ecs.csus.edu/~teamone/AndroidUploadImage/uploads/"+path;
+    }
+    public void clear(){
+        mEventData.clear();
+        notifyDataSetChanged();
+    }
+    //add a list of items
+    public void addAll(ArrayList<JSONObject> list){
+        mEventData.addAll(list);
+        notifyDataSetChanged();
+
+    }
+    public JSONObject getObject(int position){
+        return mEventData.get(position);
     }
 }
