@@ -11,7 +11,10 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
 
+import com.example.codenamebiscuit.helper.QueryEventList;
+import com.example.codenamebiscuit.helper.RecyclerItemClickListener;
 import com.example.codenamebiscuit.login.FacebookLoginActivity;
 import com.example.codenamebiscuit.rv.EventAdapter;
 import com.facebook.AccessToken;
@@ -49,18 +52,30 @@ public class MainActivity extends AppCompatActivity {
         mRecyclerView = (RecyclerView) findViewById(R.id.recyclerview_events);
 
 
+
         LinearLayoutManager layoutManager
                 = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
 
-
         mRecyclerView.setLayoutManager(layoutManager);
-
         mRecyclerView.setHasFixedSize(true);
 
         mEventAdapter = new EventAdapter();
-
         mRecyclerView.setAdapter(mEventAdapter);
-        loadEventData();
+
+        mRecyclerView.addOnItemTouchListener(new RecyclerItemClickListener(
+                getApplicationContext(), mRecyclerView, new RecyclerItemClickListener.OnItemClickListener(){
+
+            @Override
+            public void onItemClick(View view, int position) {
+                Log.v("input", String.valueOf(position));
+                Toast.makeText(getApplicationContext(), "Click on item "+position+"", Toast.LENGTH_SHORT).show();
+            }
+            @Override
+            public void onLongItemClick(View view, int position) {
+
+            }
+        }));
+
 
         if (AccessToken.getCurrentAccessToken() == null) {
             Intent intent = new Intent(MainActivity.this, FacebookLoginActivity.class);
@@ -74,7 +89,7 @@ public class MainActivity extends AppCompatActivity {
         } catch (JSONException e) {
             e.printStackTrace();
         }
-
+        loadEventData();
 
     }
     @Override
@@ -90,89 +105,7 @@ public class MainActivity extends AppCompatActivity {
      */
     private void loadEventData() {
         mRecyclerView.setVisibility(View.VISIBLE);
-        new QueryEventsList().execute(currentUserId);
-    }
-
-    public class QueryEventsList extends AsyncTask<JSONObject, Void, ArrayList<JSONObject>> {
-        private static final String DATABASE_MAIN_EVENTS_PULLER =
-                "http://athena.ecs.csus.edu/~teamone/php/pull_main_events_list.php";
-
-
-        @Override
-        protected ArrayList<JSONObject> doInBackground(JSONObject... objs) {
-            JSONObject userJSON = objs[0];
-
-            OutputStreamWriter wr = null;
-            BufferedReader reader = null;
-            try {
-                String data;
-                if (userJSON != null)
-                    data = userJSON.toString();  // data is the JSONObject being sent to the php server
-                else
-                    return null;
-
-                // Connect to the URL
-                URL url = new URL(DATABASE_MAIN_EVENTS_PULLER);
-                URLConnection conn = url.openConnection();
-
-                conn.setDoOutput(true);
-                wr = new OutputStreamWriter(conn.getOutputStream());
-
-                // POST the information to the URL
-                wr.write( data );
-                wr.flush();
-
-                // Create a means to read the output from the PHP
-                reader = new BufferedReader(new
-                        InputStreamReader(conn.getInputStream()));
-
-                StringBuilder sb = new StringBuilder();
-                String line = null;
-
-                // Read Server Response
-                while((line = reader.readLine()) != null) {
-                    Log.v("PrintLine", line);
-                    sb.append(line);
-                }
-
-                JSONArray jArray;
-                jArray = new JSONArray(sb.toString());
-                ArrayList<JSONObject> eventList = new ArrayList<JSONObject>();
-
-                if (jArray != null) {
-                    for (int i=0;i<jArray.length();i++){
-                        eventList.add(jArray.getJSONObject(i));
-                        Log.v("PrintLine", eventList.get(i).toString());
-                    }
-                }
-
-                wr.close(); // close OutputStreamWriter
-                reader.close(); // close BufferedReader
-
-                return eventList;
-            } catch (MalformedURLException e) {
-                Log.e("MalformedURL", e.toString());
-                return null;
-            } catch (IOException e) {
-                Log.e("IOException", e.toString());
-                return null;
-            } catch (JSONException e) {
-                e.printStackTrace();
-                return null;
-            }
-        }
-
-        @Override
-        protected void onPostExecute(ArrayList<JSONObject> objs) {
-            if (objs != null) {
-                ArrayList<JSONObject> eventList = objs;
-                mEventAdapter.setEventData(eventList);
-                mRecyclerView.setVisibility(View.VISIBLE);
-
-            }
-
-        }
-
+        new QueryEventList(mEventAdapter, mRecyclerView).execute(currentUserId);
     }
 
 
