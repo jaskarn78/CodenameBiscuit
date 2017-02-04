@@ -70,4 +70,8 @@
 
     <string name="pref_entertainment_title">Entertainment</string>
     <string name="pref_entertainment_key" translatable="false">prefer_entertainment</string>
+
+    <string name="title_activity_fullscreen">FullscreenActivity</string>
+    <string name="dummy_button">Dummy Button</string>
+    <string name="dummy_content">DUMMY\nCONTENT</string>
 </resources>

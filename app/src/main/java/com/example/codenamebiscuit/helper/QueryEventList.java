@@ -31,9 +31,11 @@ public class QueryEventList extends AsyncTask<JSONObject, Void, ArrayList<JSONOb
             "http://athena.ecs.csus.edu/~teamone/php/pull_main_events_list.php";
     private EventAdapter mEventAdapter;
     private RecyclerView mRecycleView;
+    private ArrayList<JSONObject> eventList;
     public QueryEventList(EventAdapter mEventAdapter, RecyclerView mRecycleView){
         this.mEventAdapter = mEventAdapter;
         this.mRecycleView=mRecycleView;
+
     }
 
 
@@ -76,7 +78,7 @@ public class QueryEventList extends AsyncTask<JSONObject, Void, ArrayList<JSONOb
 
             JSONArray jArray;
             jArray = new JSONArray(sb.toString());
-            ArrayList<JSONObject> eventList = new ArrayList<JSONObject>();
+            eventList = new ArrayList<JSONObject>();
 
             if (jArray != null) {
                 for (int i = 0; i < jArray.length(); i++) {
@@ -109,6 +111,10 @@ public class QueryEventList extends AsyncTask<JSONObject, Void, ArrayList<JSONOb
             mRecycleView.setVisibility(View.VISIBLE);
 
         }
+
+    }
+    public ArrayList<JSONObject> getEventList(){
+        return eventList;
 
     }
 }

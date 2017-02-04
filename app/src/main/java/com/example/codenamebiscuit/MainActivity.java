@@ -28,6 +28,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
+
 
 public class MainActivity extends AppCompatActivity {
     private RecyclerView mRecyclerView;
@@ -35,6 +37,7 @@ public class MainActivity extends AppCompatActivity {
     private JSONObject currentUserId = new JSONObject();
     private SwipeRefreshLayout swipeContainer;
     private ImageView iv;
+    private ArrayList<JSONObject> eventData;
 
 
     private static final String DATABASE_CONNECTION_LINK =
@@ -52,9 +55,75 @@ public class MainActivity extends AppCompatActivity {
         this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
         setContentView(R.layout.activity_main);
+        setupRecyclerView();
+
+
+        setupSwipeDownRefresh();
+
+
+        if (AccessToken.getCurrentAccessToken() == null) {
+            Intent intent = new Intent(MainActivity.this, FacebookLoginActivity.class);
+            startActivity(intent);
+        }
+
+        try {
+            currentUserId.put("user_id", AccessToken.getCurrentAccessToken().getUserId());
+            Log.v("PrintLine", AccessToken.getCurrentAccessToken().getUserId());
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        onClick();
+    }
+
+
+    @Override
+    public void onResume() {  // After a pause OR at startup
+        super.onResume();
+        loadEventData();
+    }
+    @Override
+    public void onStart(){
+        super.onStart();
+        loadEventData();
+    }
+
+    private void setupRecyclerView(){
         mRecyclerView = (RecyclerView) findViewById(R.id.recyclerview_events);
+        LinearLayoutManager layoutManager
+                = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
+
+        mRecyclerView.setLayoutManager(layoutManager);
+        mRecyclerView.setHasFixedSize(true);
+        mRecyclerView.setItemViewCacheSize(20);
+        mRecyclerView.setDrawingCacheEnabled(true);
+        mRecyclerView.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_HIGH);
+
+        mEventAdapter = new EventAdapter(this);
+        mRecyclerView.setAdapter(mEventAdapter);
+    }
+
+
+
+    private void onClick(){
+        mRecyclerView.addOnItemTouchListener(new RecyclerItemClickListener(
+                getApplicationContext(), mRecyclerView, new RecyclerItemClickListener.OnItemClickListener(){
+
+            @Override
+            public void onItemClick(View v, int position) throws JSONException {
+                Log.v("input", String.valueOf(position));
+            }
+            @Override
+            public void onLongItemClick(View view, int position) {
+
+            }
+        }));
+    }
+
+
+    private void setupSwipeDownRefresh(){
         swipeContainer = (SwipeRefreshLayout)findViewById(R.id.swipeContainer);
-        iv=(ImageView)findViewById(R.id.full_screen_image);
+        //iv=(ImageView)findViewById(R.id.full_screen_image);
         swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
@@ -67,49 +136,6 @@ public class MainActivity extends AppCompatActivity {
                 android.R.color.holo_orange_light,
                 android.R.color.holo_red_light);
 
-
-        LinearLayoutManager layoutManager
-                = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
-
-        mRecyclerView.setLayoutManager(layoutManager);
-        mRecyclerView.setHasFixedSize(true);
-
-        mEventAdapter = new EventAdapter();
-        mRecyclerView.setAdapter(mEventAdapter);
-        mRecyclerView.addOnItemTouchListener(new RecyclerItemClickListener(
-                getApplicationContext(), mRecyclerView, new RecyclerItemClickListener.OnItemClickListener(){
-
-            @Override
-            public void onItemClick(View v, int position) throws JSONException {
-                Log.v("input", String.valueOf(position));
-                Toast.makeText(getApplicationContext(), "Click on item "+position+"", Toast.LENGTH_SHORT).show();
-
-            }
-            @Override
-            public void onLongItemClick(View view, int position) {
-
-            }
-        }));
-
-        if (AccessToken.getCurrentAccessToken() == null) {
-            Intent intent = new Intent(MainActivity.this, FacebookLoginActivity.class);
-            startActivity(intent);
-        }
-        try {
-            currentUserId.put("user_id", AccessToken.getCurrentAccessToken().getUserId());
-            Log.v("PrintLine", AccessToken.getCurrentAccessToken().getUserId());
-
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        loadEventData();
-
-    }
-    @Override
-    public void onResume() {  // After a pause OR at startup
-        super.onResume();
-        loadEventData();
-        //Refresh your stuff here
     }
 
 
@@ -119,13 +145,11 @@ public class MainActivity extends AppCompatActivity {
      */
     private void loadEventData() {
         new QueryEventList(mEventAdapter, mRecyclerView).execute(currentUserId);
+        eventData =new QueryEventList(mEventAdapter, mRecyclerView).getEventList();
         mRecyclerView.setVisibility(View.VISIBLE);
 
     }
-    public void showImageActivity(){
 
-
-    }
 
 
     /**********************************************************************************************
