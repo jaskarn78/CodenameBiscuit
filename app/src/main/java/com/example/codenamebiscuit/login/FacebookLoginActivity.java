@@ -43,7 +43,6 @@ public class FacebookLoginActivity extends FragmentActivity{
         super.onCreate(savedInstanceState);
         FacebookSdk.sdkInitialize(getApplicationContext());
         setContentView(R.layout.activity_login);
-
         mCallbackManager = CallbackManager.Factory.create();
 
         initializeTokens();
@@ -52,7 +51,6 @@ public class FacebookLoginActivity extends FragmentActivity{
         LoginButton mLoginButton = (LoginButton)findViewById(R.id.facebook_login_button);
 
         // Set permissions and register the callback
-        mLoginButton.setReadPermissions(mPermissions);
 
         mLoginButton.registerCallback(mCallbackManager, new FacebookCallback<LoginResult>() {
 

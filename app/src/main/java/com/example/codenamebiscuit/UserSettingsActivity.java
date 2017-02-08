@@ -1,10 +1,11 @@
 package com.example.codenamebiscuit;
 
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
@@ -18,18 +19,24 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.example.codenamebiscuit.helper.App;
+import com.example.codenamebiscuit.helper.DatabaseHelper;
 import com.example.codenamebiscuit.helper.RoundedImageView;
-import com.example.codenamebiscuit.login.FacebookLoginActivity;
+import com.example.codenamebiscuit.login.ChooseLogin;
 import com.facebook.AccessToken;
 import com.facebook.FacebookSdk;
 import com.facebook.Profile;
 import com.facebook.login.LoginManager;
+
+
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.InputStream;
 import java.lang.ref.WeakReference;
+
+
 
 public class UserSettingsActivity
         extends AppCompatActivity
@@ -47,27 +54,41 @@ public class UserSettingsActivity
     private boolean mRetailPreference;
     private boolean mPerformingArtsPreference;
     private boolean mEntertainmentPreference;
+
     private JSONObject pref = new JSONObject();
+    private SharedPreferences prefs;
+    private DatabaseHelper db;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         FacebookSdk.sdkInitialize(getApplicationContext());
         setContentView(R.layout.activity_user_settings);
-
+        prefs = PreferenceManager.getDefaultSharedPreferences(this);
         ActionBar actionBar = this.getSupportActionBar();
-
         // Set the action bar back button to look like an up button
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
 
         Profile profile = Profile.getCurrentProfile();
+        if(App.getGoogleApiHelper().isConnected()) {
+            //signIn();
+            db = new DatabaseHelper(this);
+            Cursor rs = db.getPerson("0");
+            rs.moveToFirst();
+            String img = rs.getString(rs.getColumnIndex(DatabaseHelper.PERSON_COLUMN_URL));
+            Uri pic = Uri.parse(img);
+            String fName = rs.getString(rs.getColumnIndex(DatabaseHelper.PERSON_COLUMN_FNAME));
+            String lName = rs.getString(rs.getColumnIndex(DatabaseHelper.PERSON_COLUMN_LNAME));
+            initializeGoogleProfileInfo(fName, lName, pic);
 
-        AccessToken accessToken = AccessToken.getCurrentAccessToken();
+        }
+
 
         if (profile != null) {
-            initializeProfileInfo(profile);
+            initializeFBProfileInfo(profile);
         }
 
         initializeLogoutButton();
@@ -77,22 +98,26 @@ public class UserSettingsActivity
             e.printStackTrace();
         }
     }
-
-    /**
-     * initializeProfileInfo
-     * Takes a Bundle, and uses information in Bundle to create the ImageView and TextView
-     *
-     * @param profile
-     */
-    private void initializeProfileInfo(Profile profile) {
+        /**
+         * initializeProfileInfo
+         * Takes a Bundle, and uses information in Bundle to create the ImageView and TextView
+         *
+         * @param profile
+         */
+    private void initializeFBProfileInfo(Profile profile) {
         String name = profile.getFirstName();
         String surname = profile.getLastName();
         String imageUrl = profile.getProfilePictureUri(200, 200).toString();
 
         new DownloadImage((RoundedImageView) findViewById(R.id.pref_user_image)).execute(imageUrl);
-
         mNameView = (TextView) findViewById(R.id.pref_user_name);
         mNameView.setText(name + " " + surname);
+    }
+
+    private void initializeGoogleProfileInfo(String fName, String lName, Uri url){
+        new DownloadImage((RoundedImageView) findViewById(R.id.pref_user_image)).execute(url.toString());
+        mNameView = (TextView) findViewById(R.id.pref_user_name);
+        mNameView.setText(fName + " " + lName);
     }
 
     /**
@@ -104,8 +129,12 @@ public class UserSettingsActivity
         logout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                LoginManager.getInstance().logOut();
-                Intent login = new Intent(UserSettingsActivity.this, FacebookLoginActivity.class);
+                if(LoginManager.getInstance()!=null) {
+                    LoginManager.getInstance().logOut();
+                }else{
+                    App.getGoogleApiHelper().disconnect();
+                }
+                Intent login = new Intent(UserSettingsActivity.this, ChooseLogin.class);
                 startActivity(login);
                 finish();
             }
@@ -326,7 +355,15 @@ public class UserSettingsActivity
             }
         }
         try {
-            pref.put("user_id", AccessToken.getCurrentAccessToken().getUserId());
+            if(AccessToken.getCurrentAccessToken()!=null) {
+                pref.put("user_id", prefs.getString("user_idG", null));
+                pref.put("user_id", AccessToken.getCurrentAccessToken().getUserId());
+            }
+
+            else if(prefs.getString("user_id", null)!=null) {
+                pref.put("user_id", prefs.getString("user_idG", null));
+            }
+
         } catch (JSONException e) {
             e.printStackTrace();
         }

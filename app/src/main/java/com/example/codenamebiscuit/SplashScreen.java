@@ -13,6 +13,8 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.widget.ProgressBar;
 
+import com.example.codenamebiscuit.login.ChooseLogin;
+
 
 public class SplashScreen extends Activity {
     //Splash screen timer

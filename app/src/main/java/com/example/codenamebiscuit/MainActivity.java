@@ -1,10 +1,11 @@
 package com.example.codenamebiscuit;
 
 import android.content.Intent;
-import android.os.AsyncTask;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.preference.PreferenceManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -15,16 +16,15 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.ImageView;
-import android.widget.Toast;
 
+import com.example.codenamebiscuit.helper.DatabaseHelper;
 import com.example.codenamebiscuit.helper.QueryEventList;
 import com.example.codenamebiscuit.helper.RecyclerItemClickListener;
-import com.example.codenamebiscuit.login.FacebookLoginActivity;
+import com.example.codenamebiscuit.login.ChooseLogin;
 import com.example.codenamebiscuit.rv.EventAdapter;
 import com.facebook.AccessToken;
 import com.facebook.FacebookSdk;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -38,6 +38,10 @@ public class MainActivity extends AppCompatActivity {
     private SwipeRefreshLayout swipeContainer;
     private ImageView iv;
     private ArrayList<JSONObject> eventData;
+    private SharedPreferences pref;
+    private DatabaseHelper db;
+
+
 
 
     private static final String DATABASE_CONNECTION_LINK =
@@ -47,6 +51,7 @@ public class MainActivity extends AppCompatActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         FacebookSdk.sdkInitialize(getApplicationContext());
+        pref = PreferenceManager.getDefaultSharedPreferences(this);
 
         //Remove title bar
         this.requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -56,22 +61,31 @@ public class MainActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_main);
         setupRecyclerView();
-
+        loadEventData();
 
         setupSwipeDownRefresh();
 
 
-        if (AccessToken.getCurrentAccessToken() == null) {
-            Intent intent = new Intent(MainActivity.this, FacebookLoginActivity.class);
+        if (AccessToken.getCurrentAccessToken() == null && pref.getString("user_idG", null)==null) {
+            Intent intent = new Intent(MainActivity.this, ChooseLogin.class);
             startActivity(intent);
         }
 
-        try {
-            currentUserId.put("user_id", AccessToken.getCurrentAccessToken().getUserId());
-            Log.v("PrintLine", AccessToken.getCurrentAccessToken().getUserId());
+        if(AccessToken.getCurrentAccessToken()!=null){
+            try {
+                currentUserId.put("user_id", AccessToken.getCurrentAccessToken().getUserId());
 
-        } catch (JSONException e) {
-            e.printStackTrace();
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+        if(pref.getString("user_idG", null)!=null && AccessToken.getCurrentAccessToken()==null){
+            try{
+                currentUserId.put("user_id", pref.getString("user_idG", null));
+
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
         }
         onClick();
     }
