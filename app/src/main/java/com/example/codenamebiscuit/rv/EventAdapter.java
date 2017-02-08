@@ -6,14 +6,19 @@ import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.ContextMenu;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.codenamebiscuit.R;
+import com.squareup.picasso.Callback;
+import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 import com.squareup.picasso.Transformation;
@@ -26,35 +31,44 @@ import java.util.ArrayList;
 public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapterViewHolder> {
     private ArrayList<JSONObject> mEventData;
     private Context context;
+    private boolean flag;
+    private int LayoutIdForListItem;
+
 
     public EventAdapter(Context context) {
         this.context=context;
+        flag=false;
+
     }
 
 
-    public class EventAdapterViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener
-    , View.OnLongClickListener{
+    public class EventAdapterViewHolder extends RecyclerView.ViewHolder implements
+            View.OnCreateContextMenuListener, View.OnClickListener {
         //public final TextView mEventNameTV;
         public final TextView mEventPreferenceTV;
         public final TextView mEventLocationTV;
         public final ImageView mEventImage;
+        private ImageView mEnlargedImage;
         public final TextView mEventName;
         Target target = new Target() {
             @Override
             public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
                 mEventImage.setImageBitmap(bitmap);
+                mEnlargedImage=mEventImage;
 
             }
 
             @Override
             public void onBitmapFailed(Drawable errorDrawable) {
                 mEventImage.setImageResource(R.drawable.error);
+                mEnlargedImage=mEventImage;
 
             }
 
             @Override
             public void onPrepareLoad(Drawable placeHolderDrawable) {
                 mEventImage.setImageResource(R.drawable.placeholder);
+                mEnlargedImage.setImageResource(R.drawable.placeholder);
                 Toast.makeText(mEventImage.getContext(),
                         "Loading Event Images...", Toast.LENGTH_SHORT).show();
 
@@ -64,31 +78,28 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
         public EventAdapterViewHolder(View view) {
             super(view);
            // mEventNameTV = (TextView) view.findViewById(R.id.tv_event_name);
+
             mEventPreferenceTV = (TextView) view.findViewById(R.id.tv_event_preference);
             mEventLocationTV = (TextView)view.findViewById(R.id.tv_event_location);
             mEventImage = (ImageView)view.findViewById(R.id.iv_event_image);
+            mEnlargedImage = (ImageView)view.findViewById(R.id.iv_event_details);
             mEventName = (TextView)view.findViewById(R.id.tv_event_name);
-
+            //mEnlargedImage = (ImageView)view.findViewById(R.id.enlarge_image);
+            mEventImage.setOnClickListener(this);
+            view.setOnCreateContextMenuListener(this);
             view.setOnClickListener(this);
-            mEventImage.setOnClickListener(this);
-            mEventImage.setOnClickListener(this);
+
         }
 
         @Override
         public void onClick(View v) {
-            if(v.getId() ==mEventImage.getId()){
-                Toast.makeText(v.getContext(), "ITEM PRESSED = "+
-                        String.valueOf(getAdapterPosition()), Toast.LENGTH_SHORT).show();
-
-            }else{
-                Toast.makeText(v.getContext(), "ROW PRESSED = "+
-                String.valueOf(getAdapterPosition()), Toast.LENGTH_SHORT).show();
-            }
+            flag=!flag;
+            Toast.makeText(context, flag+"", Toast.LENGTH_SHORT).show();
         }
 
         @Override
-        public boolean onLongClick(View v) {
-            return false;
+        public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+
         }
     }
 
@@ -96,7 +107,13 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
     @Override
     public EventAdapterViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
         Context context = viewGroup.getContext();
-        int layoutIdForListItem = R.layout.event_list_item;
+        int layoutIdForListItem=0;
+        if(!flag) {
+            layoutIdForListItem = R.layout.event_list_item;
+        }else{
+            layoutIdForListItem=R.layout.event_details;
+        }
+
         LayoutInflater inflater = LayoutInflater.from(context);
         boolean shouldAttachToParentImmediately = false;
 
@@ -127,7 +144,8 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
         eventAdapterViewHolder.mEventLocationTV.setText(eventLocation);
         eventAdapterViewHolder.mEventName.setText(event);
         Picasso.with(eventAdapterViewHolder.mEventImage.getContext().getApplicationContext())
-                .load(getImageURL(eventPath)).into(loadImage(eventAdapterViewHolder));
+                .load(getImageURL(eventPath))
+                .into(loadImage(eventAdapterViewHolder));
 
 
     }
@@ -145,6 +163,7 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
             public void onBitmapFailed(Drawable errorDrawable) {
                 eventAdapterViewHolder.mEventImage.setImageResource(R.drawable.error);
                 Log.e("Error", "Bitmap not created from URL");
+
             }
 
             @Override

@@ -87,7 +87,6 @@ public class MainActivity extends AppCompatActivity {
             }
         }
         onClick();
-        loadEventData();
     }
 
 
@@ -126,7 +125,7 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onItemClick(View v, int position) throws JSONException {
-                Log.v("input", String.valueOf(position));
+
             }
             @Override
             public void onLongItemClick(View view, int position) {

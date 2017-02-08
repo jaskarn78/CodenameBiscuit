@@ -75,13 +75,18 @@ public class UserSettingsActivity
         Profile profile = Profile.getCurrentProfile();
         if(profile==null) {
             //signIn();
-            db = new DatabaseHelper(this);
-            Cursor rs = db.getPerson("0");
-            rs.moveToFirst();
-            String img = rs.getString(rs.getColumnIndex(DatabaseHelper.PERSON_COLUMN_URL));
-            Uri pic = Uri.parse(img);
-            String fName = rs.getString(rs.getColumnIndex(DatabaseHelper.PERSON_COLUMN_FNAME));
-            String lName = rs.getString(rs.getColumnIndex(DatabaseHelper.PERSON_COLUMN_LNAME));
+            //db = new DatabaseHelper(this);
+            //Cursor rs = db.getPerson("0");
+            //rs.move(Integer.valueOf("0"));
+            //String img = rs.getString(rs.getColumnIndex(DatabaseHelper.PERSON_COLUMN_URL));
+            //Uri pic = Uri.parse(img);
+            //String fName = rs.getString(rs.getColumnIndex(DatabaseHelper.PERSON_COLUMN_FNAME));
+            //String lName = rs.getString(rs.getColumnIndex(DatabaseHelper.PERSON_COLUMN_LNAME));
+
+            Uri pic = Uri.parse(prefs.getString("user_image", null));
+            String fName = prefs.getString("fName", null);
+            String lName = prefs.getString("lName", null);
+
             initializeGoogleProfileInfo(fName, lName, pic);
 
         }
@@ -356,11 +361,11 @@ public class UserSettingsActivity
         }
         try {
             if(AccessToken.getCurrentAccessToken()!=null) {
-                pref.put("user_id", prefs.getString("user_idG", null));
+                //pref.put("user_id", prefs.getString("user_idG", null));
                 pref.put("user_id", AccessToken.getCurrentAccessToken().getUserId());
             }
 
-            else if(prefs.getString("user_id", null)!=null) {
+            else if(prefs.getString("user_idG", null)!=null) {
                 pref.put("user_id", prefs.getString("user_idG", null));
             }
 

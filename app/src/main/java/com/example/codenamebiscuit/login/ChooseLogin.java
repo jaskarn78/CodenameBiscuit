@@ -109,6 +109,10 @@ public class ChooseLogin extends FragmentActivity implements GoogleApiClient.OnC
             GoogleSignInAccount acct = App.getGoogleApiHelper().getSignInAccount();
 
             pref.edit().putString("user_idG", acct.getId()).apply();
+            pref.edit().putString("user_image", String.valueOf(acct.getPhotoUrl())).apply();
+            pref.edit().putString("fName", acct.getGivenName()).apply();
+            pref.edit().putString("lName", acct.getFamilyName()).apply();
+
             JSONObject obj = new JSONObject();
             obj.put("user_id", acct.getId());
             obj.put("first_name", acct.getGivenName());
