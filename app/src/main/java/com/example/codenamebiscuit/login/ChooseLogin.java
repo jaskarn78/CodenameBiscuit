@@ -9,8 +9,6 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v7.preference.PreferenceManager;
 import android.util.Log;
 import android.view.View;
-import android.widget.Button;
-import android.widget.Toast;
 
 import com.example.codenamebiscuit.MainActivity;
 import com.example.codenamebiscuit.R;
@@ -100,8 +98,6 @@ public class ChooseLogin extends FragmentActivity implements GoogleApiClient.OnC
 
         signIn();
         App.getGoogleApiHelper().connect();
-        Toast.makeText(this, App.getGoogleApiHelper().getApiClient().isConnected()+"", Toast.LENGTH_SHORT).show();
-
 
     }
     private void handleSignInResult(GoogleSignInResult result) throws JSONException {
@@ -187,12 +183,14 @@ public class ChooseLogin extends FragmentActivity implements GoogleApiClient.OnC
                                     SigninActivity userSignin = new SigninActivity();
                                     userSignin.execute(bFacebookData);
 
-                                    nextActivity();
 
                                 } catch (NullPointerException e) {
                                     Log.e("ERRR", e.toString());
                                 }
+                                nextActivity();
+
                             }
+
 
                         });
                 Bundle parameters = new Bundle();
@@ -245,7 +243,6 @@ public class ChooseLogin extends FragmentActivity implements GoogleApiClient.OnC
 
     private void nextActivity() {
             Intent main = new Intent(this, MainActivity.class);
-            main.putExtra("user_id", App.getGoogleApiHelper().getSignInAccount().getId());
             startActivity(main);
     }
 

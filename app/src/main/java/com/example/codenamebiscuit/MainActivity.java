@@ -62,7 +62,6 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         setupRecyclerView();
         loadEventData();
-
         setupSwipeDownRefresh();
 
 
@@ -88,6 +87,7 @@ public class MainActivity extends AppCompatActivity {
             }
         }
         onClick();
+        loadEventData();
     }
 
 
@@ -101,6 +101,7 @@ public class MainActivity extends AppCompatActivity {
         super.onStart();
         loadEventData();
     }
+
 
     private void setupRecyclerView(){
         mRecyclerView = (RecyclerView) findViewById(R.id.recyclerview_events);

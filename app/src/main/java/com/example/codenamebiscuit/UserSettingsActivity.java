@@ -73,7 +73,7 @@ public class UserSettingsActivity
         }
 
         Profile profile = Profile.getCurrentProfile();
-        if(App.getGoogleApiHelper().isConnected()) {
+        if(profile==null) {
             //signIn();
             db = new DatabaseHelper(this);
             Cursor rs = db.getPerson("0");
