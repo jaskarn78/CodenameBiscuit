@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.example.codenamebiscuit.swipedeck.layouts.SwipeFrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:swipedeck="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/blue_grey_500"
+    android:id="@+id/swipeLayout"
+    android:orientation="vertical">
+
+    <com.example.codenamebiscuit.swipedeck.SwipeDeck
+        android:id="@+id/swipe_deck"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        swipedeck:max_visible="3"
+        swipedeck:render_above="false"
+        swipedeck:card_spacing="15dp"
+       />
+
+
+</com.example.codenamebiscuit.swipedeck.layouts.SwipeFrameLayout>

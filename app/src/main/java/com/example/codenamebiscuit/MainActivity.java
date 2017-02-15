@@ -8,7 +8,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.preference.PreferenceManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -17,21 +16,22 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.ImageView;
 
-import com.example.codenamebiscuit.helper.DatabaseHelper;
 import com.example.codenamebiscuit.helper.QueryEventList;
 import com.example.codenamebiscuit.helper.RecyclerItemClickListener;
 import com.example.codenamebiscuit.login.ChooseLogin;
 import com.example.codenamebiscuit.rv.EventAdapter;
+import com.example.codenamebiscuit.swipedeck.SwipeEvents;
 import com.facebook.AccessToken;
 import com.facebook.FacebookSdk;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
 
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity{
     private RecyclerView mRecyclerView;
     private EventAdapter mEventAdapter;
     private JSONObject currentUserId = new JSONObject();
@@ -39,32 +39,59 @@ public class MainActivity extends AppCompatActivity {
     private ImageView iv;
     private ArrayList<JSONObject> eventData;
     private SharedPreferences pref;
-    private DatabaseHelper db;
+    private int positionClick;
 
 
 
 
     private static final String DATABASE_CONNECTION_LINK =
             "http://athena.ecs.csus.edu/~teamone/php/user_insert.php";
+    private final String IMAGE_URL_PATH = "http://athena.ecs.csus.edu/~teamone/AndroidUploadImage/uploads/";
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        FacebookSdk.sdkInitialize(getApplicationContext());
-        pref = PreferenceManager.getDefaultSharedPreferences(this);
-
         //Remove title bar
         this.requestWindowFeature(Window.FEATURE_NO_TITLE);
 
         //Remove notification bar
         this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
-
         setContentView(R.layout.activity_main);
+
+        if(findViewById(R.id.swipeContainer)!=null){
+            if(savedInstanceState !=null){
+                return;
+            }
+        }
+
+        FacebookSdk.sdkInitialize(getApplicationContext());
+        pref = PreferenceManager.getDefaultSharedPreferences(this);
+
+
+
         setupRecyclerView();
         loadEventData();
         setupSwipeDownRefresh();
+        checkIfFbOrGoogleLogin();
 
 
+
+    }
+
+
+    @Override
+    public void onResume() {  // After a pause OR at startup
+        super.onResume();
+        loadEventData();
+    }
+    @Override
+    public void onStart(){
+        super.onStart();
+        loadEventData();
+    }
+
+    private void checkIfFbOrGoogleLogin(){
         if (AccessToken.getCurrentAccessToken() == null && pref.getString("user_idG", null)==null) {
             Intent intent = new Intent(MainActivity.this, ChooseLogin.class);
             startActivity(intent);
@@ -90,18 +117,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    @Override
-    public void onResume() {  // After a pause OR at startup
-        super.onResume();
-        loadEventData();
-    }
-    @Override
-    public void onStart(){
-        super.onStart();
-        loadEventData();
-    }
-
-
     private void setupRecyclerView(){
         mRecyclerView = (RecyclerView) findViewById(R.id.recyclerview_events);
         LinearLayoutManager layoutManager
@@ -122,9 +137,40 @@ public class MainActivity extends AppCompatActivity {
     private void onClick(){
         mRecyclerView.addOnItemTouchListener(new RecyclerItemClickListener(
                 getApplicationContext(), mRecyclerView, new RecyclerItemClickListener.OnItemClickListener(){
+            Intent intent = new Intent(getBaseContext(), ViewEvent.class);
+
 
             @Override
             public void onItemClick(View v, int position) throws JSONException {
+                JSONObject info = mEventAdapter.getObject().get(position);
+                String url = mEventAdapter.getImageURL(info.getString("img_path"));
+
+                String event_name = info.getString("event_name");
+                String event_location = info.getString("event_location");
+                String preference_name = info.getString("preference_name");
+
+                int nextitem = mRecyclerView.getChildAdapterPosition(v);
+                positionClick = position;
+
+                intent.putExtra("image_path", url);
+                intent.putExtra("event_name", event_name);
+                intent.putExtra("event_location", event_location);
+                intent.putExtra("preference_name", preference_name);
+                intent.putExtra("data", mEventAdapter.getObject().toString());
+                ArrayList<String> data = new ArrayList<String>();
+                for(int i=0; i<mEventAdapter.getObject().size(); i++){
+                    data.add(mEventAdapter.getObject().get(i).toString());
+
+                }
+                JSONArray jsonArray = new JSONArray(mEventAdapter.getObject());
+                String x = mRecyclerView.getChildLayoutPosition(mRecyclerView.getFocusedChild())+"";
+                intent.putStringArrayListExtra("data", data);
+                intent.putExtra("position", position);
+                intent.putExtra("jArray", jsonArray.toString());
+                startActivity(intent);
+
+
+
 
             }
             @Override
@@ -152,17 +198,29 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-
     /**
      * This method will get the user's preferred location for weather, and then tell some
      * background method to get the weather data in the background.
      */
     private void loadEventData() {
-        new QueryEventList(mEventAdapter, mRecyclerView).execute(currentUserId);
-        eventData =new QueryEventList(mEventAdapter, mRecyclerView).getEventList();
         mRecyclerView.setVisibility(View.VISIBLE);
+        QueryEventList list = (QueryEventList) new QueryEventList(mEventAdapter).execute(currentUserId);
+        eventData =list.getEventList();
+
+        //mRecyclerView.setVisibility(View.VISIBLE);
 
     }
+    public String getImageURL(String path){
+        return IMAGE_URL_PATH+path;
+    }
+    public ArrayList<JSONObject> getData(){
+        return eventData;
+    }
+    public int getPostion(){
+        return positionClick;
+    }
+
+
 
 
 
@@ -183,6 +241,21 @@ public class MainActivity extends AppCompatActivity {
         if (itemId == R.id.events_list_menu_action) {
             Intent startUserSettingsActivity = new Intent(this, UserSettingsActivity.class);
             startActivity(startUserSettingsActivity);
+            return true;
+        }
+        if(itemId == R.id.ChangeView){
+            Intent intent = new Intent(this, SwipeEvents.class);
+            intent.putExtra("user_id", currentUserId+"");
+            ArrayList<String> data = new ArrayList<String>();
+            for(int i=0; i<mEventAdapter.getObject().size(); i++){
+                data.add(mEventAdapter.getObject().get(i).toString());
+
+            }
+            JSONArray jsonArray = new JSONArray(mEventAdapter.getObject());
+            intent.putStringArrayListExtra("data", data);
+            intent.putExtra("jArray", jsonArray.toString());
+
+            startActivity(intent);
             return true;
         }
         return super.onOptionsItemSelected(item);

@@ -9,5 +9,6 @@
     <dimen name="notification_icon_width_height">64dp</dimen>
     <dimen name="card_margin">5dp</dimen>
     <dimen name="card_album_radius">0dp</dimen>
+    <dimen name="fab_margin">16dp</dimen>
 
 </resources>

@@ -5,4 +5,10 @@
         android:id="@+id/events_list_menu_action"
         app:showAsAction="always"
         android:title="Edit"/>
+    <item
+        android:id="@+id/ChangeView"
+        android:title="swipe_view"
+        app:showAsAction="always">
+    </item>
+
 </menu>

@@ -30,11 +30,11 @@ public class QueryEventList extends AsyncTask<JSONObject, Void, ArrayList<JSONOb
     private static final String DATABASE_MAIN_EVENTS_PULLER =
             "http://athena.ecs.csus.edu/~teamone/php/pull_main_events_list.php";
     private EventAdapter mEventAdapter;
-    private RecyclerView mRecycleView;
     private ArrayList<JSONObject> eventList;
-    public QueryEventList(EventAdapter mEventAdapter, RecyclerView mRecycleView){
+
+    public QueryEventList(EventAdapter mEventAdapter){
         this.mEventAdapter = mEventAdapter;
-        this.mRecycleView=mRecycleView;
+        //this.mRecycleView=mRecycleView;
 
     }
 
@@ -108,7 +108,6 @@ public class QueryEventList extends AsyncTask<JSONObject, Void, ArrayList<JSONOb
         if (objs != null) {
             ArrayList<JSONObject> eventList = objs;
             mEventAdapter.setEventData(eventList);
-            mRecycleView.setVisibility(View.VISIBLE);
 
         }
 

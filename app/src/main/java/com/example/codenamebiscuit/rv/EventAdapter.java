@@ -2,8 +2,11 @@ package com.example.codenamebiscuit.rv;
 
 import android.content.Context;
 import android.content.Intent;
+import android.database.DataSetObserver;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
+import android.provider.ContactsContract;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.ContextMenu;
@@ -41,6 +44,9 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
 
     }
 
+    public void unregisterAdapterDataObserver(DataSetObserver observer) {
+    }
+
 
     public class EventAdapterViewHolder extends RecyclerView.ViewHolder implements
             View.OnCreateContextMenuListener, View.OnClickListener {
@@ -50,42 +56,16 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
         public final ImageView mEventImage;
         private ImageView mEnlargedImage;
         public final TextView mEventName;
-        Target target = new Target() {
-            @Override
-            public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
-                mEventImage.setImageBitmap(bitmap);
-                mEnlargedImage=mEventImage;
 
-            }
-
-            @Override
-            public void onBitmapFailed(Drawable errorDrawable) {
-                mEventImage.setImageResource(R.drawable.error);
-                mEnlargedImage=mEventImage;
-
-            }
-
-            @Override
-            public void onPrepareLoad(Drawable placeHolderDrawable) {
-                mEventImage.setImageResource(R.drawable.placeholder);
-                mEnlargedImage.setImageResource(R.drawable.placeholder);
-                Toast.makeText(mEventImage.getContext(),
-                        "Loading Event Images...", Toast.LENGTH_SHORT).show();
-
-            }
-        };
 
         public EventAdapterViewHolder(View view) {
             super(view);
            // mEventNameTV = (TextView) view.findViewById(R.id.tv_event_name);
-
             mEventPreferenceTV = (TextView) view.findViewById(R.id.tv_event_preference);
             mEventLocationTV = (TextView)view.findViewById(R.id.tv_event_location);
             mEventImage = (ImageView)view.findViewById(R.id.iv_event_image);
-            mEnlargedImage = (ImageView)view.findViewById(R.id.iv_event_details);
             mEventName = (TextView)view.findViewById(R.id.tv_event_name);
-            //mEnlargedImage = (ImageView)view.findViewById(R.id.enlarge_image);
-            mEventImage.setOnClickListener(this);
+            //mEventImage.setOnClickListener(this);
             view.setOnCreateContextMenuListener(this);
             view.setOnClickListener(this);
 
@@ -145,6 +125,8 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
         eventAdapterViewHolder.mEventName.setText(event);
         Picasso.with(eventAdapterViewHolder.mEventImage.getContext().getApplicationContext())
                 .load(getImageURL(eventPath))
+                .resize(100, 100)
+                .centerCrop()
                 .into(loadImage(eventAdapterViewHolder));
 
 
@@ -156,12 +138,14 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
             @Override
             public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
                 eventAdapterViewHolder.mEventImage.setImageBitmap(bitmap);
+
                 Log.v("Success", "image created from url");
             }
 
             @Override
             public void onBitmapFailed(Drawable errorDrawable) {
                 eventAdapterViewHolder.mEventImage.setImageResource(R.drawable.error);
+
                 Log.e("Error", "Bitmap not created from URL");
 
             }
@@ -169,6 +153,7 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
             @Override
             public void onPrepareLoad(Drawable placeHolderDrawable) {
                 eventAdapterViewHolder.mEventImage.setImageResource(R.drawable.placeholder);
+
 
             }
         };
