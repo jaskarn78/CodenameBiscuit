@@ -31,10 +31,8 @@ public class SwipeEvents extends AppCompatActivity {
     private final String IMAGE_URL_PATH = "http://athena.ecs.csus.edu/~teamone/AndroidUploadImage/uploads/";
 
     private SwipeDeck cardStack;
-    private Context context = this;
     private SwipeDeckAdapter adapter;
     private ArrayList<String> testData;
-    private CheckBox dragCheckbox;
     private String image;
 
     @Override
@@ -64,19 +62,19 @@ public class SwipeEvents extends AppCompatActivity {
         if (cardStack != null) {
             cardStack.setAdapter(adapter);
         }
-        ImageView imageView = (ImageView) findViewById(R.id.offer_image);
-        //Picasso.with(this).load(getImageURL(testData.get(0))).fit().centerCrop().into(imageView);
-
 
         cardStack.setCallback(new SwipeDeck.SwipeDeckCallback() {
             @Override
             public void cardSwipedLeft(long stableId) {
                 Log.i("MainActivity", "card was swiped left, position in adapter: " + stableId);
+                Toast.makeText(getApplicationContext(), "Card was swiped left, position in adapter: "+stableId, Toast.LENGTH_SHORT).show();
             }
 
             @Override
             public void cardSwipedRight(long stableId) {
                 Log.i("MainActivity", "card was swiped right, position in adapter: " + stableId);
+                Toast.makeText(getApplicationContext(), "Card was swiped right, position in adapter: "+stableId, Toast.LENGTH_SHORT).show();
+
 
             }
 

@@ -16,6 +16,7 @@
                     android:background="@color/cardview_dark_background"
                     />
 
+
         </android.support.v4.widget.SwipeRefreshLayout>
 
 </FrameLayout>

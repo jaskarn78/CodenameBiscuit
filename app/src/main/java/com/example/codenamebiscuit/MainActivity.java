@@ -14,7 +14,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
-import android.widget.ImageView;
 
 import com.example.codenamebiscuit.helper.QueryEventList;
 import com.example.codenamebiscuit.helper.RecyclerItemClickListener;
@@ -36,7 +35,6 @@ public class MainActivity extends AppCompatActivity{
     private EventAdapter mEventAdapter;
     private JSONObject currentUserId = new JSONObject();
     private SwipeRefreshLayout swipeContainer;
-    private ImageView iv;
     private ArrayList<JSONObject> eventData;
     private SharedPreferences pref;
     private int positionClick;
@@ -149,7 +147,6 @@ public class MainActivity extends AppCompatActivity{
                 String event_location = info.getString("event_location");
                 String preference_name = info.getString("preference_name");
 
-                int nextitem = mRecyclerView.getChildAdapterPosition(v);
                 positionClick = position;
 
                 intent.putExtra("image_path", url);
@@ -163,13 +160,10 @@ public class MainActivity extends AppCompatActivity{
 
                 }
                 JSONArray jsonArray = new JSONArray(mEventAdapter.getObject());
-                String x = mRecyclerView.getChildLayoutPosition(mRecyclerView.getFocusedChild())+"";
                 intent.putStringArrayListExtra("data", data);
                 intent.putExtra("position", position);
                 intent.putExtra("jArray", jsonArray.toString());
                 startActivity(intent);
-
-
 
 
             }
@@ -183,7 +177,6 @@ public class MainActivity extends AppCompatActivity{
 
     private void setupSwipeDownRefresh(){
         swipeContainer = (SwipeRefreshLayout)findViewById(R.id.swipeContainer);
-        //iv=(ImageView)findViewById(R.id.full_screen_image);
         swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
@@ -203,11 +196,11 @@ public class MainActivity extends AppCompatActivity{
      * background method to get the weather data in the background.
      */
     private void loadEventData() {
-        mRecyclerView.setVisibility(View.VISIBLE);
+        if(mRecyclerView!=null)
+            mRecyclerView.setVisibility(View.VISIBLE);
         QueryEventList list = (QueryEventList) new QueryEventList(mEventAdapter).execute(currentUserId);
         eventData =list.getEventList();
 
-        //mRecyclerView.setVisibility(View.VISIBLE);
 
     }
     public String getImageURL(String path){
