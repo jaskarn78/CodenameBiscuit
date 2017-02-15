@@ -67,7 +67,7 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
             mEventName = (TextView)view.findViewById(R.id.tv_event_name);
             //mEventImage.setOnClickListener(this);
             view.setOnCreateContextMenuListener(this);
-            view.setOnClickListener(this);
+            //view.setOnClickListener(this);
 
         }
 
