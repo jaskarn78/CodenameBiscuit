@@ -12,7 +12,9 @@ import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.os.Handler;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 
+import com.example.codenamebiscuit.helper.App;
 import com.example.codenamebiscuit.login.ChooseLogin;
 
 
@@ -51,7 +53,15 @@ public class SplashScreen extends Activity {
                 SPLASH_TIME_OUT=0;
             }
         }
-        SPLASH_TIME_OUT=1000;
+        if(App.getGoogleApiHelper().isConnected()) {
+            //Toast.makeText(this, App.getGoogleApiHelper().getSignInAccount().getDisplayName(), Toast.LENGTH_SHORT).show();
+        }
+        else{
+            App.getGoogleApiHelper().connect();
+            Toast.makeText(this, App.getGoogleApiHelper().isConnected()+"", Toast.LENGTH_SHORT).show();
+
+        }
+        SPLASH_TIME_OUT=3000;
     }
 
 }

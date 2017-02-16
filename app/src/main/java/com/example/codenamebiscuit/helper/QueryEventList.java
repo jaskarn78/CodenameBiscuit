@@ -1,6 +1,9 @@
 package com.example.codenamebiscuit.helper;
 
+import android.app.ProgressDialog;
+import android.content.Context;
 import android.os.AsyncTask;
+import android.os.Handler;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
@@ -27,13 +30,15 @@ import java.util.List;
  */
 
 public class QueryEventList extends AsyncTask<JSONObject, Void, ArrayList<JSONObject>> {
-    private static final String DATABASE_MAIN_EVENTS_PULLER =
-            "http://athena.ecs.csus.edu/~teamone/php/pull_main_events_list.php";
+
     private EventAdapter mEventAdapter;
     private ArrayList<JSONObject> eventList;
+    private String DATABASE_MAIN_EVENTS_PULLER;
 
-    public QueryEventList(EventAdapter mEventAdapter){
+
+    public QueryEventList(EventAdapter mEventAdapter, String DATABASE_MAIN_EVENTS_PULLER){
         this.mEventAdapter = mEventAdapter;
+        this.DATABASE_MAIN_EVENTS_PULLER=DATABASE_MAIN_EVENTS_PULLER;
         //this.mRecycleView=mRecycleView;
 
     }

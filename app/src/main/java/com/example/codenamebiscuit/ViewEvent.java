@@ -40,7 +40,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
-public class ViewEvent extends Activity{
+public class ViewEvent extends AppCompatActivity{
     private final String IMAGE_URL_PATH = "http://athena.ecs.csus.edu/~teamone/AndroidUploadImage/uploads/";
     private ImageView eventImage;
     private EventAdapter mEventAdapter;

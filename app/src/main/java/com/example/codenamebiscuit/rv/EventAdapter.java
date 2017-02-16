@@ -1,30 +1,21 @@
 package com.example.codenamebiscuit.rv;
 
 import android.content.Context;
-import android.content.Intent;
-import android.database.DataSetObserver;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
-import android.net.Uri;
-import android.provider.ContactsContract;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.codenamebiscuit.R;
-import com.squareup.picasso.Callback;
-import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
-import com.squareup.picasso.Transformation;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -35,7 +26,6 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
     private ArrayList<JSONObject> mEventData;
     private Context context;
     private boolean flag;
-    private int LayoutIdForListItem;
 
 
     public EventAdapter(Context context) {
@@ -44,29 +34,26 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
 
     }
 
-    public void unregisterAdapterDataObserver(DataSetObserver observer) {
-    }
-
 
     public class EventAdapterViewHolder extends RecyclerView.ViewHolder implements
             View.OnCreateContextMenuListener, View.OnClickListener {
+
         //public final TextView mEventNameTV;
         public final TextView mEventPreferenceTV;
         public final TextView mEventLocationTV;
         public final ImageView mEventImage;
-        private ImageView mEnlargedImage;
         public final TextView mEventName;
 
 
         public EventAdapterViewHolder(View view) {
             super(view);
-           // mEventNameTV = (TextView) view.findViewById(R.id.tv_event_name);
             mEventPreferenceTV = (TextView) view.findViewById(R.id.tv_event_preference);
             mEventLocationTV = (TextView)view.findViewById(R.id.tv_event_location);
             mEventImage = (ImageView)view.findViewById(R.id.iv_event_image);
             mEventName = (TextView)view.findViewById(R.id.tv_event_name);
             //mEventImage.setOnClickListener(this);
             view.setOnCreateContextMenuListener(this);
+
             //view.setOnClickListener(this);
 
         }
@@ -98,6 +85,7 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
         boolean shouldAttachToParentImmediately = false;
 
         View view = inflater.inflate(layoutIdForListItem, viewGroup, shouldAttachToParentImmediately);
+
         return new EventAdapterViewHolder(view);
     }
 
@@ -109,17 +97,19 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
         String eventPref  = null;
         String eventPath = null;
         String event = null;
+        String eventid = null;
         loadImage(eventAdapterViewHolder);
         try {
             eventLocation = mEventData.get(position).getString("event_location");
             eventPref  = mEventData.get(position).getString("preference_name");
             eventPath  = mEventData.get(position).getString("img_path");
             event = mEventData.get(position).getString("event_name");
+            eventid = mEventData.get(position).getString("event_id");
         } catch (JSONException e) {
             e.printStackTrace();
         }
 
-        //eventAdapterViewHolder.mEventNameTV.setText(eventName);
+
         eventAdapterViewHolder.mEventPreferenceTV.setText(eventPref);
         eventAdapterViewHolder.mEventLocationTV.setText(eventLocation);
         eventAdapterViewHolder.mEventName.setText(event);

@@ -2,8 +2,15 @@ package com.example.codenamebiscuit;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.view.PagerTabStrip;
+import android.support.v4.view.ViewPager;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.preference.PreferenceManager;
 import android.support.v7.widget.LinearLayoutManager;
@@ -14,6 +21,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 
 import com.example.codenamebiscuit.helper.QueryEventList;
 import com.example.codenamebiscuit.helper.RecyclerItemClickListener;
@@ -34,10 +44,12 @@ public class MainActivity extends AppCompatActivity{
     private RecyclerView mRecyclerView;
     private EventAdapter mEventAdapter;
     private JSONObject currentUserId = new JSONObject();
+    private String userID;
     private SwipeRefreshLayout swipeContainer;
     private ArrayList<JSONObject> eventData;
     private SharedPreferences pref;
     private int positionClick;
+    private int SPLASH_TIME_OUT;
 
 
 
@@ -45,6 +57,8 @@ public class MainActivity extends AppCompatActivity{
     private static final String DATABASE_CONNECTION_LINK =
             "http://athena.ecs.csus.edu/~teamone/php/user_insert.php";
     private final String IMAGE_URL_PATH = "http://athena.ecs.csus.edu/~teamone/AndroidUploadImage/uploads/";
+    private static final String DATABASE_MAIN_EVENTS_PULLER =
+            "http://athena.ecs.csus.edu/~teamone/php/pull_main_events_list.php";
 
 
     @Override
@@ -57,6 +71,8 @@ public class MainActivity extends AppCompatActivity{
         this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_main);
 
+
+
         if(findViewById(R.id.swipeContainer)!=null){
             if(savedInstanceState !=null){
                 return;
@@ -65,8 +81,6 @@ public class MainActivity extends AppCompatActivity{
 
         FacebookSdk.sdkInitialize(getApplicationContext());
         pref = PreferenceManager.getDefaultSharedPreferences(this);
-
-
 
         setupRecyclerView();
         loadEventData();
@@ -86,7 +100,18 @@ public class MainActivity extends AppCompatActivity{
     @Override
     public void onStart(){
         super.onStart();
-        loadEventData();
+        swipeContainer.setRefreshing(true);
+        new android.os.Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                //this method will executed once timer runs out
+                swipeContainer.setRefreshing(false);
+                //close the activity
+
+            }
+        }, SPLASH_TIME_OUT);
+        SPLASH_TIME_OUT=2000;
+
     }
 
     private void checkIfFbOrGoogleLogin(){
@@ -98,6 +123,7 @@ public class MainActivity extends AppCompatActivity{
         if(AccessToken.getCurrentAccessToken()!=null){
             try {
                 currentUserId.put("user_id", AccessToken.getCurrentAccessToken().getUserId());
+                userID=AccessToken.getCurrentAccessToken().getUserId();
 
             } catch (JSONException e) {
                 e.printStackTrace();
@@ -106,6 +132,7 @@ public class MainActivity extends AppCompatActivity{
         if(pref.getString("user_idG", null)!=null && AccessToken.getCurrentAccessToken()==null){
             try{
                 currentUserId.put("user_id", pref.getString("user_idG", null));
+                userID=pref.getString("user_idG", null);
 
             } catch (JSONException e) {
                 e.printStackTrace();
@@ -146,9 +173,11 @@ public class MainActivity extends AppCompatActivity{
                 String event_name = info.getString("event_name");
                 String event_location = info.getString("event_location");
                 String preference_name = info.getString("preference_name");
+                String event_id = info.getString("event_id");
 
                 positionClick = position;
 
+                intent.putExtra("event_id", event_id);
                 intent.putExtra("image_path", url);
                 intent.putExtra("event_name", event_name);
                 intent.putExtra("event_location", event_location);
@@ -198,7 +227,7 @@ public class MainActivity extends AppCompatActivity{
     private void loadEventData() {
         if(mRecyclerView!=null)
             mRecyclerView.setVisibility(View.VISIBLE);
-        QueryEventList list = (QueryEventList) new QueryEventList(mEventAdapter).execute(currentUserId);
+        QueryEventList list = (QueryEventList) new QueryEventList(mEventAdapter, DATABASE_MAIN_EVENTS_PULLER).execute(currentUserId);
         eventData =list.getEventList();
 
 
@@ -250,6 +279,16 @@ public class MainActivity extends AppCompatActivity{
 
             startActivity(intent);
             return true;
+        }
+        if(itemId == R.id.events_list_saved){
+            Intent intent = new Intent(this, ViewSavedEvents.class);
+            try {
+                intent.putExtra("user_id", currentUserId.get("user_id").toString());
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            startActivity(intent);
+
         }
         return super.onOptionsItemSelected(item);
     }
