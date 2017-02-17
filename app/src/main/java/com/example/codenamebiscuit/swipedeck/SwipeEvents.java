@@ -26,7 +26,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class SwipeEvents extends AppCompatActivity {
-    private final String IMAGE_URL_PATH = "http://athena.ecs.csus.edu/~teamone/AndroidUploadImage/uploads/";
 
     private SwipeDeck cardStack;
     private SwipeDeckAdapter adapter;
@@ -74,6 +73,12 @@ public class SwipeEvents extends AppCompatActivity {
             @Override
             public void cardSwipedLeft(long stableId) {
                 Log.i("MainActivity", "card was swiped left, position in adapter: " + stableId);
+
+            }
+
+            @Override
+            public void cardSwipedRight(long stableId) {
+                Log.i("MainActivity", "card was swiped right, position in adapter: " + stableId);
                 try {
                     Toast.makeText(getApplicationContext(), "Saving Event ID...: "+adapter.getItem((int)stableId).getString("event_id"), Toast.LENGTH_SHORT).show();
                     saveEvent.put("event_id", adapter.getItem((int)stableId).get("event_id"));
@@ -82,12 +87,6 @@ public class SwipeEvents extends AppCompatActivity {
                     e.printStackTrace();
                 }
                 new SaveEventsOnSwipe().execute(saveEvent);
-            }
-
-            @Override
-            public void cardSwipedRight(long stableId) {
-                Log.i("MainActivity", "card was swiped right, position in adapter: " + stableId);
-                Toast.makeText(getApplicationContext(), "Deleting Event...: ", Toast.LENGTH_SHORT).show();
 
             }
 
@@ -99,7 +98,7 @@ public class SwipeEvents extends AppCompatActivity {
     }
 
     public String getImageURL(String path) {
-        return IMAGE_URL_PATH + path;
+        return getString(R.string.IMAGE_URL_PATH)+ path;
     }
 
 

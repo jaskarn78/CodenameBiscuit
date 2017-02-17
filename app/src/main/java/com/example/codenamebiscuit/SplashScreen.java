@@ -24,12 +24,11 @@ public class SplashScreen extends Activity {
     private ProgressBar progress;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState){
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
 
-        isMyServiceRunning(MainActivity.class);
-        progress = (ProgressBar)findViewById(R.id.progressBar1);
+        progress = (ProgressBar) findViewById(R.id.progressBar1);
         progress.getIndeterminateDrawable().setColorFilter(Color.rgb(255, 157, 252), PorterDuff.Mode.MULTIPLY);
 
         //Toast.makeText(this, "Loading...Please Wait", Toast.LENGTH_SHORT).show();
@@ -41,27 +40,11 @@ public class SplashScreen extends Activity {
                 startActivity(intent);
 
                 //close the activity
-                finish();}
-        }, SPLASH_TIME_OUT);
-    }
-    //Checks to see if application is running in the background
-    //if running then skip splash screen
-    private void isMyServiceRunning(Class<?> serviceClass) {
-        ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
-        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
-            if (serviceClass.getName().equals(service.service.getClassName())) {
-                SPLASH_TIME_OUT=0;
+                finish();
             }
-        }
-        if(App.getGoogleApiHelper().isConnected()) {
-            //Toast.makeText(this, App.getGoogleApiHelper().getSignInAccount().getDisplayName(), Toast.LENGTH_SHORT).show();
-        }
-        else{
-            App.getGoogleApiHelper().connect();
-            Toast.makeText(this, App.getGoogleApiHelper().isConnected()+"", Toast.LENGTH_SHORT).show();
-
-        }
+        }, SPLASH_TIME_OUT);
         SPLASH_TIME_OUT=3000;
     }
+
 
 }

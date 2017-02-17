@@ -1,5 +1,6 @@
 package com.example.codenamebiscuit.helper;
 
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
@@ -9,6 +10,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ListView;
 
+import com.example.codenamebiscuit.MainActivity;
 import com.example.codenamebiscuit.rv.EventAdapter;
 
 import org.json.JSONArray;
@@ -34,15 +36,24 @@ public class QueryEventList extends AsyncTask<JSONObject, Void, ArrayList<JSONOb
     private EventAdapter mEventAdapter;
     private ArrayList<JSONObject> eventList;
     private String DATABASE_MAIN_EVENTS_PULLER;
+    private Context context;
+    ProgressDialog dialog;
 
 
-    public QueryEventList(EventAdapter mEventAdapter, String DATABASE_MAIN_EVENTS_PULLER){
+    public QueryEventList(EventAdapter mEventAdapter, String DATABASE_MAIN_EVENTS_PULLER, Context context){
         this.mEventAdapter = mEventAdapter;
         this.DATABASE_MAIN_EVENTS_PULLER=DATABASE_MAIN_EVENTS_PULLER;
-        //this.mRecycleView=mRecycleView;
+        this.context=context;
+        dialog = new ProgressDialog(context);
+
 
     }
 
+    @Override
+    protected void onPreExecute(){
+        dialog.setMessage("Loading Event Data...");
+        dialog.show();
+    }
 
     @Override
     protected ArrayList<JSONObject> doInBackground(JSONObject... objs) {
@@ -108,13 +119,15 @@ public class QueryEventList extends AsyncTask<JSONObject, Void, ArrayList<JSONOb
         }
     }
 
+
     @Override
     protected void onPostExecute(ArrayList<JSONObject> objs) {
         if (objs != null) {
             ArrayList<JSONObject> eventList = objs;
             mEventAdapter.setEventData(eventList);
-
         }
+        if(dialog.isShowing())
+            dialog.dismiss();
 
     }
     public ArrayList<JSONObject> getEventList(){

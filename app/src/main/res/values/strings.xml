@@ -85,5 +85,13 @@
     <string name="action_websearch">Web search</string>
     <string name="app_not_available">Sorry, there\'s no web browser available</string>
     <string name="title_activity_view_saved_events">ViewSavedEvents</string>
+    <string name="google_maps_key" templateMergeStrategy="preserve">AIzaSyDXcIGF3rFsw_ZcxCS6udrjz5cpVeaCK4I</string>
+
+    <string name="DATABASE_MAIN_EVENTS_PULLER">http://athena.ecs.csus.edu/~teamone/php/pull_main_events_list.php</string>
+    <string name="DATABASE_CONNECTION_LINK">http://athena.ecs.csus.edu/~teamone/php/user_insert.php</string>
+    <string name="IMAGE_URL_PATH">http://athena.ecs.csus.edu/~teamone/AndroidUploadImage/uploads/</string>
+    <string name="DATABASE_STORE_SAVED_EVENTS">http://athena.ecs.csus.edu/~teamone/php/store_saved_events.php</string>
+    <string name="DATABASE_SAVED_EVENTS_PULLER">http://athena.ecs.csus.edu/~teamone/php/pull_saved_events_list.php</string>
+
 
 </resources>

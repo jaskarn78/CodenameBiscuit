@@ -25,15 +25,11 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 
 public class ViewSavedEvents extends AppCompatActivity {
-    private static final String DATABASE_SAVED_EVENTS_PULLER =
-            "http://athena.ecs.csus.edu/~teamone/php/pull_saved_events_list.php";
+
     private RecyclerView mRecyclerView;
     private EventAdapter mEventAdapter;
     private JSONObject currentUserId = new JSONObject();
     private SwipeRefreshLayout swipeContainer;
-    private ArrayList<JSONObject> eventData;
-    private SharedPreferences pref;
-    private int positionClick;
     private int SPLASH_TIME_OUT;
 
     @Override
@@ -116,8 +112,9 @@ public class ViewSavedEvents extends AppCompatActivity {
     private void loadEventData() {
         if(mRecyclerView!=null)
             mRecyclerView.setVisibility(View.VISIBLE);
-        QueryEventList list = (QueryEventList) new QueryEventList(mEventAdapter, DATABASE_SAVED_EVENTS_PULLER).execute(currentUserId);
-        eventData =list.getEventList();
+        QueryEventList list = (QueryEventList)
+                new QueryEventList( mEventAdapter, getString(R.string.DATABASE_SAVED_EVENTS_PULLER), this).execute(currentUserId);
+        ArrayList<JSONObject> eventData = list.getEventList();
 
 
     }

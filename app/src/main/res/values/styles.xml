@@ -3,7 +3,7 @@
     <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
         <!-- Customize your theme here. -->
-        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimary">@color/livinPink</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
         <item name="preferenceTheme">@style/PreferenceThemeOverlay</item>
@@ -37,6 +37,7 @@
         <item name="colorPrimary">#3a67e0</item>
         <item name="colorPrimaryDark">#ffffff</item>
         <item name="android:windowDrawsSystemBarBackgrounds">true</item>
+
         <item name="android:statusBarColor">#0d47a1</item>
     </style>
 

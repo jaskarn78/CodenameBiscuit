@@ -74,14 +74,6 @@ public class UserSettingsActivity
 
         Profile profile = Profile.getCurrentProfile();
         if(profile==null) {
-            //signIn();
-            //db = new DatabaseHelper(this);
-            //Cursor rs = db.getPerson("0");
-            //rs.move(Integer.valueOf("0"));
-            //String img = rs.getString(rs.getColumnIndex(DatabaseHelper.PERSON_COLUMN_URL));
-            //Uri pic = Uri.parse(img);
-            //String fName = rs.getString(rs.getColumnIndex(DatabaseHelper.PERSON_COLUMN_FNAME));
-            //String lName = rs.getString(rs.getColumnIndex(DatabaseHelper.PERSON_COLUMN_LNAME));
 
             Uri pic = Uri.parse(prefs.getString("user_image", null));
             String fName = prefs.getString("fName", null);

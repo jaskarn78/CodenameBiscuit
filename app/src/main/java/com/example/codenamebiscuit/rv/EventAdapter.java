@@ -1,85 +1,66 @@
 package com.example.codenamebiscuit.rv;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
+import android.location.Geocoder;
+import android.os.AsyncTask;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
-import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.codenamebiscuit.R;
+import com.example.codenamebiscuit.helper.ClickListener;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapView;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.model.LatLng;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 
-public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapterViewHolder> {
+import javax.net.ssl.HttpsURLConnection;
+
+public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapterViewHolder>{
     private ArrayList<JSONObject> mEventData;
     private Context context;
-    private boolean flag;
+    private Typeface typeface;
+    private ClickListener clickListener = null;
 
 
     public EventAdapter(Context context) {
-        this.context=context;
-        flag=false;
+        this.context = context;
+        mEventData = new ArrayList<>();
+        typeface=Typeface.createFromAsset(context.getAssets(), "fonts/HelveticaNeueBd.ttf");
 
-    }
-
-
-    public class EventAdapterViewHolder extends RecyclerView.ViewHolder implements
-            View.OnCreateContextMenuListener, View.OnClickListener {
-
-        //public final TextView mEventNameTV;
-        public final TextView mEventPreferenceTV;
-        public final TextView mEventLocationTV;
-        public final ImageView mEventImage;
-        public final TextView mEventName;
-
-
-        public EventAdapterViewHolder(View view) {
-            super(view);
-            mEventPreferenceTV = (TextView) view.findViewById(R.id.tv_event_preference);
-            mEventLocationTV = (TextView)view.findViewById(R.id.tv_event_location);
-            mEventImage = (ImageView)view.findViewById(R.id.iv_event_image);
-            mEventName = (TextView)view.findViewById(R.id.tv_event_name);
-            //mEventImage.setOnClickListener(this);
-            view.setOnCreateContextMenuListener(this);
-
-            //view.setOnClickListener(this);
-
-        }
-
-        @Override
-        public void onClick(View v) {
-            flag=!flag;
-            Toast.makeText(context, flag+"", Toast.LENGTH_SHORT).show();
-        }
-
-        @Override
-        public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
-
-        }
     }
 
 
     @Override
     public EventAdapterViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
         Context context = viewGroup.getContext();
-        int layoutIdForListItem=0;
-        if(!flag) {
-            layoutIdForListItem = R.layout.event_list_item;
-        }else{
-            layoutIdForListItem=R.layout.event_details;
-        }
+        int layoutIdForListItem = 0;
+        layoutIdForListItem = R.layout.event_list_item;
 
         LayoutInflater inflater = LayoutInflater.from(context);
         boolean shouldAttachToParentImmediately = false;
@@ -90,25 +71,97 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
     }
 
 
+    public class EventAdapterViewHolder extends RecyclerView.ViewHolder implements
+            View.OnClickListener, OnMapReadyCallback {
+
+        public final TextView mEventPreferenceTV;
+        public final TextView mEventLocationTV;
+        public final ImageView mEventImage;
+        public final ImageView mExpandedImage;
+        public final TextView mEventName;
+        public final TextView mEventAge;
+        public final TextView mEventCost;
+        public final CardView cardView;
+        public final ImageButton imageButton;
+        public final RelativeLayout layout;
+        //public final MapView map;
+        public GoogleMap googleMap;
+        public int originalHeight=0;
+        public boolean isViewExpanded=false;
+
+
+        public EventAdapterViewHolder(final View view) {
+            super(view);
+            //map = (MapView) view.findViewById(R.id.map);
+            //map.getMapAsync(this);
+
+            mEventPreferenceTV = (TextView) view.findViewById(R.id.tv_event_preference);
+            mEventPreferenceTV.setTypeface(typeface);
+
+            mEventLocationTV = (TextView) view.findViewById(R.id.tv_event_location);
+            mEventLocationTV.setTypeface(typeface);
+
+            mEventName = (TextView) view.findViewById(R.id.tv_event_name);
+            mEventName.setTypeface(typeface);
+
+            mEventAge = (TextView)view.findViewById(R.id.age);
+            mEventAge.setTypeface(typeface);
+
+            mEventCost = (TextView)view.findViewById(R.id.cost);
+            mEventCost.setTypeface(typeface);
+
+            mExpandedImage = (ImageView)view.findViewById(R.id.collapseImage);
+
+            layout = (RelativeLayout)view.findViewById(R.id.extend);
+
+
+            mEventImage = (ImageView) view.findViewById(R.id.iv_event_image);
+            cardView = (CardView) view.findViewById(R.id.cardview);
+            imageButton = (ImageButton) view.findViewById(R.id.parent_list_item_expand_arrow);
+            imageButton.setOnClickListener(this);
+            //map.onCreate(null);
+
+        }
+
+
+        @Override
+        public void onClick(final View v) {
+            if(clickListener!=null){
+                clickListener.itemClicked(v, getAdapterPosition());
+            }
+        }
+
+
+        @Override
+        public void onMapReady(GoogleMap googleMap) {
+            this.googleMap=googleMap;
+
+        }
+
+
+    }
+
 
     @Override
     public void onBindViewHolder(final EventAdapterViewHolder eventAdapterViewHolder, int position) {
+
         String eventLocation = null;
-        String eventPref  = null;
+        String eventPref = null;
         String eventPath = null;
         String event = null;
         String eventid = null;
+
+
         loadImage(eventAdapterViewHolder);
         try {
             eventLocation = mEventData.get(position).getString("event_location");
-            eventPref  = mEventData.get(position).getString("preference_name");
-            eventPath  = mEventData.get(position).getString("img_path");
+            eventPref = mEventData.get(position).getString("preference_name");
+            eventPath = mEventData.get(position).getString("img_path");
             event = mEventData.get(position).getString("event_name");
             eventid = mEventData.get(position).getString("event_id");
         } catch (JSONException e) {
             e.printStackTrace();
         }
-
 
         eventAdapterViewHolder.mEventPreferenceTV.setText(eventPref);
         eventAdapterViewHolder.mEventLocationTV.setText(eventLocation);
@@ -119,10 +172,33 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
                 .centerCrop()
                 .into(loadImage(eventAdapterViewHolder));
 
+        eventAdapterViewHolder.imageButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(v.getContext(), "button clicked", Toast.LENGTH_SHORT).show();
+
+                if (eventAdapterViewHolder.layout.getVisibility() == View.GONE) {
+                    eventAdapterViewHolder.layout.setVisibility(View.VISIBLE);
+
+                }
+
+                else {
+                    eventAdapterViewHolder.layout.setVisibility(View.GONE);
+
+                }
+                Log.i("click", "button clicked");
+            }
+        });
+        //eventAdapterViewHolder.itemView.setOnClickListener(this);
 
     }
+    public void setClickListener(ClickListener clickListener){
+        this.clickListener=clickListener;
+    }
 
-    private Target loadImage(final EventAdapterViewHolder eventAdapterViewHolder){
+
+
+    private Target loadImage(final EventAdapterViewHolder eventAdapterViewHolder) {
 
         final Target target = new Target() {
             @Override
@@ -159,10 +235,10 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
      */
     @Override
     public int getItemCount() {
-        if (null == mEventData) return 0;
-        return mEventData.size();
+        if(mEventData.size()!=0)
+            return mEventData.size();
+        return 0;
     }
-
 
 
     /**
@@ -175,21 +251,26 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
         mEventData = eventData;
         notifyDataSetChanged();
     }
-    public String getImageURL(String path){
-        return "http://athena.ecs.csus.edu/~teamone/AndroidUploadImage/uploads/"+path;
+
+    public String getImageURL(String path) {
+        return "http://athena.ecs.csus.edu/~teamone/AndroidUploadImage/uploads/" + path;
     }
-    public void clear(){
+
+    public void clear() {
         mEventData.clear();
         notifyDataSetChanged();
     }
+
     //add a list of items
-    public void addAll(ArrayList<JSONObject> list){
+    public void addAll(ArrayList<JSONObject> list) {
         mEventData.addAll(list);
         notifyDataSetChanged();
 
     }
-    public ArrayList<JSONObject> getObject(){
+
+    public ArrayList<JSONObject> getObject() {
         return mEventData;
     }
+
 
 }

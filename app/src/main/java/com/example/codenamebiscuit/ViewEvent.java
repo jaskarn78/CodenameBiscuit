@@ -41,7 +41,6 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 
 public class ViewEvent extends AppCompatActivity{
-    private final String IMAGE_URL_PATH = "http://athena.ecs.csus.edu/~teamone/AndroidUploadImage/uploads/";
     private ImageView eventImage;
     private EventAdapter mEventAdapter;
     private ArrayList<JSONObject> eventData = new ArrayList<>();
@@ -147,7 +146,7 @@ public class ViewEvent extends AppCompatActivity{
 
     }
     public String getImageURL(String path){
-        return IMAGE_URL_PATH+path;
+        return getString(R.string.IMAGE_URL_PATH)+path;
     }
 
 
@@ -165,8 +164,7 @@ public class ViewEvent extends AppCompatActivity{
     public boolean onOptionsItemSelected(MenuItem item) {
         int itemId = item.getItemId();
         if (itemId == R.id.events_list_menu_action) {
-            //Intent startUserSettingsActivity = new Intent(this, UserSettingsActivity.class);
-            //startActivity(startUserSettingsActivity);
+
             return true;
         }
         return super.onOptionsItemSelected(item);
