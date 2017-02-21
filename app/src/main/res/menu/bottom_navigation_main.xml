@@ -14,9 +14,9 @@
         android:title="Full Screen"
         app:showAsAction="ifRoom" />
     <item
-        android:id="@+id/action_navigate"
+        android:id="@+id/action_add_to_calendar"
         android:enabled="true"
-        android:icon="@drawable/ic_navigation_white_24dp"
-        android:title="Navigate"
+        android:icon="@drawable/ic_note_add_white_24dp"
+        android:title="Add to Calendar"
         app:showAsAction="ifRoom" />
 </menu>

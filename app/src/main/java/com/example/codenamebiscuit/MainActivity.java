@@ -1,47 +1,31 @@
 package com.example.codenamebiscuit;
 
-import android.*;
-import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
-import android.graphics.Typeface;
 
-import android.os.AsyncTask;
 import android.os.Bundle;
 
-import android.support.v4.app.ActivityCompat;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.preference.PreferenceManager;
-import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
-import android.widget.Button;
-import android.widget.ImageButton;
+import android.widget.ListView;
 import android.widget.RelativeLayout;
-import android.widget.TextView;
-import android.widget.Toast;
 
-import com.example.codenamebiscuit.helper.ClickListener;
+import com.example.codenamebiscuit.rv.ClickListener;
 import com.example.codenamebiscuit.helper.QueryEventList;
-import com.example.codenamebiscuit.helper.RecyclerItemClickListener;
 import com.example.codenamebiscuit.login.ChooseLogin;
 import com.example.codenamebiscuit.rv.EventAdapter;
-import com.example.codenamebiscuit.swipedeck.SwipeEvents;
 import com.facebook.AccessToken;
 import com.facebook.FacebookSdk;
-import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.MapView;
-import com.google.android.gms.maps.MapsInitializer;
-
 
 
 import org.json.JSONArray;
@@ -58,23 +42,27 @@ public class MainActivity extends AppCompatActivity implements ClickListener{
     private SwipeRefreshLayout swipeContainer;
     private ArrayList<JSONObject> eventData;
     private SharedPreferences pref;
-    private int positionClick;
-    private int SPLASH_TIME_OUT;
-    private GoogleMap googleMap;
-    private MapView map;
-    private Typeface typeface;
+    private String[] mPlanetTitles;
+    private DrawerLayout mDrawerLayout;
+    private ListView mDrawerList;
+
 
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-
         //Remove title bar
         this.requestWindowFeature(Window.FEATURE_NO_TITLE);
         //Remove notification bar
         this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+
         setContentView(R.layout.activity_main);
+        mPlanetTitles = getResources().getStringArray(R.array.menu_array);
+        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        mDrawerList = (ListView) findViewById(R.id.left_drawer);
+
+
 
 
         if (findViewById(R.id.swipeContainer) != null) {

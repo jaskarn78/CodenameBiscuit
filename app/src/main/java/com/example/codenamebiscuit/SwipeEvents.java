@@ -1,8 +1,12 @@
-package com.example.codenamebiscuit.swipedeck;
+package com.example.codenamebiscuit;
 
+
+import android.app.FragmentManager;
 import android.content.Context;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.CardView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,7 +19,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.codenamebiscuit.R;
+import com.example.codenamebiscuit.helper.FlipAnimation;
 import com.example.codenamebiscuit.helper.SaveEventsOnSwipe;
+import com.example.codenamebiscuit.swipedeck.SwipeDeck;
 import com.squareup.picasso.Picasso;
 
 import org.json.JSONArray;
@@ -25,7 +31,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SwipeEvents extends AppCompatActivity {
+public class SwipeEvents extends AppCompatActivity{
 
     private SwipeDeck cardStack;
     private SwipeDeckAdapter adapter;
@@ -34,6 +40,18 @@ public class SwipeEvents extends AppCompatActivity {
     private String image;
     private String event_id;
     private String event_location;
+    private String event_preference;
+    private String event_name;
+
+    /**
+     * A handler object, used for deferring UI operations.
+     */
+    private Handler mHandler = new Handler();
+
+    /**
+     * Whether or not we're showing the back of the card (otherwise showing the front).
+     */
+    private boolean mShowingBack = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,8 +61,18 @@ public class SwipeEvents extends AppCompatActivity {
         //Remove notification bar
         this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_swipe_events);
+        setupOnCreate();
+
+    }
+
+
+    /*Moved initializations to sepearate method
+       method initalizes the card stack view and loads event information from intent
+       event information is added into custom swipe deck adapter
+    */
+    private void setupOnCreate(){
         cardStack = (SwipeDeck) findViewById(R.id.swipe_deck);
-        TextView eventid = (TextView) findViewById(R.id.event_id_num);
+        //TextView eventid = (TextView) findViewById(R.id.event_id_num);
         saveEvent = new JSONObject();
 
         testData = new ArrayList<>();
@@ -65,6 +93,7 @@ public class SwipeEvents extends AppCompatActivity {
             }
         }
         adapter = new SwipeDeckAdapter(testData, this);
+
         if (cardStack != null) {
             cardStack.setAdapter(adapter);
         }
@@ -102,6 +131,17 @@ public class SwipeEvents extends AppCompatActivity {
     }
 
 
+
+
+
+
+
+
+
+    //Assigns values to views within the cards
+    //Handles flip animation to reveal additional event information
+
+
     public class SwipeDeckAdapter extends BaseAdapter {
 
         private List<JSONObject> data;
@@ -128,27 +168,28 @@ public class SwipeEvents extends AppCompatActivity {
             return position;
         }
 
+
+
+
         @Override
-        public View getView(final int position, View convertView, ViewGroup parent) {
+        public View getView(final int position, View convertView, final ViewGroup parent) {
 
             View v = convertView;
 
 
             if (v == null) {
                 LayoutInflater inflater = getLayoutInflater();
-                // normally use a viewholder
                 v = inflater.inflate(R.layout.cards, parent, false);
             }
+
             try {
                 image = getImageURL(testData.get(position).getString("img_path"));
                 event_id = testData.get(position).getString("event_id");
                 String user_id = testData.get(position).getString("user_id");
                 event_location = testData.get(position).getString("event_location");
+                event_name = testData.get(position).getString("event_name");
+                event_preference = testData.get(position).getString("event_preference");
 
-                TextView event_location_tv = (TextView)v.findViewById(R.id.event_location_swipe);
-                event_location_tv.setText("Location: "+ event_location);
-                TextView textView = (TextView)v.findViewById(R.id.event_id_num);
-                textView.setText("Event id: "+event_id);
 
 
             } catch (JSONException e) {
@@ -158,14 +199,41 @@ public class SwipeEvents extends AppCompatActivity {
             ImageView imageView = (ImageView) v.findViewById(R.id.offer_image);
             Picasso.with(context).load(image).fit().centerCrop().into(imageView);
 
+            ImageView flippedCardImage = (ImageView)v.findViewById(R.id.back_image);
+            Picasso.with(context).load(image).fit().centerCrop().into(flippedCardImage);
+
+            TextView event_location_tv = (TextView)v.findViewById(R.id.event_location_back);
+            event_location_tv.setText(event_location);
+
+            TextView event_name_tv = (TextView)v.findViewById(R.id.event_name_back);
+            event_name_tv.setText(event_name);
+
+            TextView event_preference_tv = (TextView)v.findViewById(R.id.event_preference_back);
+            event_preference_tv.setText(event_preference);
 
             v.setOnClickListener(new View.OnClickListener() {
                 @Override
-                public void onClick(View v) {
+                public void onClick(final View v) {
                     Log.i("Layer type: ", Integer.toString(v.getLayerType()));
                     Log.i("Hardware Accel type:", Integer.toString(View.LAYER_TYPE_HARDWARE));
-                    /*Intent i = new Intent(v.getContext(), BlankActivity.class);
-                    v.getContext().startActivity(i);*/
+
+                    //Picasso.with(context).load(R.drawable.liv1).fit().centerCrop().into(imageView);
+                    final CardView cv =(CardView) v.findViewById(R.id.card_view);
+                    final CardView cvBack = (CardView)v.findViewById(R.id.card_view_back);
+
+
+                    FlipAnimation flipAnimation = new FlipAnimation(cv, cvBack);
+
+                    if (cv.getVisibility() == View.GONE)
+                    {
+                        flipAnimation.reverse();
+
+                    }
+
+                    v.startAnimation(flipAnimation);
+
+
+
                 }
             });
             return v;

@@ -1,6 +1,17 @@
-<android.support.v7.widget.CardView xmlns:card_view="http://schemas.android.com/apk/res-auto"
+<LinearLayout
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:id="@+id/root_flip_layout"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    >
+
+
+<android.support.v7.widget.CardView
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/card_view"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -11,7 +22,8 @@
 
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:id="@+id/front_view">
 
             <ImageView
                 android:id="@+id/offer_image"
@@ -27,25 +39,86 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         >
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_centerHorizontal="true"
-            android:id="@+id/event_id_num"
-            android:textColor="@color/livinWhite"
-            android:paddingBottom="20dp"
-            android:textSize="25sp"/>
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/event_location_swipe"
-            android:layout_alignParentBottom="true"
-            android:textColor="@color/livinWhite"
-            android:text="Sample Text"
-            android:textSize="25sp" />
 
     </RelativeLayout>
+    </android.support.v7.widget.CardView>
 
 
-</android.support.v7.widget.CardView>
+
+    <android.support.v7.widget.CardView
+        xmlns:card_view="http://schemas.android.com/apk/res-auto"
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+
+        android:id="@+id/card_view_back"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        card_view:cardCornerRadius="4dp"
+        card_view:cardElevation="4dp"
+        card_view:cardUseCompatPadding="true"
+        android:visibility="gone"
+        android:layout_margin="8dp">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:padding="5dp"
+            android:id="@+id/back_view">
+
+            <ImageView
+                android:id="@+id/back_image"
+                android:layout_width="80dp"
+                android:adjustViewBounds="true"
+                android:layout_height="80dp"
+                />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/event_name_back"
+                android:textSize="20sp"
+                android:layout_marginLeft="5dp"
+                android:text="Event Name"
+                android:layout_toRightOf="@id/back_image"
+                />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/event_location_back"
+                android:textSize="15sp"
+                android:layout_marginLeft="5dp"
+                android:text="Event Location"
+                android:layout_toRightOf="@id/back_image"
+                android:layout_below="@id/event_name_back"
+                />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/event_preference_back"
+                android:textSize="15sp"
+                android:layout_marginLeft="5dp"
+                android:text="Event Preference"
+                android:layout_toRightOf="@id/back_image"
+                android:layout_below="@+id/event_location_back"
+                />
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+
+            <android.support.design.widget.BottomNavigationView
+                android:id="@+id/bottom_navigation"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                app:itemBackground="@color/livinPink"
+                app:itemIconTint="@color/livinWhite"
+                app:itemTextColor="@color/livinWhite"
+                app:menu="@menu/bottom_navigation_main" />
+            </RelativeLayout>
+
+        </RelativeLayout>
+
+    </android.support.v7.widget.CardView>
+
+
+</LinearLayout>

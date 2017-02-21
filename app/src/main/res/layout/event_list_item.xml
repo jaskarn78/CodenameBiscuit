@@ -78,11 +78,10 @@
             android:id="@+id/parent_list_item_expand_arrow"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_below="@+id/tv_event_name"
             android:layout_alignParentRight="true"
-            android:paddingTop="20dp"
-            android:layout_margin="8dp"
             android:visibility="visible"
-            android:src="@android:drawable/arrow_down_float" />
+            android:src="@drawable/ic_arrow_drop_down_black_24dp" />
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -101,6 +100,10 @@
             android:scaleType="fitXY"
             android:layout_marginBottom="10dp"
             />
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/collapseImage">
 
         <android.support.design.widget.BottomNavigationView
             android:id="@+id/bottom_navigation"
@@ -111,6 +114,7 @@
             app:itemIconTint="@color/livinWhite"
             app:itemTextColor="@color/livinWhite"
             app:menu="@menu/bottom_navigation_main" />
+            </RelativeLayout>
         </RelativeLayout>
 
     </RelativeLayout>

@@ -33,4 +33,5 @@
         <item>@string/pref_age_eighteen_value</item>
         <item>@string/pref_age_twenty_one_value</item>
     </array>
+
 </resources>

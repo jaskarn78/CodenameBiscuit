@@ -1,21 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.example.codenamebiscuit.swipedeck.layouts.SwipeFrameLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:swipedeck="http://schemas.android.com/apk/res-auto"
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/livinBlack"
-    android:id="@+id/swipeLayout"
-    android:orientation="vertical">
+    android:background="@color/livinBlack">
 
-    <com.example.codenamebiscuit.swipedeck.SwipeDeck
-        android:id="@+id/swipe_deck"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        swipedeck:max_visible="3"
-        swipedeck:render_above="false"
-        swipedeck:card_spacing="15dp"
-       />
+    <com.example.codenamebiscuit.swipedeck.layouts.SwipeFrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:swipedeck="http://schemas.android.com/apk/res-auto"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="@color/livinBlack"
+        android:id="@+id/swipeLayout"
+        android:orientation="vertical"
+        tools:layout_constraintTop_creator="1"
+        tools:layout_constraintRight_creator="1"
+        tools:layout_constraintBottom_creator="1"
+        android:layout_marginStart="8dp"
+        swipedeck:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginEnd="8dp"
+        swipedeck:layout_constraintRight_toRightOf="parent"
+        android:layout_marginTop="8dp"
+        tools:layout_constraintLeft_creator="1"
+        android:layout_marginBottom="8dp"
+        swipedeck:layout_constraintLeft_toLeftOf="parent"
+        swipedeck:layout_constraintTop_toTopOf="parent">
+
+        <com.example.codenamebiscuit.swipedeck.SwipeDeck
+            android:id="@+id/swipe_deck"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            swipedeck:max_visible="3"
+            swipedeck:render_above="false"
+            swipedeck:card_spacing="15dp" />
 
 
-</com.example.codenamebiscuit.swipedeck.layouts.SwipeFrameLayout>
+    </com.example.codenamebiscuit.swipedeck.layouts.SwipeFrameLayout>
+</android.support.constraint.ConstraintLayout>

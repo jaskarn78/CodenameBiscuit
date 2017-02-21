@@ -1,4 +1,4 @@
-package com.example.codenamebiscuit.helper;
+package com.example.codenamebiscuit.rv;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
