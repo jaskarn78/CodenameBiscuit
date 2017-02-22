@@ -93,6 +93,21 @@
     <string name="IMAGE_URL_PATH">http://athena.ecs.csus.edu/~teamone/AndroidUploadImage/uploads/</string>
     <string name="DATABASE_STORE_SAVED_EVENTS">http://athena.ecs.csus.edu/~teamone/php/store_saved_events.php</string>
     <string name="DATABASE_SAVED_EVENTS_PULLER">http://athena.ecs.csus.edu/~teamone/php/pull_saved_events_list.php</string>
+    <string name="DATABASE_STORE_DELETED_EVENTS">http://athena.ecs.csus.edu/~teamone/php/store_deleted_events.php</string>
+    <string name="DATABASE_DELETED_EVENTS_PULLER">http://athena.ecs.csus.edu/~teamone/php/pull_deleted_events_list.php</string>
+    <string name="title_activity_view_deleted_events">ViewDeletedEvents</string>
+    <string name="title_activity_main2">Main2Activity</string>
+
+    <string name="title_section1">Section 1</string>
+    <string name="title_section2">Section 2</string>
+    <string name="title_section3">Section 3</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+
+    <string name="action_example">Example action</string>
+
+    <string name="action_settings">Settings</string>
 
 
 </resources>

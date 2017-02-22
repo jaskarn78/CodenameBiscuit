@@ -5,12 +5,17 @@ import android.content.SharedPreferences;
 
 import android.os.Bundle;
 
+import android.support.design.widget.NavigationView;
+import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.preference.PreferenceManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -42,9 +47,15 @@ public class MainActivity extends AppCompatActivity implements ClickListener{
     private SwipeRefreshLayout swipeContainer;
     private ArrayList<JSONObject> eventData;
     private SharedPreferences pref;
-    private String[] mPlanetTitles;
-    private DrawerLayout mDrawerLayout;
-    private ListView mDrawerList;
+    private int SPLASH_TIME_OUT;
+
+    private DrawerLayout mDrawer;
+    private Toolbar toolbar;
+    private NavigationView nvDrawer;
+
+    // Make sure to be using android.support.v7.app.ActionBarDrawerToggle version.
+    // The android.support.v4.app.ActionBarDrawerToggle has been deprecated.
+    private ActionBarDrawerToggle drawerToggle;
 
 
 
@@ -58,11 +69,20 @@ public class MainActivity extends AppCompatActivity implements ClickListener{
         this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
         setContentView(R.layout.activity_main);
-        mPlanetTitles = getResources().getStringArray(R.array.menu_array);
-        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-        mDrawerList = (ListView) findViewById(R.id.left_drawer);
 
 
+        // Set a Toolbar to replace the ActionBar.
+        //toolbar = (Toolbar) findViewById(R.id.toolbar);
+        //setSupportActionBar(toolbar);
+
+        // Find our drawer view
+        mDrawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        // Find our drawer view
+        mDrawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        drawerToggle = setupDrawerToggle();
+
+        // Tie DrawerLayout events to the ActionBarToggle
+        mDrawer.addDrawerListener(drawerToggle);
 
 
         if (findViewById(R.id.swipeContainer) != null) {
@@ -82,18 +102,45 @@ public class MainActivity extends AppCompatActivity implements ClickListener{
 
     }
 
+    /**
+     * setup for navigation drawer
+     * @return
+     */
+    private ActionBarDrawerToggle setupDrawerToggle() {
+        // NOTE: Make sure you pass in a valid toolbar reference.  ActionBarDrawToggle() does not require it
+        // and will not render the hamburger icon without it.
+        return new ActionBarDrawerToggle(this, mDrawer, toolbar, R.string.drawer_open,  R.string.drawer_close);
+    }
+
+
+    private void setupDrawerContent(NavigationView navigationView) {
+        navigationView.setNavigationItemSelectedListener(
+                new NavigationView.OnNavigationItemSelectedListener() {
+                    @Override
+                    public boolean onNavigationItemSelected(MenuItem menuItem) {
+                        //selectDrawerItem(menuItem);
+                        return true;
+                    }
+                });
+    }
+
 
     @Override
     public void onResume() {  // After a pause OR at startup
         super.onResume();
-        mEventAdapter.notifyDataSetChanged();
+        swipeContainer.setRefreshing(true);
+        loadEventData();
+        swipeContainer.setRefreshing(false);
+        // mEventAdapter.notifyDataSetChanged();
     }
 
     @Override
     public void onStart() {
         super.onStart();
+        swipeContainer.setRefreshing(true);
         loadEventData();
-
+        swipeContainer.setRefreshing(false);
+        //close the activity
 
     }
     @Override
@@ -101,6 +148,11 @@ public class MainActivity extends AppCompatActivity implements ClickListener{
         super.onPause();
     }
 
+    /**
+     * Check if logged in user is logged in through facebook or through google
+     * to obtain the correct user id to pass to the database which in
+     * turn will provide all events based on a preferences selected by a user id
+     */
     private void checkIfFbOrGoogleLogin() {
         if (AccessToken.getCurrentAccessToken() == null && pref.getString("user_idG", null) == null) {
             Intent intent = new Intent(MainActivity.this, ChooseLogin.class);
@@ -127,6 +179,11 @@ public class MainActivity extends AppCompatActivity implements ClickListener{
     }
 
 
+    /**
+     * sets up recycler view and assigns layout
+     * assigns mEventAdapter which contains all event information retrieved from MySQL request
+     *
+     */
     private void setupRecyclerView() {
         mRecyclerView = (RecyclerView) findViewById(R.id.recyclerview_events);
         LinearLayoutManager layoutManager
@@ -142,6 +199,12 @@ public class MainActivity extends AppCompatActivity implements ClickListener{
         mRecyclerView.setAdapter(mEventAdapter);
         mEventAdapter.setClickListener(this);
     }
+
+    /**
+     * sets up refresh layout
+     *when swiping down to refresh, method calls loadEventData() to
+     * retrieve any new events that may have been added
+     */
 
     private void setupSwipeDownRefresh() {
         swipeContainer = (SwipeRefreshLayout) findViewById(R.id.swipeContainer);
@@ -159,6 +222,10 @@ public class MainActivity extends AppCompatActivity implements ClickListener{
 
     }
 
+    /**
+     * HTTP request to run python script which contains sql command
+     * to retrieve all event data filtered by user id
+     */
     private void loadEventData() {
         QueryEventList list = (QueryEventList)
                 new QueryEventList(mEventAdapter, getString(R.string.DATABASE_MAIN_EVENTS_PULLER), this).execute(currentUserId);
@@ -177,14 +244,32 @@ public class MainActivity extends AppCompatActivity implements ClickListener{
         return true;
     }
 
+    /**
+     * Check to see which menu item is clicked
+     *
+     * @param item
+     * @return
+     */
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int itemId = item.getItemId();
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                mDrawer.openDrawer(GravityCompat.START);
+                return super.onOptionsItemSelected(item);
+        }
+
+        //if "User Settings" is selected, start user settings activity
         if (itemId == R.id.events_list_menu_action) {
             Intent startUserSettingsActivity = new Intent(this, UserSettingsActivity.class);
             startActivity(startUserSettingsActivity);
             return true;
         }
+        //If "Change View" is selected, start full screen swiping activity
+        //pass data from mEventAdapter to next activity via intent
+        //need to create arraylist to pass data via intent
+        //cannot pass objects unless object is parcelable
         if (itemId == R.id.ChangeView) {
             Intent intent = new Intent(this, SwipeEvents.class);
             intent.putExtra("user_id", currentUserId + "");
@@ -200,6 +285,8 @@ public class MainActivity extends AppCompatActivity implements ClickListener{
             startActivity(intent);
             return true;
         }
+        //if "Saved Events" is selected, start Saved Events activity
+        //User id is passed via intent to retrieve saved event information for current user
         if (itemId == R.id.events_list_saved) {
             Intent intent = new Intent(this, ViewSavedEvents.class);
             try {
@@ -210,16 +297,29 @@ public class MainActivity extends AppCompatActivity implements ClickListener{
             startActivity(intent);
 
         }
+        if(itemId==R.id.events_list_deleted){
+            Intent intent = new Intent(this, ViewDeletedEvents.class);
+            try{
+                intent.putExtra("user_id", currentUserId.get("user_id").toString());
+            }catch (JSONException e){
+                e.printStackTrace();
+            }
+            startActivity(intent);
+        }
         return super.onOptionsItemSelected(item);
     }
 
     @Override
     public void onDestroy() {
-        super.onDestroy();
-        //RefWatcher refWatcher = MainActivity.getRefWatcher(this);
-        //refWatcher.watch(this);
+        super.onDestroy();;
     }
 
+    /**
+     * Handles the drop down functionality in the list view of the event data
+     * When image button is clicked, additional event information is revealed
+     * @param view
+     * @param position
+     */
 
     @Override
     public void itemClicked(View view, int position) {

@@ -438,6 +438,10 @@ public class SwipeDeck extends FrameLayout {
             }
         }
 
+        /**
+         *
+         * @param card
+         */
         @Override
         public void cardSwipedRight(View card) {
             Log.d(TAG, "card swiped right");

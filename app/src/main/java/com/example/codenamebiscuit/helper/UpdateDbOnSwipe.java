@@ -17,9 +17,13 @@ import java.net.URLConnection;
  * Created by jaskarnjagpal on 2/15/17.
  */
 
-public class SaveEventsOnSwipe extends AsyncTask<JSONObject, Void, Void> {
-    private static final String DATABASE_STORE_SAVED_EVENTS =
-            "http://athena.ecs.csus.edu/~teamone/php/store_saved_events.php";
+public class UpdateDbOnSwipe extends AsyncTask<JSONObject, String, Void> {
+    private static String DATABASE_QUERY_URL;
+
+    public UpdateDbOnSwipe(String url) {
+        DATABASE_QUERY_URL = url;
+
+    }
 
     @Override
     protected Void doInBackground(JSONObject... params) {
@@ -36,7 +40,7 @@ public class SaveEventsOnSwipe extends AsyncTask<JSONObject, Void, Void> {
 
 
             // Connect to the URL
-            URL url = new URL(DATABASE_STORE_SAVED_EVENTS);
+            URL url = new URL(DATABASE_QUERY_URL);
             URLConnection conn = url.openConnection();
 
             conn.setDoOutput(true);

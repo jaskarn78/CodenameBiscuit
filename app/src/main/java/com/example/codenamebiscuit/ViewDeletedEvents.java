@@ -1,6 +1,5 @@
 package com.example.codenamebiscuit;
 
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -25,7 +24,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
-public class ViewSavedEvents extends AppCompatActivity {
+public class ViewDeletedEvents extends AppCompatActivity {
 
     private RecyclerView mRecyclerView;
     private EventAdapter mEventAdapter;
@@ -41,7 +40,7 @@ public class ViewSavedEvents extends AppCompatActivity {
 
         //Remove notification bar
         this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
-        setContentView(R.layout.activity_view_saved_events);
+        setContentView(R.layout.activity_view_deleted_events);
         Bundle extras = getIntent().getExtras();
         try {
             String userID = extras.getString("user_id");
@@ -80,7 +79,7 @@ public class ViewSavedEvents extends AppCompatActivity {
     private void setupRecyclerView(){
         mRecyclerView = (RecyclerView) findViewById(R.id.recyclerview_saved_events);
         //mLayoutManager = new GridLayoutManager(getApplicationContext(),2);
-        LinearLayoutManager layoutManager
+         LinearLayoutManager layoutManager
                 = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
 
         mRecyclerView.setLayoutManager(layoutManager);
@@ -109,14 +108,16 @@ public class ViewSavedEvents extends AppCompatActivity {
     }
 
     /**
-     * This method will get the user's preferred location for weather, and then tell some
-     * background method to get the weather data in the background.
+     * This method will run an async task to issue a HTTP request to retrieve deleted
+     * event information based on the current user id.
+     * event information is then loaded into an ArrayList of type JSONObject
+     *
      */
     private void loadEventData() {
         if(mRecyclerView!=null)
             mRecyclerView.setVisibility(View.VISIBLE);
         QueryEventList list = (QueryEventList)
-                new QueryEventList( mEventAdapter, getString(R.string.DATABASE_SAVED_EVENTS_PULLER), this).execute(currentUserId);
+                new QueryEventList( mEventAdapter, getString(R.string.DATABASE_DELETED_EVENTS_PULLER), this).execute(currentUserId);
         ArrayList<JSONObject> eventData = list.getEventList();
 
 
@@ -128,6 +129,5 @@ public class ViewSavedEvents extends AppCompatActivity {
 
         return true;
     }
-
 
 }

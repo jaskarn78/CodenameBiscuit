@@ -17,6 +17,10 @@
             android:title="View Saved Events"
             app:showAsAction="never" />
         <item
+            android:id="@+id/events_list_deleted"
+            android:title="View Deleted Events"
+            app:showAsAction="never" />
+        <item
             android:id="@+id/events_list_menu_action"
             android:title="User Settings"
             android:icon="@drawable/ic_settings_black_24dp"

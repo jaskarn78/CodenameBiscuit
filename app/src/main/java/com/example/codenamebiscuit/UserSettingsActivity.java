@@ -333,7 +333,7 @@ public class UserSettingsActivity
                     e.printStackTrace();
                 }
             }
-        } else if (key.equals(getString(R.string.pref_food_drink_key))) {
+        } else if (key.equals(getString(R.string.pref_entertainment_key))) {
             mEntertainmentPreference = sharedPreferences.getBoolean(getString(R.string.pref_entertainment_key),
                     getResources().getBoolean(R.bool.pref_entertainment_value));
             if (mEntertainmentPreference) {

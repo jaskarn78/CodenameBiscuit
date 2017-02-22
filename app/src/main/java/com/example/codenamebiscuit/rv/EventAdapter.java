@@ -2,6 +2,7 @@ package com.example.codenamebiscuit.rv;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.support.v7.widget.CardView;
@@ -19,6 +20,7 @@ import android.widget.Toast;
 import com.example.codenamebiscuit.R;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
+import com.muddzdev.styleabletoastlibrary.StyleableToast;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 
@@ -58,7 +60,7 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
 
 
     public class EventAdapterViewHolder extends RecyclerView.ViewHolder implements
-            View.OnClickListener, OnMapReadyCallback {
+            View.OnClickListener, OnMapReadyCallback, View.OnLongClickListener {
 
         public final TextView mEventPreferenceTV;
         public final TextView mEventLocationTV;
@@ -105,6 +107,9 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
             cardView = (CardView) view.findViewById(R.id.cardview);
             imageButton = (ImageButton) view.findViewById(R.id.parent_list_item_expand_arrow);
             imageButton.setOnClickListener(this);
+            view.setOnClickListener(this);
+            view.setOnLongClickListener(this);
+
             //map.onCreate(null);
 
         }
@@ -115,6 +120,12 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
             if(clickListener!=null){
                 clickListener.itemClicked(v, getAdapterPosition());
             }
+            StyleableToast st = new StyleableToast(context, "EVENT LONG CLICKED", Toast.LENGTH_SHORT);
+            st.setBackgroundColor(Color.parseColor("#ff9dfc"));
+            st.setTextColor(Color.WHITE);
+            st.setIcon(R.drawable.ic_check_circle_white_24dp);
+            st.setMaxAlpha();
+            st.show();
         }
 
 
@@ -125,6 +136,16 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
         }
 
 
+        @Override
+        public boolean onLongClick(View v) {
+            StyleableToast st = new StyleableToast(context, "EVENT LONG CLICKED", Toast.LENGTH_SHORT);
+            st.setBackgroundColor(Color.parseColor("#ff9dfc"));
+            st.setTextColor(Color.WHITE);
+            st.setIcon(R.drawable.ic_check_circle_white_24dp);
+            st.setMaxAlpha();
+            st.show();
+            return true;
+        }
     }
 
 
