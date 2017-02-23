@@ -45,6 +45,8 @@ public class ViewDeletedEvents extends AppCompatActivity {
     private String userID;
     private Toolbar toolbar;
     private int SPLASH_TIME_OUT;
+    private ArrayList<JSONObject> eventData;
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -152,7 +154,7 @@ public class ViewDeletedEvents extends AppCompatActivity {
             mRecyclerView.setVisibility(View.VISIBLE);
         QueryEventList list = (QueryEventList)
                 new QueryEventList( mEventAdapter, getString(R.string.DATABASE_DELETED_EVENTS_PULLER), this).execute(currentUserId);
-        ArrayList<JSONObject> eventData = list.getEventList();
+        eventData = list.getEventList();
 
 
     }

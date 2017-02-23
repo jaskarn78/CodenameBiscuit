@@ -58,6 +58,10 @@ public class ChooseLogin extends FragmentActivity implements GoogleApiClient.OnC
     private static final int RC_SIGN_IN = 9001;
     private SharedPreferences pref;
     private DatabaseHelper db;
+
+    public ChooseLogin(){
+
+    }
     /**
      * ATTENTION: This was auto-generated to implement the App Indexing API.
      * See https://g.co/AppIndexing/AndroidStudio for more information.
@@ -99,6 +103,9 @@ public class ChooseLogin extends FragmentActivity implements GoogleApiClient.OnC
         signIn();
         App.getGoogleApiHelper().connect();
 
+    }
+    public GoogleApiClient getGoogleApiClient(){
+        return mGoogleApiClient;
     }
     private void handleSignInResult(GoogleSignInResult result) throws JSONException {
 

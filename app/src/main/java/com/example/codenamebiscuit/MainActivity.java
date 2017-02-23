@@ -1,41 +1,24 @@
 package com.example.codenamebiscuit;
 
-import android.animation.ObjectAnimator;
-import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-
-import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.graphics.Typeface;
-import android.graphics.drawable.Drawable;
-import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
 
-import android.os.UserManager;
-import android.support.design.widget.NavigationView;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.view.GravityCompat;
-import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.app.ActionBarActivity;
-import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.preference.PreferenceManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.codenamebiscuit.helper.SetupDrawer;
 import com.example.codenamebiscuit.rv.ClickListener;
@@ -47,6 +30,8 @@ import com.facebook.FacebookSdk;
 
 import com.mikepenz.materialdrawer.AccountHeader;
 import com.mikepenz.materialdrawer.Drawer;
+import com.muddzdev.styleabletoastlibrary.StyleableToast;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 import java.util.ArrayList;
@@ -108,10 +93,20 @@ public class MainActivity extends AppCompatActivity implements ClickListener{
         setupSwipeDownRefresh();
 
         swipeContainer.setRefreshing(true);
-        checkIfFbOrGoogleLogin();
+        checkIfFbOrGoogleLogin(savedInstanceState);
         //setupNavDrawer(savedInstanceState);
-        loadDrawer(savedInstanceState);
+
+
+        //st.show();
         loadEventData();
+
+        /** Custom stylable toast**/
+        StyleableToast st = new StyleableToast(getApplicationContext(), "Loading Events...Please Wait", Toast.LENGTH_SHORT);
+        st.setBackgroundColor(Color.parseColor("#ff9dfc"));
+        st.setTextColor(Color.WHITE);
+        st.setIcon(R.drawable.ic_autorenew_white_24dp);
+        st.spinIcon();
+        st.setMaxAlpha();
 
     }
 
@@ -160,7 +155,7 @@ public class MainActivity extends AppCompatActivity implements ClickListener{
      * turn will provide all events based on a preferences selected by a user id
      * if facebook id and google id return null, redirect to the login screen
      **********************************************************************************************/
-    private void checkIfFbOrGoogleLogin() {
+    private void checkIfFbOrGoogleLogin(Bundle savedstate) {
         if (AccessToken.getCurrentAccessToken() == null && pref.getString("user_idG", null) == null) {
             Intent intent = new Intent(MainActivity.this, ChooseLogin.class);
             startActivity(intent);
@@ -174,6 +169,7 @@ public class MainActivity extends AppCompatActivity implements ClickListener{
             } catch (JSONException e) {
                 e.printStackTrace();
             }
+            loadDrawer(savedstate);
         }
         if (pref.getString("user_idG", null) != null && AccessToken.getCurrentAccessToken() == null) {
             try {
@@ -183,6 +179,7 @@ public class MainActivity extends AppCompatActivity implements ClickListener{
             } catch (JSONException e) {
                 e.printStackTrace();
             }
+            loadDrawer(savedstate);
         }
         //onClick();
     }

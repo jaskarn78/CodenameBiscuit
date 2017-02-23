@@ -106,7 +106,7 @@ public class SwipeEvents extends AppCompatActivity {
                     StyleableToast st = new StyleableToast(getApplicationContext(), "EVENT DELETED", Toast.LENGTH_SHORT);
                     st.setBackgroundColor(Color.parseColor("#ff9dfc"));
                     st.setTextColor(Color.WHITE);
-                    st.setIcon(R.drawable.ic_check_circle_white_24dp);
+                    st.setIcon(R.drawable.ic_delete_white_24dp);
                     st.setMaxAlpha();
                     st.show();
                     deleteEvent.put("event_id", adapter.getItem((int)stableId).get("event_id"));

@@ -35,14 +35,14 @@ public class QueryEventList extends AsyncTask<JSONObject, Void, ArrayList<JSONOb
 
     private EventAdapter mEventAdapter;
     private ArrayList<JSONObject> eventList;
-    private String DATABASE_MAIN_EVENTS_PULLER;
+    private String main_events;
     private Context context;
     ProgressDialog dialog;
 
 
-    public QueryEventList(EventAdapter mEventAdapter, String DATABASE_MAIN_EVENTS_PULLER, Context context){
+    public QueryEventList(EventAdapter mEventAdapter, String main_events, Context context){
         this.mEventAdapter = mEventAdapter;
-        this.DATABASE_MAIN_EVENTS_PULLER=DATABASE_MAIN_EVENTS_PULLER;
+        this.main_events=main_events;
         this.context=context;
         dialog = new ProgressDialog(context);
 
@@ -69,7 +69,7 @@ public class QueryEventList extends AsyncTask<JSONObject, Void, ArrayList<JSONOb
                 return null;
 
             // Connect to the URL
-            URL url = new URL(DATABASE_MAIN_EVENTS_PULLER);
+            URL url = new URL(main_events);
             URLConnection conn = url.openConnection();
 
             conn.setDoOutput(true);
