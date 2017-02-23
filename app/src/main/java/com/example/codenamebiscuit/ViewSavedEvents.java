@@ -31,16 +31,20 @@ public class ViewSavedEvents extends AppCompatActivity {
     private EventAdapter mEventAdapter;
     private JSONObject currentUserId = new JSONObject();
     private SwipeRefreshLayout swipeContainer;
+    private Toolbar toolbar;
     private RecyclerView.LayoutManager mLayoutManager;
     private int SPLASH_TIME_OUT;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        this.requestWindowFeature(Window.FEATURE_NO_TITLE);
 
-        //Remove notification bar
         this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        // Handle Toolbar
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
+
         setContentView(R.layout.activity_view_saved_events);
         Bundle extras = getIntent().getExtras();
         try {

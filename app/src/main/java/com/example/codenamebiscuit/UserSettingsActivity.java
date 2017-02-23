@@ -21,6 +21,7 @@ import android.widget.TextView;
 
 import com.example.codenamebiscuit.helper.App;
 import com.example.codenamebiscuit.helper.DatabaseHelper;
+import com.example.codenamebiscuit.helper.DownloadImage;
 import com.example.codenamebiscuit.helper.RoundedImageView;
 import com.example.codenamebiscuit.login.ChooseLogin;
 import com.facebook.AccessToken;
@@ -57,7 +58,6 @@ public class UserSettingsActivity
 
     private JSONObject pref = new JSONObject();
     private SharedPreferences prefs;
-    private DatabaseHelper db;
 
 
     @Override
@@ -72,21 +72,18 @@ public class UserSettingsActivity
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
 
-        Profile profile = Profile.getCurrentProfile();
-        if(profile==null) {
+        Profile fbprofile = Profile.getCurrentProfile();
+        if(fbprofile==null) {
 
             Uri pic = Uri.parse(prefs.getString("user_image", null));
             String fName = prefs.getString("fName", null);
             String lName = prefs.getString("lName", null);
-
             initializeGoogleProfileInfo(fName, lName, pic);
-
         }
 
 
-        if (profile != null) {
-            initializeFBProfileInfo(profile);
-        }
+        if (fbprofile != null)
+            initializeFBProfileInfo(fbprofile);
 
         initializeLogoutButton();
         try {
@@ -173,6 +170,7 @@ public class UserSettingsActivity
                 getResources().getBoolean(R.bool.pref_performing_arts_value));
         mEntertainmentPreference = sharedPreferences.getBoolean(getString(R.string.pref_entertainment_key),
                 getResources().getBoolean(R.bool.pref_entertainment_value));
+
         pref.put("pref_id1", mMusicPreference);
         pref.put("pref_id2", mFoodDrinkPreference);
         pref.put("pref_id3", mSportsPreference);
@@ -182,8 +180,6 @@ public class UserSettingsActivity
         pref.put("pref_id7", mRetailPreference);
         pref.put("pref_id8", mPerformingArtsPreference);
         pref.put("pref_id9", mEntertainmentPreference);
-
-
         sharedPreferences.registerOnSharedPreferenceChangeListener(this);
     }
 
@@ -199,6 +195,7 @@ public class UserSettingsActivity
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
+
             } else {
                 try {
                     pref.put("pref_id1", 0);
@@ -369,38 +366,5 @@ public class UserSettingsActivity
     }
 
 
-
-    /**
-     * DownloadImage class runs background process to find user's facebook image
-     */
-    public class DownloadImage extends AsyncTask<String, Void, Bitmap> {
-        private final WeakReference<ImageView> viewReference;
-
-        public DownloadImage(ImageView bmImage) {
-            viewReference = new WeakReference<ImageView>(bmImage);
-        }
-
-        // Find the image via Url in a background thread
-        protected Bitmap doInBackground(String... urls) {
-            String urlDisplay = urls[0];
-            Bitmap image = null;
-            try {
-                InputStream in = new java.net.URL(urlDisplay).openStream();
-                image = BitmapFactory.decodeStream(in);
-            } catch (Exception e) {
-                Log.e("Error", e.getMessage());
-                e.printStackTrace();
-            }
-            return image;
-        }
-
-        // Set the ImageView to have the Bitmap result
-        protected void onPostExecute(Bitmap result) {
-            ImageView imageView = viewReference.get();
-            if (imageView != null) {
-                imageView.setImageBitmap(result);
-            }
-        }
-    }
 }
 

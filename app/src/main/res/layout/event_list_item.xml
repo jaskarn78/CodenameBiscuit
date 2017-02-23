@@ -74,16 +74,6 @@
             android:text="Cost: $$$"
             android:paddingBottom="10dp"
             />
-        <ImageButton
-            android:id="@+id/parent_list_item_expand_arrow"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/tv_event_name"
-            android:layout_above="@+id/cost"
-            android:layout_alignParentRight="true"
-            android:padding="10dp"
-            android:visibility="visible"
-            android:src="@drawable/ic_arrow_drop_down_black_24dp" />
 
         <RelativeLayout
             android:layout_width="match_parent"

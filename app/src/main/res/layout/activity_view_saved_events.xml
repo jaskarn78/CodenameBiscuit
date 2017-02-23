@@ -1,20 +1,56 @@
 
-
-<FrameLayout
+<RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_height="match_parent"
-    android:layout_width="match_parent">
+    android:layout_width="match_parent"
+    android:gravity="center">
 
-    <android.support.v4.widget.SwipeRefreshLayout
-        android:id="@+id/swipeContainer_saved_events"
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="?attr/actionBarSize"
+        android:background="?attr/colorPrimary"
+        android:elevation="4dp"
+        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+        app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
 
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/recyclerview_saved_events"
+    <FrameLayout
+        android:id="@+id/frame_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/toolbar">
+
+
+        <android.support.v4.widget.SwipeRefreshLayout
+
+            android:id="@+id/swipeContainer_saved_events"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="@color/cardview_dark_background"
-            />
-    </android.support.v4.widget.SwipeRefreshLayout>
-</FrameLayout>
+            tools:layout_constraintTop_creator="1"
+            tools:layout_constraintRight_creator="1"
+            tools:layout_constraintBottom_creator="1"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            android:layout_marginTop="8dp"
+            tools:layout_constraintLeft_creator="1"
+            android:layout_marginBottom="4dp"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp">
+
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/recyclerview_saved_events"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/livinBlack"
+                android:gravity="center"
+                />
+
+
+        </android.support.v4.widget.SwipeRefreshLayout>
+    </FrameLayout>
+</RelativeLayout>

@@ -39,7 +39,7 @@ public class SplashScreen extends Activity {
        //progress.getIndeterminateDrawable().setColorFilter(Color.rgb(255, 157, 252), PorterDuff.Mode.MULTIPLY);
 
         //StyleableToast st = new StyleableToast(getApplicationContext(), "LOADING EVENTS...", Toast.LENGTH_SHORT);
-        StyleableToast st = new StyleableToast(getApplicationContext(), deviceHasGoogleAccount()+"", Toast.LENGTH_SHORT);
+        StyleableToast st = new StyleableToast(getApplicationContext(), "Loading Events...Please Wait", Toast.LENGTH_SHORT);
 
         st.setBackgroundColor(Color.parseColor("#ff9dfc"));
         st.setTextColor(Color.WHITE);
@@ -56,11 +56,7 @@ public class SplashScreen extends Activity {
         Slide slide = (Slide) TransitionInflater.from(this).inflateTransition(R.transition.activity_slide);
         getWindow().setExitTransition(slide);
     }
-    private String deviceHasGoogleAccount(){
-        GoogleApiHelper googleApiHelper = new GoogleApiHelper(this);
-        googleApiHelper.getApiClient().connect();
-        return googleApiHelper.isConnected()+"";
-    }
+
 
 
 }

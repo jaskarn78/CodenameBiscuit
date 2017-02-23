@@ -17,7 +17,7 @@ import java.net.URLConnection;
  * Created by Tommy on /23/17.
  */
 
-public class SigninActivity extends AsyncTask<JSONObject, Void, Boolean> {
+public class InsertUserDB extends AsyncTask<JSONObject, Void, Boolean> {
     private static final String DATABASE_CONNECTION_LINK =
             "http://athena.ecs.csus.edu/~teamone/php/user_insert2.php";
 

@@ -28,13 +28,10 @@ import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.api.ResultCallback;
-import com.google.android.gms.common.api.Status;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -112,6 +109,7 @@ public class ChooseLogin extends FragmentActivity implements GoogleApiClient.OnC
             pref.edit().putString("user_image", String.valueOf(acct.getPhotoUrl())).apply();
             pref.edit().putString("fName", acct.getGivenName()).apply();
             pref.edit().putString("lName", acct.getFamilyName()).apply();
+            pref.edit().putString("email", acct.getEmail()).apply();
 
             JSONObject obj = new JSONObject();
             obj.put("user_id", acct.getId());
@@ -128,7 +126,7 @@ public class ChooseLogin extends FragmentActivity implements GoogleApiClient.OnC
                 }
 
                 // Update Database
-                SigninActivity userSignin = new SigninActivity();
+                InsertUserDB userSignin = new InsertUserDB();
                 userSignin.execute(obj);
 
             } catch (NullPointerException e) {
@@ -184,7 +182,7 @@ public class ChooseLogin extends FragmentActivity implements GoogleApiClient.OnC
                                     }
 
                                     // Update Database
-                                    SigninActivity userSignin = new SigninActivity();
+                                    InsertUserDB userSignin = new InsertUserDB();
                                     userSignin.execute(bFacebookData);
 
 
@@ -260,6 +258,8 @@ public class ChooseLogin extends FragmentActivity implements GoogleApiClient.OnC
                 URL profile_pic = new URL("https://graph.facebook.com/" + id + "/picture?width=200&height=150");
                 Log.i("profile_pic", profile_pic + "");
                 normalizedObj.put("profile_pic", profile_pic.toString());
+                pref.edit().putString("user_image", profile_pic.toString()).apply();
+
 
             } catch (MalformedURLException e) {
                 e.printStackTrace();
@@ -267,18 +267,28 @@ public class ChooseLogin extends FragmentActivity implements GoogleApiClient.OnC
             }
 
             normalizedObj.put("user_id", id);
-            if (object.has("first_name"))
+            if (object.has("first_name")) {
                 normalizedObj.put("first_name", object.getString("first_name"));
-            if (object.has("last_name"))
+                pref.edit().putString("fName", object.getString("first_name")).apply();
+            }
+            if (object.has("last_name")) {
                 normalizedObj.put("last_name", object.getString("last_name"));
-            if (object.has("email"))
+                pref.edit().putString("lName", object.getString("last_name")).apply();
+            }
+            if (object.has("email")) {
                 normalizedObj.put("user_email", object.getString("email"));
-            if (object.has("gender"))
+                pref.edit().putString("email", object.getString("email")).apply();
+
+            }
+            if (object.has("gender")) {
                 normalizedObj.put("gender", object.getString("gender"));
-            if (object.has("birthday"))
+            }
+            if (object.has("birthday")) {
                 normalizedObj.put("birthday", object.getString("birthday"));
-            if (object.has("location"))
+            }
+            if (object.has("location")) {
                 normalizedObj.put("location", object.getJSONObject("location").getString("name"));
+            }
 
 
             return normalizedObj;

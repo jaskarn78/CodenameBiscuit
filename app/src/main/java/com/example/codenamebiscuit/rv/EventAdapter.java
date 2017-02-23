@@ -60,28 +60,20 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
 
 
     public class EventAdapterViewHolder extends RecyclerView.ViewHolder implements
-            View.OnClickListener, OnMapReadyCallback, View.OnLongClickListener {
+            View.OnClickListener, View.OnLongClickListener {
 
         public final TextView mEventPreferenceTV;
         public final TextView mEventLocationTV;
         public final ImageView mEventImage;
-        public final ImageView mExpandedImage;
         public final TextView mEventName;
         public final TextView mEventAge;
         public final TextView mEventCost;
         public final CardView cardView;
-        public final ImageButton imageButton;
         public final RelativeLayout layout;
-        //public final MapView map;
-        public GoogleMap googleMap;
-        public int originalHeight=0;
-        public boolean isViewExpanded=false;
 
 
         public EventAdapterViewHolder(final View view) {
             super(view);
-            //map = (MapView) view.findViewById(R.id.map);
-            //map.getMapAsync(this);
 
             mEventPreferenceTV = (TextView) view.findViewById(R.id.tv_event_preference);
             mEventPreferenceTV.setTypeface(typeface);
@@ -98,19 +90,16 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
             mEventCost = (TextView)view.findViewById(R.id.cost);
             mEventCost.setTypeface(typeface);
 
-            mExpandedImage = (ImageView)view.findViewById(R.id.collapseImage);
 
             layout = (RelativeLayout)view.findViewById(R.id.extend);
 
 
             mEventImage = (ImageView) view.findViewById(R.id.iv_event_image);
             cardView = (CardView) view.findViewById(R.id.cardview);
-            imageButton = (ImageButton) view.findViewById(R.id.parent_list_item_expand_arrow);
-            imageButton.setOnClickListener(this);
+
             view.setOnClickListener(this);
             view.setOnLongClickListener(this);
 
-            //map.onCreate(null);
 
         }
 
@@ -129,12 +118,6 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
         }
 
 
-        @Override
-        public void onMapReady(GoogleMap googleMap) {
-            this.googleMap=googleMap;
-
-        }
-
 
         @Override
         public boolean onLongClick(View v) {
@@ -143,7 +126,7 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
             st.setTextColor(Color.WHITE);
             st.setIcon(R.drawable.ic_check_circle_white_24dp);
             st.setMaxAlpha();
-            st.show();
+            //st.show();
             return true;
         }
     }
@@ -179,7 +162,7 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
                 .centerCrop()
                 .into(loadImage(eventAdapterViewHolder));
 
-        eventAdapterViewHolder.imageButton.setOnClickListener(new View.OnClickListener() {
+        eventAdapterViewHolder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Toast.makeText(v.getContext(), "button clicked", Toast.LENGTH_SHORT).show();
