@@ -5,8 +5,17 @@
     android:id="@+id/activity_login"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/liv1"
     tools:context="com.example.codenamebiscuit.login.ChooseLogin">
+
+<RelativeLayout
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content">
+    <ImageView
+        android:layout_height="match_parent"
+        android:layout_width="match_parent"
+        android:scaleType="fitXY"
+        android:src="@drawable/liv1"/>
+</RelativeLayout>
 
     <LinearLayout
         android:layout_width="0dp"
@@ -24,6 +33,7 @@
         android:layout_marginBottom="8dp"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toTopOf="parent">
+
 
         <com.facebook.login.widget.LoginButton
             android:id="@+id/facebook_login_button"
@@ -43,6 +53,7 @@
             android:layout_gravity="center_horizontal" />
 
     </LinearLayout>
+
 
 
 </android.support.constraint.ConstraintLayout>

@@ -39,7 +39,7 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
     public EventAdapter(Context context) {
         this.context = context;
         mEventData = new ArrayList<>();
-        typeface=Typeface.createFromAsset(context.getAssets(), "fonts/HelveticaNeueBd.ttf");
+        typeface=Typeface.createFromAsset(context.getAssets(), "fonts/Raleway-Black.ttf");
 
     }
 
@@ -76,19 +76,19 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
             super(view);
 
             mEventPreferenceTV = (TextView) view.findViewById(R.id.tv_event_preference);
-            mEventPreferenceTV.setTypeface(typeface);
+            //mEventPreferenceTV.setTypeface(typeface);
 
             mEventLocationTV = (TextView) view.findViewById(R.id.tv_event_location);
-            mEventLocationTV.setTypeface(typeface);
+            //mEventLocationTV.setTypeface(typeface);
 
             mEventName = (TextView) view.findViewById(R.id.tv_event_name);
-            mEventName.setTypeface(typeface);
+            //mEventName.setTypeface(typeface);
 
             mEventAge = (TextView)view.findViewById(R.id.age);
-            mEventAge.setTypeface(typeface);
+            //mEventAge.setTypeface(typeface);
 
             mEventCost = (TextView)view.findViewById(R.id.cost);
-            mEventCost.setTypeface(typeface);
+           // mEventCost.setTypeface(typeface);
 
 
             layout = (RelativeLayout)view.findViewById(R.id.extend);

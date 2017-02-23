@@ -1,11 +1,13 @@
 package com.example.codenamebiscuit;
 
 import android.content.SharedPreferences;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.preference.PreferenceManager;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -16,9 +18,13 @@ import android.view.MenuInflater;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.TextView;
 
 import com.example.codenamebiscuit.helper.QueryEventList;
+import com.example.codenamebiscuit.helper.SetupDrawer;
 import com.example.codenamebiscuit.rv.EventAdapter;
+import com.mikepenz.materialdrawer.AccountHeader;
+import com.mikepenz.materialdrawer.Drawer;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -33,22 +39,33 @@ public class ViewSavedEvents extends AppCompatActivity {
     private SwipeRefreshLayout swipeContainer;
     private Toolbar toolbar;
     private RecyclerView.LayoutManager mLayoutManager;
+    private SharedPreferences prefs;
+    private AccountHeader headerResult = null;
+    private Drawer result = null;
+    private String userID;
     private int SPLASH_TIME_OUT;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+
+        setContentView(R.layout.activity_view_saved_events);
+
         // Handle Toolbar
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        this.getSupportActionBar().setDisplayShowTitleEnabled(false);
 
 
-        setContentView(R.layout.activity_view_saved_events);
+        TextView tv = (TextView)findViewById(R.id.toolbar_title);
+        Typeface typeface = Typeface.createFromAsset(getApplicationContext().getAssets(), "fonts/Raleway-Black.ttf");
+        tv.setTypeface(typeface);
+
+
         Bundle extras = getIntent().getExtras();
         try {
-            String userID = extras.getString("user_id");
+            userID = extras.getString("user_id");
             Log.i("user id", userID);
             currentUserId.put("user_id", extras.get("user_id"));
         } catch (JSONException e) {
@@ -57,7 +74,20 @@ public class ViewSavedEvents extends AppCompatActivity {
         setupRecyclerView();
         loadEventData();
         setupSwipeDownRefresh();
+        loadDrawer(savedInstanceState);
     }
+    private void loadDrawer(Bundle savedState){
+        prefs = PreferenceManager.getDefaultSharedPreferences(this);
+
+        final String pic = prefs.getString("user_image", null);
+        final String fName = prefs.getString("fName", null);
+        final String lName = prefs.getString("lName", null);
+        final String email = prefs.getString("email", null);
+        SetupDrawer setup = new SetupDrawer(headerResult, result, toolbar, currentUserId,
+                mEventAdapter, userID, getApplicationContext(), fName, lName, email, pic);
+        setup.setupNavDrawer(savedState, this);
+    }
+
 
     @Override
     public void onResume() {  // After a pause OR at startup
@@ -83,7 +113,6 @@ public class ViewSavedEvents extends AppCompatActivity {
 
     private void setupRecyclerView(){
         mRecyclerView = (RecyclerView) findViewById(R.id.recyclerview_saved_events);
-        //mLayoutManager = new GridLayoutManager(getApplicationContext(),2);
         LinearLayoutManager layoutManager
                 = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
 
@@ -127,8 +156,8 @@ public class ViewSavedEvents extends AppCompatActivity {
     }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater menuInflater = getMenuInflater();
-        menuInflater.inflate(R.menu.main_page_menu, menu);
+        //MenuInflater menuInflater = getMenuInflater();
+       // menuInflater.inflate(R.menu.main_page_menu, menu);
 
         return true;
     }

@@ -2,40 +2,34 @@ package com.example.codenamebiscuit;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.database.Cursor;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
+import android.graphics.Typeface;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.preference.PreferenceManager;
-import android.util.Log;
+import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.codenamebiscuit.helper.App;
-import com.example.codenamebiscuit.helper.DatabaseHelper;
-import com.example.codenamebiscuit.helper.DownloadImage;
-import com.example.codenamebiscuit.helper.RoundedImageView;
 import com.example.codenamebiscuit.login.ChooseLogin;
 import com.facebook.AccessToken;
 import com.facebook.FacebookSdk;
 import com.facebook.Profile;
 import com.facebook.login.LoginManager;
-
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.squareup.picasso.Picasso;
 
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.InputStream;
-import java.lang.ref.WeakReference;
 
 
 
@@ -55,7 +49,7 @@ public class UserSettingsActivity
     private boolean mRetailPreference;
     private boolean mPerformingArtsPreference;
     private boolean mEntertainmentPreference;
-
+    private Toolbar toolbar;
     private JSONObject pref = new JSONObject();
     private SharedPreferences prefs;
 
@@ -64,13 +58,24 @@ public class UserSettingsActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         FacebookSdk.sdkInitialize(getApplicationContext());
-        setContentView(R.layout.activity_user_settings);
+
+        //Remove notification bar
+       // this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+
         prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        ActionBar actionBar = this.getSupportActionBar();
-        // Set the action bar back button to look like an up button
-        if (actionBar != null) {
-            actionBar.setDisplayHomeAsUpEnabled(true);
-        }
+
+        setContentView(R.layout.activity_user_settings);
+        // Handle Toolbar
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        this.getSupportActionBar().setDisplayShowTitleEnabled(false);
+        this.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        TextView tv = (TextView)findViewById(R.id.toolbar_title);
+        Typeface typeface = Typeface.createFromAsset(getApplicationContext().getAssets(), "fonts/Raleway-Black.ttf");
+        tv.setTypeface(typeface);
+
 
         Profile fbprofile = Profile.getCurrentProfile();
         if(fbprofile==null) {
@@ -103,17 +108,18 @@ public class UserSettingsActivity
         String surname = profile.getLastName();
         String imageUrl = profile.getProfilePictureUri(200, 200).toString();
 
-        new DownloadImage((RoundedImageView) findViewById(R.id.pref_user_image)).execute(imageUrl);
+        //        this.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        Picasso.with(this).load(imageUrl).centerCrop().fit().into((ImageView)findViewById(R.id.pref_user_image));
+
         mNameView = (TextView) findViewById(R.id.pref_user_name);
         mNameView.setText(name + " " + surname);
     }
 
     private void initializeGoogleProfileInfo(String fName, String lName, Uri url){
-        new DownloadImage((RoundedImageView) findViewById(R.id.pref_user_image)).execute(url.toString());
+        Picasso.with(this).load(url).centerCrop().fit().into((ImageView)findViewById(R.id.pref_user_image));
         mNameView = (TextView) findViewById(R.id.pref_user_name);
         mNameView.setText(fName + " " + lName);
     }
-
     /**
      * initializeLogoutButton creates the button that will log the user out of the application
      */
@@ -137,15 +143,13 @@ public class UserSettingsActivity
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-        // When the home button is pressed, take the user back to the VisualizerActivity
-        if (id == android.R.id.home) {
-            NavUtils.navigateUpFromSameTask(this);
-            Intent intent = new Intent(this, MainActivity.class);
-            finish();
-            startActivity(intent);
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                NavUtils.navigateUpFromSameTask(this);
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
         }
-        return super.onOptionsItemSelected(item);
     }
 
     private void setupSharedPreferences() throws JSONException {

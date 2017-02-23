@@ -9,6 +9,7 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v7.preference.PreferenceManager;
 import android.util.Log;
 import android.view.View;
+import android.view.WindowManager;
 
 import com.example.codenamebiscuit.MainActivity;
 import com.example.codenamebiscuit.R;
@@ -67,6 +68,8 @@ public class ChooseLogin extends FragmentActivity implements GoogleApiClient.OnC
         super.onCreate(savedInstanceState);
         pref = PreferenceManager.getDefaultSharedPreferences(this);
         FacebookSdk.sdkInitialize(getApplicationContext());
+        this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+
         setContentView(R.layout.activity_login);
         mLoginButton = (LoginButton) findViewById(R.id.facebook_login_button);
         mGoogleApiClient = App.getGoogleApiHelper().getApiClient();

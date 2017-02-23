@@ -14,7 +14,15 @@
         android:background="?attr/colorPrimary"
         android:elevation="4dp"
         android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
-        app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
+        app:popupTheme="@style/ThemeOverlay.AppCompat.Light" >
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Saved Events"
+        android:textSize="20sp"
+        android:id="@+id/toolbar_title" />
+    </android.support.v7.widget.Toolbar>
 
     <FrameLayout
         android:id="@+id/frame_container"
@@ -46,7 +54,7 @@
                 android:id="@+id/recyclerview_saved_events"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@color/livinBlack"
+                android:background="@color/black_overlay"
                 android:gravity="center"
                 />
 

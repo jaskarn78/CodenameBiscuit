@@ -1,10 +1,13 @@
 package com.example.codenamebiscuit;
 
+import android.animation.ObjectAnimator;
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 
 import android.graphics.Bitmap;
+import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -12,6 +15,9 @@ import android.os.Bundle;
 
 import android.os.UserManager;
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -27,52 +33,22 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.Window;
 import android.view.WindowManager;
-import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.example.codenamebiscuit.helper.App;
-import com.example.codenamebiscuit.helper.DownloadImage;
-import com.example.codenamebiscuit.helper.DownloadProfilePic;
-import com.example.codenamebiscuit.helper.GoogleApiHelper;
-import com.example.codenamebiscuit.helper.RoundedImageView;
+import com.example.codenamebiscuit.helper.SetupDrawer;
 import com.example.codenamebiscuit.rv.ClickListener;
 import com.example.codenamebiscuit.helper.QueryEventList;
 import com.example.codenamebiscuit.login.ChooseLogin;
 import com.example.codenamebiscuit.rv.EventAdapter;
 import com.facebook.AccessToken;
 import com.facebook.FacebookSdk;
-import com.google.android.gms.auth.api.Auth;
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
-import com.google.android.gms.auth.api.signin.GoogleSignInResult;
-import com.google.android.gms.plus.Plus;
-import com.google.android.gms.plus.model.people.Person;
-import com.mikepenz.iconics.IconicsDrawable;
+
 import com.mikepenz.materialdrawer.AccountHeader;
-import com.mikepenz.materialdrawer.AccountHeaderBuilder;
 import com.mikepenz.materialdrawer.Drawer;
-import com.mikepenz.materialdrawer.DrawerBuilder;
-import com.mikepenz.materialdrawer.model.DividerDrawerItem;
-import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
-import com.mikepenz.materialdrawer.model.ProfileDrawerItem;
-import com.mikepenz.materialdrawer.model.ProfileSettingDrawerItem;
-import com.mikepenz.materialdrawer.model.SecondaryDrawerItem;
-import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
-import com.mikepenz.materialdrawer.model.interfaces.IProfile;
-import com.mikepenz.materialdrawer.util.AbstractDrawerImageLoader;
-import com.mikepenz.materialdrawer.util.DrawerImageLoader;
-import com.squareup.picasso.Picasso;
-
-
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.io.IOException;
 import java.util.ArrayList;
 
 
@@ -90,7 +66,7 @@ public class MainActivity extends AppCompatActivity implements ClickListener{
     private AccountHeader headerResult = null;
     private Drawer result = null;
     private SharedPreferences prefs;
-    private static final int PROFILE_SETTING = 100000;
+    private int SPLASH_TIME_OUT;
 
 
 
@@ -107,8 +83,6 @@ public class MainActivity extends AppCompatActivity implements ClickListener{
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        //Remove title bar
-        //this.requestWindowFeature(Window.FEATURE_NO_TITLE);
         //Remove notification bar
         this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
@@ -119,6 +93,12 @@ public class MainActivity extends AppCompatActivity implements ClickListener{
         // Handle Toolbar
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        this.getSupportActionBar().setDisplayShowTitleEnabled(false);
+
+
+        TextView tv = (TextView)findViewById(R.id.toolbar_title);
+        Typeface typeface = Typeface.createFromAsset(getApplicationContext().getAssets(), "fonts/Raleway-Black.ttf");
+        tv.setTypeface(typeface);
 
         mEventAdapter = new EventAdapter(this);
         FacebookSdk.sdkInitialize(getApplicationContext());
@@ -128,12 +108,21 @@ public class MainActivity extends AppCompatActivity implements ClickListener{
         setupSwipeDownRefresh();
 
         swipeContainer.setRefreshing(true);
-        loadEventData();
         checkIfFbOrGoogleLogin();
-        setupNavDrawer(savedInstanceState);
+        //setupNavDrawer(savedInstanceState);
+        loadDrawer(savedInstanceState);
+        loadEventData();
 
+    }
 
-
+    private void loadDrawer(Bundle savedState){
+        final String pic = prefs.getString("user_image", null);
+        final String fName = prefs.getString("fName", null);
+        final String lName = prefs.getString("lName", null);
+        final String email = prefs.getString("email", null);
+        SetupDrawer setup = new SetupDrawer(headerResult, result, toolbar,
+                currentUserId, mEventAdapter, userId, getApplicationContext(), fName, lName, email, pic);
+        setup.setupNavDrawer(savedState, this);
     }
 
 
@@ -156,9 +145,8 @@ public class MainActivity extends AppCompatActivity implements ClickListener{
     public void onStart() {
         super.onStart();
         swipeContainer.setRefreshing(true);
-
-
-
+        loadEventData();
+        swipeContainer.setRefreshing(false);
     }
     @Override
     public void onPause(){
@@ -199,105 +187,7 @@ public class MainActivity extends AppCompatActivity implements ClickListener{
         //onClick();
     }
 
-    /**********************************************************************************************
-     * Sets up navigation drawer with a list of activities
-     * activities include: saved events, deleted events, and user preferences
-     * sets current user profile information into the drawer
-     **********************************************************************************************/
-    private void setupNavDrawer(Bundle savedState) {
-        final String pic = prefs.getString("user_image", null);
-        final String fName = prefs.getString("fName", null);
-        final String lName = prefs.getString("lName", null);
-        final String email = prefs.getString("email", null);
 
-        DrawerImageLoader.init(new AbstractDrawerImageLoader() {
-            @Override
-            public void set(ImageView imageView, Uri uri, Drawable placeholder) {
-                Picasso.with(imageView.getContext())
-                        .load(uri)
-                        .placeholder(placeholder)
-                        .fit()
-                        .centerCrop()
-                        .into(imageView);
-
-            }
-        });
-
-        IProfile profile = new ProfileDrawerItem().withName(fName + " " + lName).withIcon(Uri.parse(pic)).withEmail(email).withIdentifier(100);
-
-        //new DrawerBuilder().withActivity(this).build();
-        headerResult = new AccountHeaderBuilder()
-                .withActivity(this)
-                .withTranslucentStatusBar(true)
-                .withHeaderBackground(R.drawable.header)
-                .addProfiles(profile)
-                .withActivity(this)
-                .withSavedInstance(savedState)
-                .build();
-
-        //if you want to update the items at a later time it is recommended to keep it in a variable
-        PrimaryDrawerItem item1 = new PrimaryDrawerItem().withIdentifier(1).withName("Home")
-                .withIcon(R.drawable.ic_home_black_24dp).withIdentifier(100000);
-
-        //create the drawer and remember the `Drawer` result object
-        result = new DrawerBuilder()
-                .withActivity(this)
-                .withToolbar(toolbar)
-                .withAccountHeader(headerResult)
-                .addDrawerItems(
-                        item1,
-                        new DividerDrawerItem(),
-                        new SecondaryDrawerItem().withName("Full Screen").withIcon(R.drawable.ic_fullscreen_black_24dp).withIdentifier(2),
-                        new DividerDrawerItem(),
-                        new SecondaryDrawerItem().withName("Saved Events").withIcon(R.drawable.ic_save_black_24dp).withIdentifier(3),
-                        new DividerDrawerItem(),
-                        new SecondaryDrawerItem().withName("Deleted Events").withIcon(R.drawable.ic_delete_black_24dp).withIdentifier(4),
-                        new DividerDrawerItem(),
-                        new SecondaryDrawerItem().withName("Preferences").withIcon(R.drawable.ic_settings_black_24dp).withIdentifier(5)
-                )
-                .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
-                    @Override
-                    public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
-                        // do something with the clicked item :D
-                        if (drawerItem != null) {
-                            Intent intent = null;
-                            if (drawerItem.getIdentifier() == 1) {
-                                intent = new Intent(MainActivity.this, MainActivity.class);
-                            } else if (drawerItem.getIdentifier() == 2) {
-
-                                intent = new Intent(MainActivity.this, SwipeEvents.class);
-                                intent.putExtra("user_id", currentUserId + "");
-                                ArrayList<String> data = new ArrayList<String>();
-                                for (int i = 0; i < mEventAdapter.getObject().size(); i++) {
-                                    data.add(mEventAdapter.getObject().get(i).toString());
-
-                                }
-                                JSONArray jsonArray = new JSONArray(mEventAdapter.getObject());
-                                intent.putStringArrayListExtra("data", data);
-                                intent.putExtra("jArray", jsonArray.toString());
-
-                            } else if (drawerItem.getIdentifier() == 3) {
-                                intent = new Intent(MainActivity.this, ViewSavedEvents.class);
-                                    intent.putExtra("user_id", userId);
-                            } else if (drawerItem.getIdentifier() == 4) {
-                                intent = new Intent(MainActivity.this, ViewDeletedEvents.class);
-                                intent.putExtra("user_id", userId);
-
-                            } else if (drawerItem.getIdentifier() == 5) {
-                                intent = new Intent(MainActivity.this, UserSettingsActivity.class);
-                            }
-
-                            if (intent != null) {
-                                MainActivity.this.startActivity(intent);
-                            }
-                        }
-                        return false;
-                    }
-                })
-                .withSavedInstance(savedState)
-                .withShowDrawerOnFirstLaunch(true)
-                .build();
-    }
 
     /**********************************************************************************************
      * sets up recycler view and assigns layout
@@ -358,8 +248,8 @@ public class MainActivity extends AppCompatActivity implements ClickListener{
      **********************************************************************************************/
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater menuInflater = getMenuInflater();
-        menuInflater.inflate(R.menu.main_page_menu, menu);
+       // MenuInflater menuInflater = getMenuInflater();
+       // menuInflater.inflate(R.menu.main_page_menu, menu);
         return true;
     }
 
@@ -392,12 +282,9 @@ public class MainActivity extends AppCompatActivity implements ClickListener{
     @Override
     public void itemClicked(View view, int position) {
         RelativeLayout layout = (RelativeLayout)view.findViewById(R.id.extend);
-        if (layout.getVisibility() == View.GONE) {
+        if (layout.getVisibility() == View.GONE)
             layout.setVisibility(View.VISIBLE);
-        }
-        else {
+        else
             layout.setVisibility(View.GONE);
-
-        }
     }
 }

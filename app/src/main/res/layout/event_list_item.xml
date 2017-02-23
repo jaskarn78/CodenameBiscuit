@@ -9,7 +9,7 @@
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:id="@+id/activity_main"
-  >
+    >
 
     <android.support.v7.widget.CardView
         android:id="@+id/cardview"
@@ -40,7 +40,7 @@
             android:id="@+id/tv_event_name"
             android:layout_toRightOf="@+id/iv_event_image"
             android:layout_alignParentTop="true"
-            android:textSize="30sp"
+            android:textSize="20sp"
             />
 
         <TextView
@@ -70,16 +70,16 @@
             android:layout_below="@id/tv_event_location"
             android:id="@+id/cost"
             android:layout_toRightOf="@id/age"
-            android:paddingLeft="10dp"
+            android:paddingLeft="5dp"
             android:text="Cost: $$$"
-            android:paddingBottom="10dp"
+            android:paddingBottom="5dp"
             />
 
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="fill_parent"
             android:layout_below="@id/iv_event_image"
-            android:paddingTop="10dp"
+            android:paddingTop="5dp"
             android:visibility="gone"
             android:id="@+id/extend">
 

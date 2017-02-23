@@ -14,7 +14,15 @@
         android:background="?attr/colorPrimary"
         android:elevation="4dp"
         android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
-        app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
+        app:popupTheme="@style/ThemeOverlay.AppCompat.Light">
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Removed Events"
+        android:textSize="20sp"
+        android:id="@+id/toolbar_title" />
+    </android.support.v7.widget.Toolbar>
+
     <FrameLayout
         android:id="@+id/frame_container"
         android:layout_width="match_parent"
@@ -24,7 +32,7 @@
 
         <android.support.v4.widget.SwipeRefreshLayout
 
-            android:id="@+id/swipeContainer_saved_events"
+            android:id="@+id/swipeContainer"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             tools:layout_constraintTop_creator="1"
@@ -42,10 +50,10 @@
 
 
             <android.support.v7.widget.RecyclerView
-                android:id="@+id/recyclerview_saved_events"
+                android:id="@+id/recyclerview_deleted_events"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@color/livinBlack"
+                android:background="@color/black_overlay"
                 android:gravity="center"
                 />
 
