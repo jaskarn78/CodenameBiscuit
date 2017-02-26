@@ -358,8 +358,8 @@ public class UserSettingsActivity
                 pref.put("user_id", AccessToken.getCurrentAccessToken().getUserId());
             }
 
-            else if(prefs.getString("user_idG", null)!=null) {
-                pref.put("user_id", prefs.getString("user_idG", null));
+            else if(prefs.getString("user_id", null)!=null) {
+                pref.put("user_id", prefs.getString("user_id", null));
             }
 
         } catch (JSONException e) {

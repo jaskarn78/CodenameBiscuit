@@ -41,7 +41,7 @@
 
         </activity>
         <activity
-            android:name=".ViewSavedEvents"
+            android:name=".SavedEventsFrag"
             android:label="Saved Events"
             android:launchMode="singleTop">
             <meta-data
@@ -53,7 +53,7 @@
             </intent-filtr>
         </activity>
         <activity
-            android:name=".ViewDeletedEvents"
+            android:name=".DeletedEventsFrag"
             android:label="Removed Events"
             android:launchMode="singleTop">
             <meta-data

@@ -70,6 +70,7 @@ public class ChooseLogin extends FragmentActivity implements GoogleApiClient.OnC
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Log.i("activity started", "choose login");
         pref = PreferenceManager.getDefaultSharedPreferences(this);
         FacebookSdk.sdkInitialize(getApplicationContext());
         this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
@@ -115,7 +116,7 @@ public class ChooseLogin extends FragmentActivity implements GoogleApiClient.OnC
             App.getGoogleApiHelper().setSignInResult(result);
             GoogleSignInAccount acct = App.getGoogleApiHelper().getSignInAccount();
 
-            pref.edit().putString("user_idG", acct.getId()).apply();
+            pref.edit().putString("user_id", acct.getId()).apply();
             pref.edit().putString("user_image", String.valueOf(acct.getPhotoUrl())).apply();
             pref.edit().putString("fName", acct.getGivenName()).apply();
             pref.edit().putString("lName", acct.getFamilyName()).apply();
@@ -127,17 +128,17 @@ public class ChooseLogin extends FragmentActivity implements GoogleApiClient.OnC
             obj.put("last_name", acct.getFamilyName());
             obj.put("user_email", acct.getEmail());
             obj.put("gender", "M/F");
-            db.insertPerson("0", acct.getGivenName(), acct.getFamilyName(), String.valueOf(acct.getPhotoUrl()));
+            //db.insertPerson("0", acct.getGivenName(), acct.getFamilyName(), String.valueOf(acct.getPhotoUrl()));
 
 
             try {
-                if (obj != null) {
-                    Log.v("DATA BITCH", obj.toString());
-                }
+                Log.v("DATA BITCH", obj.toString());
 
                 // Update Database
-                InsertUserDB userSignin = new InsertUserDB();
-                userSignin.execute(obj);
+                if(obj.length()!=0) {
+                    InsertUserDB userSignin = new InsertUserDB();
+                    userSignin.execute(obj);
+                }
 
             } catch (NullPointerException e) {
                 Log.e("ERRR", e.toString());
@@ -193,7 +194,8 @@ public class ChooseLogin extends FragmentActivity implements GoogleApiClient.OnC
 
                                     // Update Database
                                     InsertUserDB userSignin = new InsertUserDB();
-                                    userSignin.execute(bFacebookData);
+                                    if(bFacebookData.length()!=0)
+                                        userSignin.execute(bFacebookData);
 
 
                                 } catch (NullPointerException e) {
@@ -263,6 +265,7 @@ public class ChooseLogin extends FragmentActivity implements GoogleApiClient.OnC
         try {
             JSONObject normalizedObj = new JSONObject();
             String id = object.getString("id");
+            pref.edit().putString("user_id", id).apply();
 
             try {
                 URL profile_pic = new URL("https://graph.facebook.com/" + id + "/picture?width=200&height=150");

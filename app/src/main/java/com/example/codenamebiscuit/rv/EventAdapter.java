@@ -11,15 +11,12 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.codenamebiscuit.R;
-import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.OnMapReadyCallback;
 import com.muddzdev.styleabletoastlibrary.StyleableToast;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
@@ -225,9 +222,10 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
      */
     @Override
     public int getItemCount() {
-        if(mEventData.size()!=0)
+        if(mEventData.isEmpty())
+            return 0;
+        else
             return mEventData.size();
-        return 0;
     }
 
 

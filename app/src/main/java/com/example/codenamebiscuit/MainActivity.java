@@ -2,58 +2,61 @@ package com.example.codenamebiscuit;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Color;
 import android.graphics.Typeface;
+import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Bundle;
-
-import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.preference.PreferenceManager;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
-import android.widget.RelativeLayout;
+import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.example.codenamebiscuit.helper.SetupDrawer;
-import com.example.codenamebiscuit.rv.ClickListener;
-import com.example.codenamebiscuit.helper.QueryEventList;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.example.codenamebiscuit.helper.VolleySingleton;
 import com.example.codenamebiscuit.login.ChooseLogin;
-import com.example.codenamebiscuit.rv.EventAdapter;
-import com.facebook.AccessToken;
 import com.facebook.FacebookSdk;
-
 import com.mikepenz.materialdrawer.AccountHeader;
+import com.mikepenz.materialdrawer.AccountHeaderBuilder;
 import com.mikepenz.materialdrawer.Drawer;
-import com.muddzdev.styleabletoastlibrary.StyleableToast;
+import com.mikepenz.materialdrawer.DrawerBuilder;
+import com.mikepenz.materialdrawer.model.DividerDrawerItem;
+import com.mikepenz.materialdrawer.model.ProfileDrawerItem;
+import com.mikepenz.materialdrawer.model.SecondaryDrawerItem;
+import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
+import com.mikepenz.materialdrawer.model.interfaces.IProfile;
+import com.mikepenz.materialdrawer.util.AbstractDrawerImageLoader;
+import com.mikepenz.materialdrawer.util.DrawerImageLoader;
+import com.squareup.picasso.Picasso;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 import java.util.ArrayList;
 
 
-public class MainActivity extends AppCompatActivity implements ClickListener{
-    private RecyclerView mRecyclerView;
-    private EventAdapter mEventAdapter;
+public class MainActivity extends AppCompatActivity {
+
     private JSONObject currentUserId = new JSONObject();
     private String userId;
-    private SwipeRefreshLayout swipeContainer;
     private ArrayList<JSONObject> eventData;
     private SharedPreferences pref;
     private Toolbar toolbar;
+    private android.app.FragmentTransaction fragmentTransaction;
 
     //save our header or result
     private AccountHeader headerResult = null;
     private Drawer result = null;
-    private SharedPreferences prefs;
-    private int SPLASH_TIME_OUT;
-
-
+    MainEventsFrag frag;
 
 
     /**********************************************************************************************
@@ -67,87 +70,121 @@ public class MainActivity extends AppCompatActivity implements ClickListener{
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         //Remove notification bar
         this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.launch_layout);
 
-        prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        pref = PreferenceManager.getDefaultSharedPreferences(this);
 
         // Handle Toolbar
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         this.getSupportActionBar().setDisplayShowTitleEnabled(false);
 
-
         TextView tv = (TextView)findViewById(R.id.toolbar_title);
         Typeface typeface = Typeface.createFromAsset(getApplicationContext().getAssets(), "fonts/Raleway-Black.ttf");
         tv.setTypeface(typeface);
-
-        mEventAdapter = new EventAdapter(this);
         FacebookSdk.sdkInitialize(getApplicationContext());
-        pref = PreferenceManager.getDefaultSharedPreferences(this);
 
-        setupRecyclerView();
-        setupSwipeDownRefresh();
+        //verify that user is logged in either through fb or google
+        //if not looged in, redirect to chooseLogin activity
+        Log.i("activity started: ", "main activity");
 
-        swipeContainer.setRefreshing(true);
         checkIfFbOrGoogleLogin(savedInstanceState);
-        //setupNavDrawer(savedInstanceState);
+        // Normal app init code...
 
-
-        //st.show();
-        loadEventData();
-
-        /** Custom stylable toast**/
-        StyleableToast st = new StyleableToast(getApplicationContext(), "Loading Events...Please Wait", Toast.LENGTH_SHORT);
-        st.setBackgroundColor(Color.parseColor("#ff9dfc"));
-        st.setTextColor(Color.WHITE);
-        st.setIcon(R.drawable.ic_autorenew_white_24dp);
-        st.spinIcon();
-        st.setMaxAlpha();
-
+        //loads the navigation drawer and adds fragments
+        if(savedInstanceState==null) {
+            MainEventsFrag eventsFrag = new MainEventsFrag();
+            fragmentTransaction = getFragmentManager().beginTransaction();
+            getSupportFragmentManager().beginTransaction().add(R.id.fragment_container, eventsFrag, "mainFrag").commit();
+            getSupportFragmentManager().popBackStack();
+        }
+        RequestQueue queue = VolleySingleton.getInstance(this.getApplicationContext()).getRequestQueue();
     }
 
     private void loadDrawer(Bundle savedState){
-        final String pic = prefs.getString("user_image", null);
-        final String fName = prefs.getString("fName", null);
-        final String lName = prefs.getString("lName", null);
-        final String email = prefs.getString("email", null);
-        SetupDrawer setup = new SetupDrawer(headerResult, result, toolbar,
-                currentUserId, mEventAdapter, userId, getApplicationContext(), fName, lName, email, pic);
-        setup.setupNavDrawer(savedState, this);
-    }
+        final String pic = pref.getString("user_image", null);
+        final String fName = pref.getString("fName", null);
+        final String lName = pref.getString("lName", null);
+        final String email = pref.getString("email", null);
 
 
-    /**********************************************************************************************
-     * When activity resumes after a pause, check to see if any new events have been added
-     * set swipeContainer.setRefreshing to true
-     * load the event data
-     * set swipecontainer.setRefreshing to false
-     **********************************************************************************************/
+        DrawerImageLoader.init(new AbstractDrawerImageLoader() {
+            @Override
+            public void set(ImageView imageView, Uri uri, Drawable placeholder) {
+                Picasso.with(imageView.getContext()).load(uri).placeholder(placeholder)
+                        .fit().centerCrop().into(imageView);}
+        });
+
+        IProfile profile = new ProfileDrawerItem().withName(fName + " " + lName).withIcon(Uri.parse(pic)).withEmail(email).withIdentifier(100);
+
+        headerResult = new AccountHeaderBuilder().withActivity(this).withTranslucentStatusBar(true).withHeaderBackground(R.drawable.header)
+                .addProfiles(profile).withActivity(this).withSavedInstance(savedState).build();
+
+        //create the drawer and remember the `Drawer` result object
+        result = new DrawerBuilder().withActivity(this).withToolbar(toolbar)
+                .withAccountHeader(headerResult).addDrawerItems(
+                        new SecondaryDrawerItem().withName("Home").withIcon(R.drawable.ic_home_black_24dp).withIdentifier(1),
+                        new DividerDrawerItem(),
+                        new SecondaryDrawerItem().withName("Full Screen").withIcon(R.drawable.ic_fullscreen_black_24dp).withIdentifier(2),
+                        new DividerDrawerItem(),
+                        new SecondaryDrawerItem().withName("Saved Events").withIcon(R.drawable.ic_save_black_24dp).withIdentifier(3),
+                        new DividerDrawerItem(),
+                        new SecondaryDrawerItem().withName("Deleted Events").withIcon(R.drawable.ic_delete_black_24dp).withIdentifier(4),
+                        new DividerDrawerItem(),
+                        new SecondaryDrawerItem().withName("Preferences").withIcon(R.drawable.ic_settings_black_24dp).withIdentifier(5)
+                )
+                .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
+                    @Override
+                    public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
+                        // do something with the clicked item :D
+                        Fragment fragment = null;
+                        FragmentManager fragmentManager = getSupportFragmentManager();
+                        if (drawerItem != null) {
+                            Intent intent = null;
+
+                            if (drawerItem.getIdentifier() == 1) {
+                                fragment = new MainEventsFrag();
+
+                            } else if (drawerItem.getIdentifier() == 2) {
+                                //MainEventsFrag main = (MainEventsFrag)getSupportFragmentManager().findFragmentById(R.id.fragment_container);
+                                intent = new Intent(MainActivity.this, SwipeEvents.class);
+                                //intent.putExtra("jArray", main.getEventList().toString());
+
+                            } else if (drawerItem.getIdentifier() == 3) {
+                                fragment = new SavedEventsFrag();
+                            } else if (drawerItem.getIdentifier() == 4) {
+                                fragment = new DeletedEventsFrag();
+
+                            } else if (drawerItem.getIdentifier() == 5) {
+                                intent = new Intent(getApplicationContext(), UserSettingsActivity.class);
+                            }
+
+                            if (intent != null)
+                                startActivity(intent);
+
+                            if(fragment!=null)
+                                fragmentManager.beginTransaction().replace(R.id.fragment_container, fragment)
+                                        .commit();
+
+                        }
+                        return false;
+                    }
+                })
+                .withSavedInstance(savedState).withShowDrawerOnFirstLaunch(true).build();}
+
     @Override
     public void onResume() {  // After a pause OR at startup
         super.onResume();
-        swipeContainer.setRefreshing(true);
-        loadEventData();
-        swipeContainer.setRefreshing(false);
 
     }
 
     @Override
     public void onStart() {
         super.onStart();
-        swipeContainer.setRefreshing(true);
-        loadEventData();
-        swipeContainer.setRefreshing(false);
     }
-    @Override
-    public void onPause(){
-        super.onPause();
-    }
-
 
     /**********************************************************************************************
      * Check if logged in user is logged in through facebook or through google
@@ -156,106 +193,32 @@ public class MainActivity extends AppCompatActivity implements ClickListener{
      * if facebook id and google id return null, redirect to the login screen
      **********************************************************************************************/
     private void checkIfFbOrGoogleLogin(Bundle savedstate) {
-        if (AccessToken.getCurrentAccessToken() == null && pref.getString("user_idG", null) == null) {
+
+
+        if (pref.getString("user_id", null)==null){
+            Log.i("user id status", "null");
             Intent intent = new Intent(MainActivity.this, ChooseLogin.class);
             startActivity(intent);
-        }
+            finish();
 
-        if (AccessToken.getCurrentAccessToken() != null) {
+        }else{
             try {
-                currentUserId.put("user_id", AccessToken.getCurrentAccessToken().getUserId());
-                userId = AccessToken.getCurrentAccessToken().getUserId();
-
+                currentUserId.put("user_id", pref.getString("user_id", null));
             } catch (JSONException e) {
                 e.printStackTrace();
             }
             loadDrawer(savedstate);
+
         }
-        if (pref.getString("user_idG", null) != null && AccessToken.getCurrentAccessToken() == null) {
-            try {
-                currentUserId.put("user_id", pref.getString("user_idG", null));
-                userId = pref.getString("user_idG", null);
-
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-            loadDrawer(savedstate);
-        }
-        //onClick();
     }
-
-
-
-    /**********************************************************************************************
-     * sets up recycler view and assigns layout
-     * assigns mEventAdapter which contains all event information retrieved from MySQL request
-     * recycler view is assigned a linear layout
-     **********************************************************************************************/
-    private void setupRecyclerView() {
-        mRecyclerView = (RecyclerView) findViewById(R.id.recyclerview_events);
-        LinearLayoutManager layoutManager
-                = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
-
-        mRecyclerView.setLayoutManager(layoutManager);
-        mRecyclerView.setHasFixedSize(true);
-        mRecyclerView.setItemViewCacheSize(20);
-        mRecyclerView.setDrawingCacheEnabled(true);
-        mRecyclerView.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_HIGH);
-
-        mRecyclerView.setAdapter(mEventAdapter);
-        mEventAdapter.setClickListener(this);
-    }
-
-
-    /**********************************************************************************************
-     * setup up swipe container to refresh event list when performing down swipe gesture
-     * when swipeContainer.setRefresh(true) load the event data
-     * after data has been loaded, set swipeContainer.setRefresh(false)
-     **********************************************************************************************/
-    private void setupSwipeDownRefresh() {
-        swipeContainer = (SwipeRefreshLayout) findViewById(R.id.swipeContainer);
-        swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                loadEventData();
-                swipeContainer.setRefreshing(false);
-            }
-        });
-        swipeContainer.setColorSchemeResources(android.R.color.holo_blue_bright,
-                android.R.color.holo_green_light,
-                android.R.color.holo_orange_light,
-                android.R.color.holo_red_light);
-
-    }
-
-
-    /**********************************************************************************************
-     * HTTP request to run python script which contains sql command
-     * to retrieve all event data filtered by user id
-     **********************************************************************************************/
-    private void loadEventData() {
-        QueryEventList list = (QueryEventList)
-                new QueryEventList(mEventAdapter, getString(R.string.DATABASE_MAIN_EVENTS_PULLER), this).execute(currentUserId);
-        eventData = list.getEventList();
-    }
-
-
     /**********************************************************************************************
      Create Menu
      **********************************************************************************************/
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-       // MenuInflater menuInflater = getMenuInflater();
-       // menuInflater.inflate(R.menu.main_page_menu, menu);
+
         return true;
     }
-
-
-    /**********************************************************************************************
-     * Verify which item in the options menu was clicked and begin appropriate activity
-     * @param item
-     * @return
-     **********************************************************************************************/
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -265,23 +228,5 @@ public class MainActivity extends AppCompatActivity implements ClickListener{
     @Override
     public void onDestroy() {
         super.onDestroy();
-    }
-
-
-    /**********************************************************************************************
-     * Handles the drop down functionality in the list view of the event data
-     * When image button is clicked, additional event information is revealed
-     * @param view
-     * @param position
-     **********************************************************************************************/
-
-
-    @Override
-    public void itemClicked(View view, int position) {
-        RelativeLayout layout = (RelativeLayout)view.findViewById(R.id.extend);
-        if (layout.getVisibility() == View.GONE)
-            layout.setVisibility(View.VISIBLE);
-        else
-            layout.setVisibility(View.GONE);
     }
 }

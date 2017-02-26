@@ -34,21 +34,16 @@ public class SplashScreen extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-       // progress = (ProgressBar) findViewById(R.id.progressBar1);
+        //progress = (ProgressBar) findViewById(R.id.progressBar1);
        //progress.getIndeterminateDrawable().setColorFilter(Color.rgb(255, 157, 252), PorterDuff.Mode.MULTIPLY);
 
         //StyleableToast st = new StyleableToast(getApplicationContext(), "LOADING EVENTS...", Toast.LENGTH_SHORT);
-        setupWindowAnimations();
+        //setupWindowAnimations();
         Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);
         finish();
-    }
-    private void setupWindowAnimations() {
-        Slide slide = (Slide) TransitionInflater.from(this).inflateTransition(R.transition.activity_slide);
-        getWindow().setExitTransition(slide);
-    }
 
+    }
 
 
 }

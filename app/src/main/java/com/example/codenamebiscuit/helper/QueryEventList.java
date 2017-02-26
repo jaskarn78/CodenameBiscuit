@@ -44,15 +44,17 @@ public class QueryEventList extends AsyncTask<JSONObject, Void, ArrayList<JSONOb
         this.mEventAdapter = mEventAdapter;
         this.main_events=main_events;
         this.context=context;
-        dialog = new ProgressDialog(context);
+        //dialog = new ProgressDialog(context);
 
-
+    }
+    public QueryEventList(String main_events){
+        this.main_events=main_events;
     }
 
     @Override
     protected void onPreExecute(){
-        dialog.setMessage("Loading Event Data...");
-        dialog.show();
+       // dialog.setMessage("Loading Event Data...");
+        //dialog.show();
     }
 
     @Override
@@ -124,14 +126,21 @@ public class QueryEventList extends AsyncTask<JSONObject, Void, ArrayList<JSONOb
     protected void onPostExecute(ArrayList<JSONObject> objs) {
         if (objs != null) {
             ArrayList<JSONObject> eventList = objs;
-            mEventAdapter.setEventData(eventList);
+            setEventList(eventList);
         }
-        if(dialog.isShowing())
-            dialog.dismiss();
+        if(mEventAdapter!=null && eventList!=null)
+            mEventAdapter.setEventData(eventList);
+
+        //if(dialog.isShowing())
+         //   dialog.dismiss();
 
     }
     public ArrayList<JSONObject> getEventList(){
+        Log.i("event list", eventList.toString());
         return eventList;
 
+    }
+    public void setEventList(ArrayList<JSONObject> list){
+         eventList = list;
     }
 }

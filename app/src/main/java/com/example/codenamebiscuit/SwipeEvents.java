@@ -2,9 +2,11 @@ package com.example.codenamebiscuit;
 
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.preference.PreferenceManager;
 import android.support.v7.widget.CardView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -18,6 +20,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.codenamebiscuit.helper.FlipAnimation;
+import com.example.codenamebiscuit.helper.QueryEventList;
 import com.example.codenamebiscuit.helper.UpdateDbOnSwipe;
 import com.example.codenamebiscuit.swipedeck.SwipeDeck;
 import com.muddzdev.styleabletoastlibrary.StyleableToast;
@@ -29,6 +32,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 public class SwipeEvents extends AppCompatActivity {
 
@@ -41,6 +45,8 @@ public class SwipeEvents extends AppCompatActivity {
     private String event_location;
     private String event_preference;
     private String event_name;
+    private SharedPreferences pref;
+    private JSONObject user;
 
 
     @Override
@@ -51,7 +57,16 @@ public class SwipeEvents extends AppCompatActivity {
         //Remove notification bar
         this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_swipe_events);
+        pref = PreferenceManager.getDefaultSharedPreferences(this);
+        String user_id = pref.getString("user_id", null);
+        user=new JSONObject();
+        try {
+            user.put("user_id", user_id);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
         setupOnCreate();
+
 
     }
 
@@ -71,24 +86,15 @@ public class SwipeEvents extends AppCompatActivity {
          * testData is an arraylist passed through an intent from main activity
          * contains all event information for current user
          */
-        testData = new ArrayList<>();
-        Bundle extras = getIntent().getExtras();
-        String array = extras.getString("jArray");
-        if (extras != null) {
-
-            try {
-                JSONArray jsonAr = new JSONArray(array);
-                for (int i = 0; i < jsonAr.length(); i++) {
-                    JSONObject jsonObj = jsonAr.getJSONObject(i);
-                    testData.add(jsonObj);
-
-
-                }
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
+        QueryEventList list = new QueryEventList(getString(R.string.DATABASE_MAIN_EVENTS_PULLER));
+        list.execute(user);
+        try {
+            testData=list.get();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
         }
-
         adapter = new SwipeDeckAdapter(testData, this);
 
         if (cardStack != null) {
