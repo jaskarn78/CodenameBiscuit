@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:id="@+id/event_list"
+    >
+
+
+    <android.support.v7.widget.CardView
+        android:id="@+id/cardview"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="2dp"
+        card_view:cardElevation="3dp"
+        android:paddingBottom="1dp">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/card_relative_layout">
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="fitXY"
+                android:id="@+id/iv_event_image"
+                />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/tv_event_name"
+                android:layout_above="@+id/iv_event_image"
+                android:textSize="20sp"
+                />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/tv_event_location"
+                android:layout_toRightOf="@+id/iv_event_image"
+                android:layout_below="@+id/tv_event_preference"
+                android:visibility="gone"
+
+                />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/tv_event_preference"
+                android:layout_toRightOf="@+id/iv_event_image"
+                android:layout_below="@+id/tv_event_name"
+                android:visibility="gone"
+
+                />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/age"
+                android:layout_below="@id/tv_event_location"
+                android:layout_toRightOf="@+id/iv_event_image"
+                android:visibility="gone"
+                android:text="Age: 21+"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/tv_event_location"
+                android:id="@+id/gird_cost"
+                android:layout_toRightOf="@id/age"
+                android:paddingLeft="5dp"
+                android:text="Cost: $$$"
+                android:paddingBottom="5dp"
+                android:visibility="gone"
+                />
+
+        </RelativeLayout>
+
+    </android.support.v7.widget.CardView>
+
+    <android.support.v7.widget.CardView
+        xmlns:card_view="http://schemas.android.com/apk/res-auto"
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+
+        android:id="@+id/card_view_back"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        card_view:cardCornerRadius="4dp"
+        card_view:cardElevation="4dp"
+        android:visibility="gone"
+        android:layout_margin="2dp">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="5dp"
+        android:id="@+id/back_view">
+
+        <ImageView
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:scaleType="fitXY"
+            android:id="@+id/iv_event_image_back"
+            />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/event_name_back"
+        android:textSize="15sp"
+        android:layout_marginLeft="2dp"
+        android:text="Event Name"
+        android:layout_toRightOf="@id/iv_event_image_back"
+        />
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/event_location_back"
+        android:textSize="16sp"
+        android:layout_marginLeft="2dp"
+        android:text="Event Location"
+        android:layout_below="@id/iv_event_image_back"
+        />
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/event_preference_back"
+        android:textSize="15sp"
+        android:layout_marginLeft="2dp"
+        android:text="Event Preference"
+        android:layout_toRightOf="@id/iv_event_image_back"
+        android:layout_below="@+id/event_name_back"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/event_location_back"
+        android:layout_marginLeft="2dp"
+        android:id="@+id/event_age_back"
+        android:textSize="15sp"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/event_age_back"
+            android:layout_marginLeft="2dp"
+            android:id="@+id/event_cost_back"
+            android:textSize="15sp"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/event_cost_back"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="5dp"
+            android:layout_marginLeft="2dp"
+            android:id="@+id/event_info_back"
+            android:textSize="15sp"/>
+
+</RelativeLayout>
+</android.support.v7.widget.CardView>
+</LinearLayout>
+
