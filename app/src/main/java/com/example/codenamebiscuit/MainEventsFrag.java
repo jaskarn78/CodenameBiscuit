@@ -1,8 +1,10 @@
 package com.example.codenamebiscuit;
 
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Color;
-import android.os.AsyncTask;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -11,6 +13,7 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,9 +23,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.codenamebiscuit.helper.QueryEventList;
+import com.example.codenamebiscuit.helper.UpdateDbOnSwipe;
 import com.example.codenamebiscuit.rv.ClickListener;
 import com.example.codenamebiscuit.rv.EventAdapter;
 
+import com.github.brnunes.swipeablerecyclerview.SwipeableRecyclerViewTouchListener;
+import com.google.android.gms.maps.model.LatLng;
 import com.muddzdev.styleabletoastlibrary.StyleableToast;
 
 
@@ -36,23 +42,25 @@ import java.util.concurrent.ExecutionException;
  * Created by jaskarnjagpal on 2/23/17.
  */
 
-public class MainEventsFrag extends Fragment implements ClickListener{
+public class MainEventsFrag extends Fragment implements ClickListener {
 
-    private RecyclerView mRecyclerView;
+    private RecyclerView mRecyclerView, mRecyclerViewFeatured;
     private EventAdapter mAdapter;
     private ArrayList<JSONObject> eventData;
     private LinearLayoutManager mLinearLayoutManager;
     private SharedPreferences pref;
     private JSONObject currentUserId = new JSONObject();
     private SwipeRefreshLayout swipeContainer;
-    private boolean mIsVisibleToUser;
-    private boolean isDataFetched;
+    private JSONObject saveEvent, deleteEvent;
 
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         pref = PreferenceManager.getDefaultSharedPreferences(getContext());
+        saveEvent = new JSONObject();
+        deleteEvent=new JSONObject();
+
 
         String user_id = pref.getString("user_id", null);
         try {
@@ -60,40 +68,42 @@ public class MainEventsFrag extends Fragment implements ClickListener{
         } catch (JSONException e) {
             e.printStackTrace();
         }
-
         //initialize event dataset
         eventData = new ArrayList<JSONObject>();
 
         //Custom stylable toast*
         if (savedInstanceState == null) {
-            StyleableToast st = new StyleableToast(getContext(), "Loading Events...Please Wait", Toast.LENGTH_SHORT);
-            st.setBackgroundColor(Color.parseColor("#ff9dfc"));
-            st.setTextColor(Color.WHITE);
-            st.setIcon(R.drawable.ic_autorenew_white_24dp);
-            st.spinIcon();
-            st.setMaxAlpha();
-            st.show();
+
         }
-        if (user_id != null)
-            loadEventData();
 
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState){
+
         View rootView = inflater.inflate(R.layout.activity_main, container, false);
+
         swipeContainer = (SwipeRefreshLayout) rootView.findViewById(R.id.swipeContainer);
         setupSwipeDownRefresh();
 
         mRecyclerView = (RecyclerView)rootView.findViewById(R.id.recyclerview_events);
+
         //alter toolbar title
         TextView textView = (TextView)getActivity().findViewById(R.id.toolbar_title);
         textView.setText("UpComing Events");
 
+
         return rootView;
 
     }
+    private boolean isNetworkAvailable() {
+        ConnectivityManager connectivityManager
+                = (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
+    }
+
 
     /**********************************************************************************************
      * sets up recycler view and assigns layout
@@ -104,23 +114,43 @@ public class MainEventsFrag extends Fragment implements ClickListener{
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-            mAdapter = new EventAdapter(getActivity());
-            mLinearLayoutManager = new LinearLayoutManager(getActivity());
-            mRecyclerView.setAdapter(mAdapter);
-            LinearLayoutManager layoutManager
-                    = new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false);
 
-            mRecyclerView.setLayoutManager(layoutManager);
-            mRecyclerView.setHasFixedSize(true);
-            mRecyclerView.setItemViewCacheSize(20);
-            mRecyclerView.setDrawingCacheEnabled(true);
-            mRecyclerView.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_HIGH);
-            mRecyclerView.setItemAnimator(new DefaultItemAnimator());
+        StyleableToast st = new StyleableToast(getContext(), "Network not detected!", Toast.LENGTH_LONG);
+        //Custom stylable toast*
+        st.setBackgroundColor(Color.RED);
+        st.setTextColor(Color.WHITE);
+        st.spinIcon();
+        st.setMaxAlpha();
 
-            //loadEventData();
-            //mAdapter.setClickListener(getContext());
+        if(!isNetworkAvailable())
+            st.show();
 
-    }
+
+        mAdapter = new EventAdapter(getContext(), 1);
+        mLinearLayoutManager = new LinearLayoutManager(getContext());
+        StaggeredGridLayoutManager staggeredGridLayoutManager = new StaggeredGridLayoutManager(2, 1);
+        mRecyclerView.setAdapter(mAdapter);
+       //mRecyclerViewFeatured.setAdapter(mAdapter);
+
+        LinearLayoutManager layoutManager
+                = new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false);
+        LinearLayoutManager layoutManagerFeatured =
+                new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
+
+        mRecyclerView.setLayoutManager(mLinearLayoutManager);
+        mRecyclerView.setHasFixedSize(true);
+        mRecyclerView.setItemViewCacheSize(40);
+        mRecyclerView.setDrawingCacheEnabled(true);
+        mRecyclerView.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_HIGH);
+        mRecyclerView.setItemAnimator(new DefaultItemAnimator());
+
+       // mRecyclerViewFeatured.setLayoutManager(layoutManagerFeatured);
+        //mRecyclerViewFeatured.setHasFixedSize(true);
+        //mRecyclerViewFeatured.setItemViewCacheSize(20);
+        //mRecyclerViewFeatured.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_HIGH);
+        //mRecyclerViewFeatured.setItemAnimator(new DefaultItemAnimator());
+
+        enableCardSwiping();}
 
 
     /**********************************************************************************************
@@ -132,24 +162,17 @@ public class MainEventsFrag extends Fragment implements ClickListener{
     @Override
     public void onResume() {  // After a pause OR at startup
         super.onResume();
-        loadEventData();
 
     }
 
     @Override
     public void onStart() {
         super.onStart();
-        //swipeContainer.setRefreshing(true);
-        if(mIsVisibleToUser)
-            loadEventData();
-        //swipeContainer.setRefreshing(false);
+        loadEventData();
     }
+
     @Override
     public void setUserVisibleHint(boolean isVisibleToUser){
-        mIsVisibleToUser=isVisibleToUser;
-        if(isVisibleToUser)
-            loadEventData();
-
     }
 
 
@@ -196,16 +219,18 @@ public class MainEventsFrag extends Fragment implements ClickListener{
      **********************************************************************************************/
     private void loadEventData(){
             QueryEventList list = (QueryEventList)
-                    new QueryEventList(mAdapter, getString(R.string.DATABASE_MAIN_EVENTS_PULLER), getContext()).execute(currentUserId);
+                    new QueryEventList(getString(R.string.DATABASE_MAIN_EVENTS_PULLER), getContext()).execute(currentUserId);
         try {
             Log.i("list size: ",list.get()+"");
             setEventData(list.get());
+            eventData = list.get();
+            mAdapter.setEventData(eventData);
+
         } catch (InterruptedException e) {
             e.printStackTrace();
         } catch (ExecutionException e) {
             e.printStackTrace();
         }
-        // eventData = list.getEventList();
     }
     public ArrayList<JSONObject> getEventList(){
         return eventData;
@@ -214,4 +239,89 @@ public class MainEventsFrag extends Fragment implements ClickListener{
         eventData = data;
     }
 
+
+    private void enableCardSwiping(){
+        SwipeableRecyclerViewTouchListener swipeTouchListener =
+                new SwipeableRecyclerViewTouchListener(mRecyclerView,
+                        new SwipeableRecyclerViewTouchListener.SwipeListener() {
+                            @Override
+                            public boolean canSwipeLeft(int i) {
+                                return true;
+                            }
+
+                            @Override
+                            public boolean canSwipeRight(int i) {
+                                return true;
+                            }
+
+                            @Override
+                            public void onDismissedBySwipeLeft(RecyclerView recyclerView, int[] ints) {
+                                StyleableToast st = new StyleableToast(getContext(), "Removing...", Toast.LENGTH_SHORT);
+
+                                for (int position : ints) {
+                                    //eventData.remove(position);
+                                    mAdapter.notifyItemRemoved(position);
+                                    try {
+                                        deleteEvent.put("user_id", mAdapter.getObject().get(position).getString("user_id"));
+                                        deleteEvent.put("event_id", mAdapter.getObject().get(position).getString("event_id"));
+                                        //Custom stylable toast*
+                                        st.setBackgroundColor(Color.RED);
+                                        st.setTextColor(Color.WHITE);
+                                        st.setIcon(R.drawable.ic_delete_black_24dp);
+                                        st.spinIcon();
+                                        st.setMaxAlpha();
+                                        st.show();
+                                        eventData.remove(position);
+                                        if(eventData!=null)
+                                            mAdapter.setEventData(eventData);
+
+
+                                    } catch (JSONException e) {
+                                        e.printStackTrace();
+                                    }
+                                    mAdapter.notifyDataSetChanged();
+
+
+                                }
+                                new UpdateDbOnSwipe(getString(R.string.DATABASE_STORE_DELETED_EVENTS)).execute(deleteEvent);
+
+                            }
+
+                            @Override
+                            public void onDismissedBySwipeRight(RecyclerView recyclerView, int[] ints) {
+                                StyleableToast st = new StyleableToast(getContext(), "Saving...", Toast.LENGTH_SHORT);
+
+                                for (int position : ints) {
+                                    //eventData.remove(position);
+                                    mAdapter.notifyItemRemoved(position);
+
+                                    try {
+                                        saveEvent.put("user_id", mAdapter.getObject().get(position).getString("user_id"));
+                                        saveEvent.put("event_id", mAdapter.getObject().get(position).getString("event_id"));
+                                        //Custom stylable toast*
+                                        st.setBackgroundColor(Color.parseColor("#ff9dfc"));
+                                        st.setTextColor(Color.WHITE);
+                                        st.setIcon(R.drawable.ic_save_black_24dp);
+                                        st.spinIcon();
+                                        st.setMaxAlpha();
+                                        st.show();
+                                        eventData.remove(position);
+                                        if(eventData!=null)
+                                            mAdapter.setEventData(eventData);
+                                        //Toast.makeText(getContext(), mAdapter.getObject().get(position).getString("event_id"), Toast.LENGTH_SHORT).show();
+
+
+                                    } catch (JSONException e) {
+                                        e.printStackTrace();
+                                    }
+                                    mAdapter.notifyDataSetChanged();
+
+                                }
+
+                                new UpdateDbOnSwipe(getString(R.string.DATABASE_STORE_SAVED_EVENTS)).execute(saveEvent);
+
+                            }
+                        });
+        mRecyclerView.addOnItemTouchListener(swipeTouchListener);
+    }
 }

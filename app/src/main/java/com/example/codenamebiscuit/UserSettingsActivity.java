@@ -9,12 +9,14 @@ import android.support.v4.app.NavUtils;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.preference.PreferenceManager;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.codenamebiscuit.helper.App;
 import com.example.codenamebiscuit.login.ChooseLogin;
@@ -126,14 +128,12 @@ public class UserSettingsActivity
     private void initializeLogoutButton() {
         // Create the Logout button
         Button logout = (Button) findViewById(R.id.user_logout_button);
+        Log.i("google login", App.getInstance().getGoogleApiHelperInstance().getApiClient().isConnected()+"");
+
         logout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(LoginManager.getInstance()!=null) {
-                    LoginManager.getInstance().logOut();
-                }else{
-                    App.getGoogleApiHelper().disconnect();
-                }
+                prefs.edit().putString("user_id", null).apply();
                 Intent login = new Intent(UserSettingsActivity.this, ChooseLogin.class);
                 startActivity(login);
                 finish();

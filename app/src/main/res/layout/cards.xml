@@ -140,7 +140,7 @@
                 android:layout_below="@+id/event_preference_back"
                 android:gravity="center_horizontal"
                 android:layout_marginTop="40dp"
-                android:text="ADDITONAL EVENT INFORMATION HERE"
+                android:id="@+id/additional_info"
                 android:textSize="30sp"/>
 
             <RelativeLayout

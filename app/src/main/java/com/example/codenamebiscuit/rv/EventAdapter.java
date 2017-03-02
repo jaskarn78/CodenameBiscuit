@@ -1,10 +1,9 @@
 package com.example.codenamebiscuit.rv;
 
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.Typeface;
-import android.graphics.drawable.Drawable;
+import android.location.Geocoder;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -17,27 +16,32 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.codenamebiscuit.R;
+import com.example.codenamebiscuit.helper.FlipAnimation;
+import com.google.android.gms.maps.model.LatLng;
 import com.muddzdev.styleabletoastlibrary.StyleableToast;
 import com.squareup.picasso.Picasso;
-import com.squareup.picasso.Target;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
 
-public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapterViewHolder>{
+
+public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapterViewHolder> {
     private ArrayList<JSONObject> mEventData;
     private Context context;
+    private LatLng latLng;
+    private Geocoder geocoder;
     private Typeface typeface;
     private ClickListener clickListener = null;
+    private int type;
 
 
-    public EventAdapter(Context context) {
+    public EventAdapter(Context context, int type) {
         this.context = context;
         mEventData = new ArrayList<>();
-        typeface=Typeface.createFromAsset(context.getAssets(), "fonts/Raleway-Black.ttf");
-
+        typeface = Typeface.createFromAsset(context.getAssets(), "fonts/Raleway-Black.ttf");
+        this.type=type;
     }
 
 
@@ -45,7 +49,10 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
     public EventAdapterViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
         Context context = viewGroup.getContext();
         int layoutIdForListItem = 0;
-        layoutIdForListItem = R.layout.event_list_item;
+        if(type==1)
+            layoutIdForListItem = R.layout.event_list_item;
+        else if(type==2)
+            layoutIdForListItem=R.layout.grid_events;
 
         LayoutInflater inflater = LayoutInflater.from(context);
         boolean shouldAttachToParentImmediately = false;
@@ -59,12 +66,16 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
     public class EventAdapterViewHolder extends RecyclerView.ViewHolder implements
             View.OnClickListener, View.OnLongClickListener {
 
-        public final TextView mEventPreferenceTV;
-        public final TextView mEventLocationTV;
-        public final ImageView mEventImage;
-        public final TextView mEventName;
-        public final TextView mEventAge;
-        public final TextView mEventCost;
+        public final TextView mEventPreferenceTV, mEventPreferenceTVBack;
+        public final TextView mEventLocationTV, mEventLocationTVBack;
+        public final TextView mEventName, mEventNameBack;
+        public final TextView mEventAge, mEventAgeBack;
+        public final TextView mEventCost, mEventCostBack;
+        public final ImageView mEventImage, mEventImageback;
+        public final TextView mEventInfoBack;
+
+        // public final ImageView mFeaturedImage;
+        public final TextView mEventDistance;
         public final CardView cardView;
         public final RelativeLayout layout;
 
@@ -73,22 +84,35 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
             super(view);
 
             mEventPreferenceTV = (TextView) view.findViewById(R.id.tv_event_preference);
+            mEventPreferenceTVBack = (TextView) view.findViewById(R.id.event_preference_back);
+
             //mEventPreferenceTV.setTypeface(typeface);
 
             mEventLocationTV = (TextView) view.findViewById(R.id.tv_event_location);
+            mEventLocationTVBack = (TextView) view.findViewById(R.id.event_location_back);
+
             //mEventLocationTV.setTypeface(typeface);
 
             mEventName = (TextView) view.findViewById(R.id.tv_event_name);
+            mEventNameBack = (TextView) view.findViewById(R.id.event_name_back);
+
             //mEventName.setTypeface(typeface);
 
-            mEventAge = (TextView)view.findViewById(R.id.age);
+            mEventAge = (TextView) view.findViewById(R.id.age);
+            mEventAgeBack = (TextView)view.findViewById(R.id.event_age_back);
             //mEventAge.setTypeface(typeface);
 
-            mEventCost = (TextView)view.findViewById(R.id.cost);
-           // mEventCost.setTypeface(typeface);
+            mEventCost = (TextView) view.findViewById(R.id.cost);
+            mEventCostBack = (TextView)view.findViewById(R.id.event_cost_back);
+            // mEventCost.setTypeface(typeface);
 
+            mEventDistance = (TextView) view.findViewById(R.id.event_distance);
 
-            layout = (RelativeLayout)view.findViewById(R.id.extend);
+            mEventInfoBack = (TextView)view.findViewById(R.id.event_info_back);
+
+            mEventImageback = (ImageView)view.findViewById(R.id.iv_event_image_back);
+
+            layout = (RelativeLayout) view.findViewById(R.id.extend);
 
 
             mEventImage = (ImageView) view.findViewById(R.id.iv_event_image);
@@ -97,13 +121,32 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
             view.setOnClickListener(this);
             view.setOnLongClickListener(this);
 
+            if(type==2) {
+                mEventNameBack.setTypeface(typeface);
+                view.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(final View v) {
+                        Log.i("Layer type: ", Integer.toString(v.getLayerType()));
+                        Log.i("Hardware Accel type:", Integer.toString(View.LAYER_TYPE_HARDWARE));
 
+                        //Picasso.with(context).load(R.drawable.liv1).fit().centerCrop().into(imageView);
+                        final CardView cv = (CardView) v.findViewById(R.id.cardview);
+                        final CardView cvBack = (CardView) v.findViewById(R.id.card_view_back);
+
+
+                        FlipAnimation flipAnimation = new FlipAnimation(cv, cvBack);
+
+                        if (cv.getVisibility() == View.GONE)
+                            flipAnimation.reverse();
+                        v.startAnimation(flipAnimation);}
+                });
+            }
         }
 
 
         @Override
         public void onClick(final View v) {
-            if(clickListener!=null){
+            if (clickListener != null) {
                 clickListener.itemClicked(v, getAdapterPosition());
             }
             StyleableToast st = new StyleableToast(context, "EVENT LONG CLICKED", Toast.LENGTH_SHORT);
@@ -112,8 +155,9 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
             st.setIcon(R.drawable.ic_check_circle_white_24dp);
             st.setMaxAlpha();
             st.show();
-        }
 
+
+        }
 
 
         @Override
@@ -123,7 +167,7 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
             st.setTextColor(Color.WHITE);
             st.setIcon(R.drawable.ic_check_circle_white_24dp);
             st.setMaxAlpha();
-            //st.show();
+            st.show();
             return true;
         }
     }
@@ -133,19 +177,22 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
     public void onBindViewHolder(final EventAdapterViewHolder eventAdapterViewHolder, int position) {
 
         String eventLocation = null;
+        String eventDistance = null;
         String eventPref = null;
         String eventPath = null;
         String event = null;
         String eventid = null;
+        String eventInfo = "";
+        LatLng latLng = null;
 
 
-        loadImage(eventAdapterViewHolder);
         try {
             eventLocation = mEventData.get(position).getString("event_location");
             eventPref = mEventData.get(position).getString("preference_name");
             eventPath = mEventData.get(position).getString("img_path");
             event = mEventData.get(position).getString("event_name");
             eventid = mEventData.get(position).getString("event_id");
+            eventInfo = mEventData.get(position).getString("event_description");
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -153,29 +200,49 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
         eventAdapterViewHolder.mEventPreferenceTV.setText(eventPref);
         eventAdapterViewHolder.mEventLocationTV.setText(eventLocation);
         eventAdapterViewHolder.mEventName.setText(event);
-        Picasso.with(eventAdapterViewHolder.mEventImage.getContext().getApplicationContext())
-                .load(getImageURL(eventPath))
-                .resize(100, 100)
-                .centerCrop()
-                .into(loadImage(eventAdapterViewHolder));
 
-        eventAdapterViewHolder.itemView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Toast.makeText(v.getContext(), "button clicked", Toast.LENGTH_SHORT).show();
+        if(type==2) {
+            eventAdapterViewHolder.mEventPreferenceTVBack.setText(eventPref);
+            eventAdapterViewHolder.mEventNameBack.setText(event);
+            eventAdapterViewHolder.mEventLocationTVBack.setText("1234 Example St. "+eventLocation);
+            eventAdapterViewHolder.mEventCostBack.setText("Event Price: $20.00");
+            eventAdapterViewHolder.mEventAgeBack.setText("Age Restriction: 21+");
+            eventAdapterViewHolder.mEventInfoBack.setText("Description: "+eventInfo);
 
-                if (eventAdapterViewHolder.layout.getVisibility() == View.GONE) {
-                    eventAdapterViewHolder.layout.setVisibility(View.VISIBLE);
+            Picasso.with(context)
+                    .load(getImageURL(eventPath))
+                    .into(eventAdapterViewHolder.mEventImageback);
+            Picasso.with(context)
+                    .load(getImageURL(eventPath))
+                    .into(eventAdapterViewHolder.mEventImage);
+        }
 
+        if(type==1){
+            Picasso.with(context)
+                    .load(getImageURL(eventPath))
+                    .centerCrop()
+                    .fit()
+                    .into(eventAdapterViewHolder.mEventImage);
+        }
+
+
+        final String finalEventInfo = eventInfo;
+        if(type==1) {
+            eventAdapterViewHolder.itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+
+                    if (eventAdapterViewHolder.layout.getVisibility() == View.GONE) {
+                        eventAdapterViewHolder.layout.setVisibility(View.VISIBLE);
+
+
+                    } else {
+                        eventAdapterViewHolder.layout.setVisibility(View.GONE);
+
+                    }
                 }
-
-                else {
-                    eventAdapterViewHolder.layout.setVisibility(View.GONE);
-
-                }
-                Log.i("click", "button clicked");
-            }
-        });
+            });
+        }
         //eventAdapterViewHolder.itemView.setOnClickListener(this);
 
     }
@@ -185,36 +252,9 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
 
 
 
-    private Target loadImage(final EventAdapterViewHolder eventAdapterViewHolder) {
-
-        final Target target = new Target() {
-            @Override
-            public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
-                eventAdapterViewHolder.mEventImage.setImageBitmap(bitmap);
-
-                Log.v("Success", "image created from url");
-            }
-
-            @Override
-            public void onBitmapFailed(Drawable errorDrawable) {
-                eventAdapterViewHolder.mEventImage.setImageResource(R.drawable.error);
-
-                Log.e("Error", "Bitmap not created from URL");
-
-            }
-
-            @Override
-            public void onPrepareLoad(Drawable placeHolderDrawable) {
-                eventAdapterViewHolder.mEventImage.setImageResource(R.drawable.placeholder);
 
 
-            }
-        };
-        return target;
-    }
-
-
-    /**
+        /**
      * This method simply returns the number of items to display. It is used behind the scenes
      * to help layout our Views and for animations.
      *
@@ -222,7 +262,7 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
      */
     @Override
     public int getItemCount() {
-        if(mEventData.isEmpty())
+        if(mEventData==null)
             return 0;
         else
             return mEventData.size();

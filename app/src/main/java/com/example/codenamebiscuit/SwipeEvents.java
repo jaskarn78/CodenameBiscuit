@@ -45,6 +45,7 @@ public class SwipeEvents extends AppCompatActivity {
     private String event_location;
     private String event_preference;
     private String event_name;
+    private String event_description;
     private SharedPreferences pref;
     private JSONObject user;
 
@@ -213,6 +214,7 @@ public class SwipeEvents extends AppCompatActivity {
                 event_location = testData.get(position).getString("event_location");
                 event_name = testData.get(position).getString("event_name");
                 event_preference = testData.get(position).getString("preference_name");
+                event_description = testData.get(position).getString("event_description");
 
 
             } catch (JSONException e) {
@@ -237,6 +239,9 @@ public class SwipeEvents extends AppCompatActivity {
 
             TextView event_preference_tv = (TextView) v.findViewById(R.id.event_preference_back);
             event_preference_tv.setText(event_preference);
+
+            TextView event_info = (TextView)v.findViewById(R.id.additional_info);
+            event_info.setText(event_description);
 
 
 

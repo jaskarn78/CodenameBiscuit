@@ -33,15 +33,13 @@ import java.util.List;
 
 public class QueryEventList extends AsyncTask<JSONObject, Void, ArrayList<JSONObject>> {
 
-    private EventAdapter mEventAdapter;
     private ArrayList<JSONObject> eventList;
     private String main_events;
     private Context context;
     ProgressDialog dialog;
 
 
-    public QueryEventList(EventAdapter mEventAdapter, String main_events, Context context){
-        this.mEventAdapter = mEventAdapter;
+    public QueryEventList(String main_events, Context context){
         this.main_events=main_events;
         this.context=context;
         //dialog = new ProgressDialog(context);
@@ -128,8 +126,8 @@ public class QueryEventList extends AsyncTask<JSONObject, Void, ArrayList<JSONOb
             ArrayList<JSONObject> eventList = objs;
             setEventList(eventList);
         }
-        if(mEventAdapter!=null && eventList!=null)
-            mEventAdapter.setEventData(eventList);
+        //if(mEventAdapter!=null && eventList!=null)
+          //  mEventAdapter.setEventData(eventList);
 
         //if(dialog.isShowing())
          //   dialog.dismiss();

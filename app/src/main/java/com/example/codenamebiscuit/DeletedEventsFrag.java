@@ -11,6 +11,7 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,13 +20,16 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.codenamebiscuit.helper.QueryEventList;
+import com.example.codenamebiscuit.helper.UpdateDbOnSwipe;
 import com.example.codenamebiscuit.rv.ClickListener;
 import com.example.codenamebiscuit.rv.EventAdapter;
+import com.github.brnunes.swipeablerecyclerview.SwipeableRecyclerViewTouchListener;
 import com.muddzdev.styleabletoastlibrary.StyleableToast;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.concurrent.ExecutionException;
 
 /**
  * Created by jaskarnjagpal on 2/23/17.
@@ -39,6 +43,8 @@ public class DeletedEventsFrag extends Fragment implements ClickListener{
     protected SharedPreferences pref;
     private JSONObject currentUserId = new JSONObject();
     private SwipeRefreshLayout swipeContainer;
+    private RecyclerView mRecyclerView;
+    private JSONObject restoreEvent;
 
 
 
@@ -47,31 +53,25 @@ public class DeletedEventsFrag extends Fragment implements ClickListener{
     public void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
         pref = PreferenceManager.getDefaultSharedPreferences(getContext());
-
+        restoreEvent = new JSONObject();
         String user_id = pref.getString("user_id", null);
         try {
             currentUserId.put("user_id", user_id);
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        mAdapter = new EventAdapter(getActivity());
 
 
-        //initialize event dataset
         eventData = new ArrayList<JSONObject>();
-        loadEventData();
-        //alter toolbar title
-        TextView textView = (TextView)getActivity().findViewById(R.id.toolbar_title);
-        textView.setText("Removed Events");
 
-        //Custom stylable toast*
+        /*Custom stylable toast*
         StyleableToast st = new StyleableToast(getContext(), "Loading Removed Events...Please Wait", Toast.LENGTH_SHORT);
         st.setBackgroundColor(Color.parseColor("#ff9dfc"));
         st.setTextColor(Color.WHITE);
         st.setIcon(R.drawable.ic_autorenew_white_24dp);
         st.spinIcon();
         st.setMaxAlpha();
-        st.show();
+        st.show();*/
 
     }
 
@@ -81,18 +81,8 @@ public class DeletedEventsFrag extends Fragment implements ClickListener{
         View rootView = inflater.inflate(R.layout.activity_main, container, false);
         swipeContainer = (SwipeRefreshLayout) rootView.findViewById(R.id.swipeContainer);
         setupSwipeDownRefresh();
-        RecyclerView mRecyclerView = (RecyclerView) rootView.findViewById(R.id.recyclerview_events);
-        LinearLayoutManager mLinearLayoutManager = new LinearLayoutManager(getActivity());
-        mRecyclerView.setAdapter(mAdapter);
-        LinearLayoutManager layoutManager
-                = new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false);
+        mRecyclerView = (RecyclerView) rootView.findViewById(R.id.recyclerview_events);
 
-        mRecyclerView.setLayoutManager(layoutManager);
-        mRecyclerView.setHasFixedSize(true);
-        mRecyclerView.setItemViewCacheSize(20);
-        mRecyclerView.setDrawingCacheEnabled(true);
-        mRecyclerView.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_HIGH);
-        mRecyclerView.setItemAnimator(new DefaultItemAnimator());
         return rootView;
 
     }
@@ -106,6 +96,22 @@ public class DeletedEventsFrag extends Fragment implements ClickListener{
     @Override
     public void onActivityCreated(Bundle savedInstanceState){
         super.onActivityCreated(savedInstanceState);
+        mAdapter = new EventAdapter(getActivity().getApplicationContext(), 1);
+        LinearLayoutManager mLinearLayoutManager = new LinearLayoutManager(getContext());
+        mRecyclerView.setAdapter(mAdapter);
+        LinearLayoutManager layoutManager
+                = new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false);
+
+        mRecyclerView.setLayoutManager(layoutManager);
+        mRecyclerView.setHasFixedSize(true);
+        mRecyclerView.setItemViewCacheSize(40);
+        mRecyclerView.setDrawingCacheEnabled(true);
+        mRecyclerView.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_HIGH);
+        mRecyclerView.setItemAnimator(new DefaultItemAnimator());
+        TextView tv = (TextView)getActivity().findViewById(R.id.toolbar_title);
+        tv.setText("Deleted Events");
+        enableCardSwiping();
+
 
         //mAdapter.setClickListener(getContext());
     }
@@ -119,15 +125,65 @@ public class DeletedEventsFrag extends Fragment implements ClickListener{
     @Override
     public void onResume() {  // After a pause OR at startup
         super.onResume();
-        swipeContainer.setRefreshing(true);
         loadEventData();
-        swipeContainer.setRefreshing(false);
 
     }
 
     @Override
     public void onStart() {
         super.onStart();
+        loadEventData();
+    }
+    private void enableCardSwiping() {
+        SwipeableRecyclerViewTouchListener swipeTouchListener =
+                new SwipeableRecyclerViewTouchListener(mRecyclerView,
+                        new SwipeableRecyclerViewTouchListener.SwipeListener() {
+                            @Override
+                            public boolean canSwipeLeft(int i) {
+                                return true;
+                            }
+
+                            @Override
+                            public boolean canSwipeRight(int i) {
+                                return true;
+                            }
+
+                            @Override
+                            public void onDismissedBySwipeLeft(RecyclerView recyclerView, int[] ints) {
+                                StyleableToast st = new StyleableToast(getContext(), "Restoring...", Toast.LENGTH_SHORT);
+                                for (int position : ints) {
+                                    //eventData.remove(position);
+                                    mAdapter.notifyItemRemoved(position);
+                                    try {
+                                        restoreEvent.put("user_id", mAdapter.getObject().get(position).get("user_id"));
+                                        restoreEvent.put("event_id", mAdapter.getObject().get(position).getString("event_id"));
+                                        st.setBackgroundColor(Color.GREEN);
+                                        st.setTextColor(Color.WHITE);
+                                        st.spinIcon();
+                                        st.setMaxAlpha();
+                                        st.show();
+                                        st.show();
+                                        eventData.remove(position);
+                                        mAdapter.setEventData(eventData);
+
+
+                                    } catch (JSONException e) {
+                                        e.printStackTrace();
+                                    }
+
+
+                                }
+                                new UpdateDbOnSwipe(getString(R.string.DATABASE_RESTORE_DELETED_EVENTS)).execute(restoreEvent);
+
+
+                            }
+
+                            @Override
+                            public void onDismissedBySwipeRight(RecyclerView recyclerView, int[] ints) {
+
+                            }
+                        });
+        mRecyclerView.addOnItemTouchListener(swipeTouchListener);
     }
 
     /**********************************************************************************************
@@ -155,8 +211,16 @@ public class DeletedEventsFrag extends Fragment implements ClickListener{
      **********************************************************************************************/
     private void loadEventData() {
         QueryEventList list = (QueryEventList)
-                new QueryEventList(mAdapter, getString(R.string.DATABASE_DELETED_EVENTS_PULLER),
+                new QueryEventList(getString(R.string.DATABASE_DELETED_EVENTS_PULLER),
                         getContext()).execute(currentUserId);
+        try {
+            eventData=list.get();
+            mAdapter.setEventData(eventData);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        }
     }
     /**********************************************************************************************
      * Handles the drop down functionality in the list view of the event data

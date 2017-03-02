@@ -10,6 +10,7 @@ import android.support.v7.preference.PreferenceManager;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.Button;
 
 import com.example.codenamebiscuit.MainActivity;
 import com.example.codenamebiscuit.R;
@@ -102,6 +103,7 @@ public class ChooseLogin extends FragmentActivity implements GoogleApiClient.OnC
     private  void setupViaGoogle(){
 
         signIn();
+        App.getInstance().setClient(App.getGoogleApiHelper().getApiClient());
         App.getGoogleApiHelper().connect();
 
     }
@@ -148,6 +150,10 @@ public class ChooseLogin extends FragmentActivity implements GoogleApiClient.OnC
         }
         nextActivity();
     }
+    @Override
+    public void onBackPressed() {
+        moveTaskToBack(true);
+    }
     private void signIn() {
         Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
         startActivityForResult(signInIntent, RC_SIGN_IN);
@@ -160,7 +166,6 @@ public class ChooseLogin extends FragmentActivity implements GoogleApiClient.OnC
 
         mCallbackManager = CallbackManager.Factory.create();
         initializeTokens();
-
 
         // Initialize Facebook LoginButton
         LoginButton mLoginButton = (LoginButton) findViewById(R.id.facebook_login_button);

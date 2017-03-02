@@ -54,6 +54,9 @@ dependencies {
     compile 'com.muddzdev:styleabletoast:1.0.6'
     compile 'com.getbase:floatingactionbutton:1.10.1'
     compile 'com.android.volley:volley:1.0.0'
+    compile 'com.github.brnunes:swipeablerecyclerview:1.0.2'
+
+
 
     compile('com.mikepenz:materialdrawer:5.8.1@aar') {
         transitive = true
