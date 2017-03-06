@@ -9,6 +9,10 @@ import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.Volley;
 import com.squareup.okhttp.Request;
 
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+
 /**
  * Created by jaskarnjagpal on 2/24/17.*/
 
@@ -21,7 +25,6 @@ public class VolleySingleton {
     private VolleySingleton(Context context) {
         mCtx = context;
         mRequestQueue = getRequestQueue();
-
         mImageLoader = new ImageLoader(mRequestQueue,
                 new ImageLoader.ImageCache() {
                     private final LruCache<String, Bitmap>
@@ -62,4 +65,5 @@ public class VolleySingleton {
     public ImageLoader getImageLoader() {
         return mImageLoader;
     }
+
 }

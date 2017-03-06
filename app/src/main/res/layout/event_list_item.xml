@@ -16,23 +16,23 @@
         android:id="@+id/cardview"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="2dp"
-        card_view:cardElevation="3dp"
-        card_view:contentPadding="4dp"
-        android:paddingBottom="1dp">
+        android:layout_margin="1dp"
+        card_view:cardElevation="2dp"
+        card_view:contentPadding="2dp"
+       >
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_margin="3dp"
         android:id="@+id/card_relative_layout"
         >
 
         <ImageView
-            android:layout_width="100dp"
-            android:layout_height="100dp"
+            android:layout_width="95dp"
+            android:layout_height="95dp"
             android:id="@+id/iv_event_image"
             android:layout_alignParentLeft="true"
-            android:layout_alignParentTop="true"
             android:layout_marginRight="16dp"
             />
 
@@ -42,7 +42,16 @@
             android:id="@+id/tv_event_name"
             android:layout_toRightOf="@+id/iv_event_image"
             android:layout_alignParentTop="true"
+            android:layout_marginTop="2dp"
             android:textSize="20sp"
+            />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/tv_event_hoster"
+            android:layout_toRightOf="@+id/iv_event_image"
+            android:layout_below="@+id/tv_event_preference"
+            android:textSize="10sp"
             />
 
         <TextView
@@ -50,31 +59,52 @@
             android:layout_height="wrap_content"
             android:id="@+id/tv_event_location"
             android:layout_toRightOf="@+id/iv_event_image"
-            android:layout_below="@+id/tv_event_preference"
+            android:layout_below="@+id/tv_event_hoster"
             />
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/tv_event_preference"
-            android:layout_toRightOf="@+id/iv_event_image"
-            android:layout_below="@+id/tv_event_name"
+            android:textSize="12sp"
+            android:layout_toEndOf="@+id/tv_event_name"
+            android:layout_marginTop="7dp"
             />
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/age"
-            android:layout_below="@id/tv_event_location"
-            android:layout_toRightOf="@+id/iv_event_image"
-            android:text="Age: 21+"/>
+
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@id/tv_event_location"
             android:id="@+id/cost"
-            android:layout_toRightOf="@id/age"
-            android:paddingLeft="5dp"
-            android:text="Cost: $$$"
+            android:layout_toRightOf="@+id/iv_event_image"
+            android:text="Entrance Fee: $$$"
+            />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/age"
+            android:layout_below="@id/cost"
+            android:layout_toRightOf="@+id/iv_event_image"
+            android:visibility="gone"
+            android:text="Age Min: 21+"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/start_date"
+            android:textSize="12sp"
+            android:layout_alignParentTop="true"
+            android:layout_toRightOf="@id/tv_event_name"
+            android:layout_marginTop="7dp"
+            android:layout_alignParentEnd="true"
             android:paddingBottom="5dp"
+            android:visibility="gone"
+            />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/age"
+            android:id="@+id/start_time"
+            android:layout_toRightOf="@id/iv_event_image"
+            android:visibility="gone"
             />
 
         <RelativeLayout
@@ -86,12 +116,14 @@
             android:id="@+id/extend">
 
 
+
             <TextView
                 android:id="@+id/extra_info"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center_horizontal"
                 android:layout_marginTop="30dp"
+                android:visibility="gone"
                 android:textSize="30sp"/>
 
             <TextView
@@ -100,21 +132,60 @@
                 android:id="@+id/event_distance"
                 android:gravity="center_horizontal"
                 android:textSize="20sp"
+                android:visibility="gone"
                 android:layout_marginTop="10dp"/>
             <RelativeLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:layout_below="@+id/extra_info">
+                <ScrollView android:id="@+id/LinearLayout01"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical">
+                <WebView
+                    android:layout_width="wrap_content"
+                    android:layout_height="400dp"
+                    android:id="@+id/webView"
+                    android:layout_alignParentTop="true"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignParentStart="true"
+                    android:visibility="gone"
+                    >
+                </WebView>
+                </ScrollView>
 
-        <android.support.design.widget.BottomNavigationView
-            android:id="@+id/bottom_navigation"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            app:itemBackground="@color/livinPink"
-            app:itemIconTint="@color/livinWhite"
-            app:itemTextColor="@color/livinWhite"
-            app:menu="@menu/bottom_navigation_main" />
+                <LinearLayout android:id="@+id/footer"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:background="@color/livinBlack"
+                    android:layout_alignParentBottom="true" style="@android:style/Theme.NoTitleBar">
+
+                    <ImageButton android:id="@+id/saveButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="30dp"
+                        android:layout_weight="1"
+                        android:src="@drawable/calendar"
+                        android:background="@color/livinPink"
+                        android:text="Add to Calendar" />
+
+                    <ImageButton android:id="@+id/likeButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="30dp"
+                        android:layout_weight="1"
+                        android:layout_marginStart="2dp"
+                        android:layout_marginEnd="2dp"
+                        android:src="@drawable/share"
+                        android:background="@color/livinPink"
+                        android:text="Save" />
+                    <ImageButton android:id="@+id/linkButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="30dp"
+                        android:layout_weight="1"
+                        android:src="@drawable/linkvariant"
+                        android:background="@color/livinPink"
+                        android:text="Save" />
+                </LinearLayout>
             </RelativeLayout>
         </RelativeLayout>
 

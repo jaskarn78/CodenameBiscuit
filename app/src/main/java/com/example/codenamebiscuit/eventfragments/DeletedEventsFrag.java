@@ -1,5 +1,6 @@
-package com.example.codenamebiscuit;
+package com.example.codenamebiscuit.eventfragments;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
@@ -19,6 +20,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.codenamebiscuit.R;
 import com.example.codenamebiscuit.helper.QueryEventList;
 import com.example.codenamebiscuit.helper.UpdateDbOnSwipe;
 import com.example.codenamebiscuit.rv.ClickListener;
@@ -45,6 +47,25 @@ public class DeletedEventsFrag extends Fragment implements ClickListener{
     private SwipeRefreshLayout swipeContainer;
     private RecyclerView mRecyclerView;
     private JSONObject restoreEvent;
+    private ArrayList<JSONObject> data;
+    GetDeletedEventsInterface sGetDeletedEventsInterface;
+
+    public interface GetDeletedEventsInterface {
+        ArrayList<JSONObject> getDeletedEventList();
+        ArrayList<JSONObject> getUpdatedDeletedEventList();
+
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        try {
+            sGetDeletedEventsInterface = (GetDeletedEventsInterface) context;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(context.toString() + "must implement GetDataInterface Interface");
+        }
+    }
+
 
 
 
@@ -54,6 +75,8 @@ public class DeletedEventsFrag extends Fragment implements ClickListener{
         super.onCreate(savedInstanceState);
         pref = PreferenceManager.getDefaultSharedPreferences(getContext());
         restoreEvent = new JSONObject();
+        data = new ArrayList<JSONObject>();
+
         String user_id = pref.getString("user_id", null);
         try {
             currentUserId.put("user_id", user_id);
@@ -104,15 +127,13 @@ public class DeletedEventsFrag extends Fragment implements ClickListener{
 
         mRecyclerView.setLayoutManager(layoutManager);
         mRecyclerView.setHasFixedSize(true);
-        mRecyclerView.setItemViewCacheSize(40);
+        mRecyclerView.setItemViewCacheSize(80);
         mRecyclerView.setDrawingCacheEnabled(true);
-        mRecyclerView.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_HIGH);
+        mRecyclerView.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_LOW);
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
         TextView tv = (TextView)getActivity().findViewById(R.id.toolbar_title);
         tv.setText("Deleted Events");
         enableCardSwiping();
-
-
         //mAdapter.setClickListener(getContext());
     }
 
@@ -125,14 +146,23 @@ public class DeletedEventsFrag extends Fragment implements ClickListener{
     @Override
     public void onResume() {  // After a pause OR at startup
         super.onResume();
-        loadEventData();
+        try {
+            data = new QueryEventList(getString(R.string.DATABASE_DELETED_EVENTS_PULLER)).execute(currentUserId).get();
+            mAdapter.setEventData(data);
+
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        }
+        //loadEventData();
 
     }
 
     @Override
     public void onStart() {
         super.onStart();
-        loadEventData();
+        //loadEventData();
     }
     private void enableCardSwiping() {
         SwipeableRecyclerViewTouchListener swipeTouchListener =
@@ -163,15 +193,13 @@ public class DeletedEventsFrag extends Fragment implements ClickListener{
                                         st.setMaxAlpha();
                                         st.show();
                                         st.show();
-                                        eventData.remove(position);
-                                        mAdapter.setEventData(eventData);
-
+                                       // eventData.remove(position);
+                                        data.remove(position);
+                                        mAdapter.setEventData(data);
 
                                     } catch (JSONException e) {
                                         e.printStackTrace();
                                     }
-
-
                                 }
                                 new UpdateDbOnSwipe(getString(R.string.DATABASE_RESTORE_DELETED_EVENTS)).execute(restoreEvent);
 
@@ -195,7 +223,15 @@ public class DeletedEventsFrag extends Fragment implements ClickListener{
         swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                loadEventData();
+                swipeContainer.setRefreshing(true);
+                try {
+                    data = new QueryEventList(getString(R.string.DATABASE_DELETED_EVENTS_PULLER)).execute(currentUserId).get();
+                    mAdapter.setEventData(data);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                } catch (ExecutionException e) {
+                    e.printStackTrace();
+                }
                 swipeContainer.setRefreshing(false);
             }
         });
@@ -206,7 +242,7 @@ public class DeletedEventsFrag extends Fragment implements ClickListener{
 
 
     /**********************************************************************************************
-     * HTTP request to run python script which contains sql command
+     * HTTP request to run php script which contains sql command
      * to retrieve all event data filtered by user id
      **********************************************************************************************/
     private void loadEventData() {

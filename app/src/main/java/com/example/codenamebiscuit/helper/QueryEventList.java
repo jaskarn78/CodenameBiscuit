@@ -99,7 +99,7 @@ public class QueryEventList extends AsyncTask<JSONObject, Void, ArrayList<JSONOb
             if (jArray != null) {
                 for (int i = 0; i < jArray.length(); i++) {
                     eventList.add(jArray.getJSONObject(i));
-                    Log.v("PrintLine", eventList.get(i).toString());
+                    //Log.v("PrintLine", eventList.get(i).toString());
                 }
             }
 
@@ -126,12 +126,6 @@ public class QueryEventList extends AsyncTask<JSONObject, Void, ArrayList<JSONOb
             ArrayList<JSONObject> eventList = objs;
             setEventList(eventList);
         }
-        //if(mEventAdapter!=null && eventList!=null)
-          //  mEventAdapter.setEventData(eventList);
-
-        //if(dialog.isShowing())
-         //   dialog.dismiss();
-
     }
     public ArrayList<JSONObject> getEventList(){
         Log.i("event list", eventList.toString());

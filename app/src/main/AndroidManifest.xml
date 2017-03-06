@@ -8,16 +8,23 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.READ_CALENDAR" />
+    <uses-permission android:name="android.permission.WRITE_CALENDAR" />
 
+    <!-- Needed only if your app targets Android 5.0 (API level 21) or higher. -->
+    <uses-feature android:name="android.hardware.location.gps" />
     <permission
         android:name="com.maret.maps.permission.MAPS_RECEIVE"
         android:protectionLevel="signature" />
-    <permission android:name="android.permission.ACCESS_COARSE_LOCATION"
-        android:protectionLevel="signature"/>
-    <permission android:name="android.permission.ACCESS_FINE_LOCATION"
-        android:protectionLevel="signature"/>
+    <permission
+        android:name="android.permission.ACCESS_FINE_LOCATION"
+        android:protectionLevel="signature" />
+    <permission
+        android:name="android.permission.ACCESS_COARSE_LOCATION"
+        android:protectionLevel="signature" />
 
     <uses-permission android:name="com.maret.maps.permission.MAPS_RECEIVE" />
+
 
     <application
         android:name=".helper.App"
@@ -45,7 +52,7 @@
 
         </activity>
         <activity
-            android:name=".SavedEventsFrag"
+            android:name=".eventfragments.SavedEventsFrag"
             android:label="Saved Events"
             android:launchMode="singleTop">
             <meta-data
@@ -57,7 +64,7 @@
             </intent-filtr>
         </activity>
         <activity
-            android:name=".DeletedEventsFrag"
+            android:name=".eventfragments.DeletedEventsFrag"
             android:label="Removed Events"
             android:launchMode="singleTop">
             <meta-data
@@ -69,7 +76,7 @@
             </intent-filtr>
         </activity>
         <activity
-            android:name=".UserSettingsActivity"
+            android:name=".settings.UserSettingsActivity"
             android:label="Settings"
             android:launchMode="singleTop">
             <meta-data
@@ -98,7 +105,7 @@
             android:value="@integer/google_play_services_version" />
 
         <activity
-            android:name=".SwipeEvents"
+            android:name=".eventfragments.SwipeEvents"
             android:label="@string/title_activity_swipe_events"
             android:launchMode="singleTop">
             <meta-data

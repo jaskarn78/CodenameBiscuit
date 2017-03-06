@@ -149,15 +149,36 @@
                 android:id="@+id/navview">
 
 
-            <android.support.design.widget.BottomNavigationView
-                android:id="@+id/bottom_navigation"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_alignParentBottom="true"
-                app:itemBackground="@color/livinPink"
-                app:itemIconTint="@color/livinWhite"
-                app:itemTextColor="@color/livinWhite"
-                app:menu="@menu/bottom_navigation_main" />
+                <LinearLayout android:id="@+id/footer"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:background="@color/livinPink"
+                    android:layout_alignParentBottom="true" style="@android:style/Theme.NoTitleBar">
+
+                    <ImageButton android:id="@+id/saveButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:src="@drawable/ic_library_add_white_24dp"
+                        android:background="@color/livinPink"
+                        android:text="Add to Calendar" />
+
+                    <ImageButton android:id="@+id/likeButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:src="@drawable/ic_favorite_white_24dp"
+                        android:background="@color/livinPink"
+                        android:text="Save" />
+                    <ImageButton android:id="@+id/deleteButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:src="@drawable/ic_delete_white_24dp"
+                        android:background="@color/livinPink"
+                        android:text="Save" />
+                </LinearLayout>
             </RelativeLayout>
 
         </RelativeLayout>

@@ -1,4 +1,4 @@
-package com.example.codenamebiscuit;
+package com.example.codenamebiscuit.settings;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -16,16 +16,14 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
+import com.example.codenamebiscuit.R;
 import com.example.codenamebiscuit.helper.App;
+import com.example.codenamebiscuit.helper.ChangePreferences;
 import com.example.codenamebiscuit.login.ChooseLogin;
 import com.facebook.AccessToken;
 import com.facebook.FacebookSdk;
 import com.facebook.Profile;
-import com.facebook.login.LoginManager;
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
-import com.google.android.gms.common.api.GoogleApiClient;
 import com.squareup.picasso.Picasso;
 
 

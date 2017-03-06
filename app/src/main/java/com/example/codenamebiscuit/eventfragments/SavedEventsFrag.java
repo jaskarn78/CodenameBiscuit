@@ -1,7 +1,12 @@
-package com.example.codenamebiscuit;
+package com.example.codenamebiscuit.eventfragments;
 
+import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -10,6 +15,7 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,6 +24,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.codenamebiscuit.R;
 import com.example.codenamebiscuit.helper.QueryEventList;
 import com.example.codenamebiscuit.helper.UpdateDbOnSwipe;
 import com.example.codenamebiscuit.rv.ClickListener;
@@ -46,6 +53,24 @@ public class SavedEventsFrag extends Fragment implements ClickListener {
     private JSONObject currentUserId = new JSONObject();
     private SwipeRefreshLayout swipeContainer;
     private JSONObject restoreEvent;
+    private ArrayList<JSONObject> data;
+    GetSavedDataInterface sGetDataInterface;
+
+    public interface GetSavedDataInterface {
+        ArrayList<JSONObject> getSavedEventList();
+        ArrayList<JSONObject> getUpdatedSavedEventList();
+
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        try {
+            sGetDataInterface = (GetSavedDataInterface) context;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(context.toString() + "must implement GetDataInterface Interface");
+        }
+    }
 
 
     @Override
@@ -63,14 +88,6 @@ public class SavedEventsFrag extends Fragment implements ClickListener {
         //initialize event dataset
 
         eventData = new ArrayList<JSONObject>();
-        /*Custom stylable toast*
-        StyleableToast st = new StyleableToast(getContext(), "Loading Saved Events...Please Wait", Toast.LENGTH_SHORT);
-        st.setBackgroundColor(Color.parseColor("#ff9dfc"));
-        st.setTextColor(Color.WHITE);
-        st.setIcon(R.drawable.ic_autorenew_white_24dp);
-        st.spinIcon();
-        st.setMaxAlpha();
-        st.show();*/
 
     }
 
@@ -108,11 +125,12 @@ public class SavedEventsFrag extends Fragment implements ClickListener {
 
             mRecyclerView.setLayoutManager(layoutManager);
             mRecyclerView.setHasFixedSize(true);
-            mRecyclerView.setItemViewCacheSize(40);
+            mRecyclerView.setItemViewCacheSize(80);
             mRecyclerView.setDrawingCacheEnabled(true);
-            mRecyclerView.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_HIGH);
+            mRecyclerView.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_LOW);
             mRecyclerView.setItemAnimator(new DefaultItemAnimator());
-            enableCardSwiping();
+
+        enableCardSwiping();
 
 
         //mAdapter.setClickListener(getContext());
@@ -127,14 +145,30 @@ public class SavedEventsFrag extends Fragment implements ClickListener {
     @Override
     public void onResume() {  // After a pause OR at startup
         super.onResume();
-        loadEventData();
+        try {
+            data = new QueryEventList(getString(R.string.DATABASE_SAVED_EVENTS_PULLER)).execute(currentUserId).get();
+            mAdapter.setEventData(data);
+
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        }
+        //loadEventData();
 
     }
+
 
     @Override
     public void onStart() {
         super.onStart();
-        loadEventData();
+       // loadEventData();
+    }
+    public void setData(ArrayList<JSONObject> sData){
+        data=sData;
+    }
+    public ArrayList<JSONObject> getData(){
+        return data;
     }
 
     /**********************************************************************************************
@@ -146,7 +180,15 @@ public class SavedEventsFrag extends Fragment implements ClickListener {
         swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                loadEventData();
+                swipeContainer.setRefreshing(true);
+                try {
+                    data = new QueryEventList(getString(R.string.DATABASE_SAVED_EVENTS_PULLER)).execute(currentUserId).get();
+                    mAdapter.setEventData(data);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                } catch (ExecutionException e) {
+                    e.printStackTrace();
+                }
                 swipeContainer.setRefreshing(false);
             }
         });
@@ -155,6 +197,7 @@ public class SavedEventsFrag extends Fragment implements ClickListener {
                 android.R.color.holo_orange_light,
                 android.R.color.holo_red_light);
     }
+
 
     private void enableCardSwiping() {
         SwipeableRecyclerViewTouchListener swipeTouchListener =
@@ -193,8 +236,8 @@ public class SavedEventsFrag extends Fragment implements ClickListener {
                                     st.spinIcon();
                                     st.setMaxAlpha();
                                     st.show();
-                                    eventData.remove(position);
-                                    mAdapter.setEventData(eventData);
+                                    data.remove(position);
+                                    mAdapter.setEventData(data);
 
 
                                 }
@@ -214,18 +257,13 @@ public class SavedEventsFrag extends Fragment implements ClickListener {
 
 
     /**********************************************************************************************
-     * HTTP request to run python script which contains sql command
+     * HTTP request to run php script which contains sql command
      * to retrieve all event data filtered by user id
      **********************************************************************************************/
     private void loadEventData() {
-        QueryEventList list = (QueryEventList)
-                new QueryEventList(getString(R.string.DATABASE_SAVED_EVENTS_PULLER),
-                        getContext()).execute(currentUserId);
         try {
-            Log.i("list size: ",list.get()+"");
-            setEventData(list.get());
-            eventData = list.get();
-            mAdapter.setEventData(eventData);
+            data =new QueryEventList(getString(R.string.DATABASE_SAVED_EVENTS_PULLER),
+                    getContext()).execute(currentUserId).get();
         } catch (InterruptedException e) {
             e.printStackTrace();
         } catch (ExecutionException e) {

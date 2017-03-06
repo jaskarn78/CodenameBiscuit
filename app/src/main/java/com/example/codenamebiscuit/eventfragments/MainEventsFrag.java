@@ -1,8 +1,4 @@
-package com.example.codenamebiscuit;
-
-/**
- * Created by jaskarnjagpal on 3/1/17.
- */
+package com.example.codenamebiscuit.eventfragments;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -15,6 +11,7 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.preference.PreferenceManager;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
+
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.util.Log;
@@ -25,12 +22,16 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.codenamebiscuit.R;
 import com.example.codenamebiscuit.helper.QueryEventList;
 import com.example.codenamebiscuit.helper.UpdateDbOnSwipe;
 import com.example.codenamebiscuit.rv.ClickListener;
 import com.example.codenamebiscuit.rv.EventAdapter;
+
 import com.github.brnunes.swipeablerecyclerview.SwipeableRecyclerViewTouchListener;
+import com.google.android.gms.maps.model.LatLng;
 import com.muddzdev.styleabletoastlibrary.StyleableToast;
+
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -38,13 +39,11 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.concurrent.ExecutionException;
 
-
-
 /**
  * Created by jaskarnjagpal on 2/23/17.
  */
 
-public class GridMainEventsFrag extends Fragment implements ClickListener {
+public class MainEventsFrag extends Fragment implements ClickListener {
 
     private RecyclerView mRecyclerView, mRecyclerViewFeatured;
     private EventAdapter mAdapter;
@@ -54,6 +53,22 @@ public class GridMainEventsFrag extends Fragment implements ClickListener {
     private JSONObject currentUserId = new JSONObject();
     private SwipeRefreshLayout swipeContainer;
     private JSONObject saveEvent, deleteEvent;
+    private ArrayList<JSONObject> data;
+    GetDataInterface sGetDataInterface;
+
+    public interface GetDataInterface {
+        ArrayList<JSONObject> getMainEventList();
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        try {
+            sGetDataInterface = (GetDataInterface) context;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(context.toString() + "must implement GetDataInterface Interface");
+        }
+    }
 
 
     @Override
@@ -72,7 +87,7 @@ public class GridMainEventsFrag extends Fragment implements ClickListener {
         }
         //initialize event dataset
         eventData = new ArrayList<JSONObject>();
-
+        data = new ArrayList<JSONObject>();
         //Custom stylable toast*
         if (savedInstanceState == null) {
 
@@ -90,11 +105,22 @@ public class GridMainEventsFrag extends Fragment implements ClickListener {
         setupSwipeDownRefresh();
 
         mRecyclerView = (RecyclerView)rootView.findViewById(R.id.recyclerview_events);
+        mAdapter = new EventAdapter(getContext().getApplicationContext(), 1);
+
+        mLinearLayoutManager = new LinearLayoutManager(getContext());
+        StaggeredGridLayoutManager staggeredGridLayoutManager = new StaggeredGridLayoutManager(3, 1);
+        mRecyclerView.setAdapter(mAdapter);
+
+        mRecyclerView.setLayoutManager(mLinearLayoutManager);
+        mRecyclerView.setHasFixedSize(true);
+        mRecyclerView.setItemViewCacheSize(80);
+        mRecyclerView.setDrawingCacheEnabled(true);
+        mRecyclerView.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_LOW);
+        mRecyclerView.setItemAnimator(new DefaultItemAnimator());
 
         //alter toolbar title
         TextView textView = (TextView)getActivity().findViewById(R.id.toolbar_title);
-        textView.setText("UpComing Events-Grid");
-
+        textView.setText("UpComing Events");
         return rootView;
 
     }
@@ -127,24 +153,6 @@ public class GridMainEventsFrag extends Fragment implements ClickListener {
             st.show();
 
 
-        mAdapter = new EventAdapter(getContext(), 2);
-        mLinearLayoutManager = new LinearLayoutManager(getContext());
-        StaggeredGridLayoutManager staggeredGridLayoutManager = new StaggeredGridLayoutManager(2, 1);
-        mRecyclerView.setAdapter(mAdapter);
-        //mRecyclerViewFeatured.setAdapter(mAdapter);
-
-        mRecyclerView.setLayoutManager(staggeredGridLayoutManager);
-        mRecyclerView.setHasFixedSize(false);
-        mRecyclerView.setItemViewCacheSize(40);
-        mRecyclerView.setDrawingCacheEnabled(true);
-        mRecyclerView.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_HIGH);
-        mRecyclerView.setItemAnimator(new DefaultItemAnimator());
-
-        // mRecyclerViewFeatured.setLayoutManager(layoutManagerFeatured);
-        //mRecyclerViewFeatured.setHasFixedSize(true);
-        //mRecyclerViewFeatured.setItemViewCacheSize(20);
-        //mRecyclerViewFeatured.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_HIGH);
-        //mRecyclerViewFeatured.setItemAnimator(new DefaultItemAnimator());
 
         enableCardSwiping();}
 
@@ -158,13 +166,21 @@ public class GridMainEventsFrag extends Fragment implements ClickListener {
     @Override
     public void onResume() {  // After a pause OR at startup
         super.onResume();
+        try {
+            data = new QueryEventList(getString(R.string.DATABASE_MAIN_EVENTS_PULLER)).execute(currentUserId).get();
+            mAdapter.setEventData(data);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        }
+
 
     }
 
     @Override
     public void onStart() {
         super.onStart();
-        loadEventData();
     }
 
     @Override
@@ -181,7 +197,15 @@ public class GridMainEventsFrag extends Fragment implements ClickListener {
         swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                loadEventData();
+                swipeContainer.setRefreshing(true);
+                try {
+                    data = new QueryEventList(getString(R.string.DATABASE_MAIN_EVENTS_PULLER)).execute(currentUserId).get();
+                    mAdapter.setEventData(data);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                } catch (ExecutionException e) {
+                    e.printStackTrace();
+                }
                 swipeContainer.setRefreshing(false);
             }
 
@@ -214,13 +238,13 @@ public class GridMainEventsFrag extends Fragment implements ClickListener {
      * to retrieve all event data filtered by user id
      **********************************************************************************************/
     private void loadEventData(){
-        QueryEventList list = (QueryEventList)
-                new QueryEventList(getString(R.string.DATABASE_MAIN_EVENTS_PULLER), getContext()).execute(currentUserId);
+            QueryEventList list = (QueryEventList)
+                    new QueryEventList(getString(R.string.DATABASE_MAIN_EVENTS_PULLER), getContext()).execute(currentUserId);
         try {
             Log.i("list size: ",list.get()+"");
             setEventData(list.get());
-            eventData = list.get();
-            mAdapter.setEventData(eventData);
+            data = list.get();
+            mAdapter.setEventData(data);
 
         } catch (InterruptedException e) {
             e.printStackTrace();
@@ -267,9 +291,9 @@ public class GridMainEventsFrag extends Fragment implements ClickListener {
                                         st.spinIcon();
                                         st.setMaxAlpha();
                                         st.show();
-                                        eventData.remove(position);
-                                        if(eventData!=null)
-                                            mAdapter.setEventData(eventData);
+                                        data.remove(position);
+                                        if(data!=null)
+                                            mAdapter.setEventData(data);
 
 
                                     } catch (JSONException e) {
@@ -301,9 +325,9 @@ public class GridMainEventsFrag extends Fragment implements ClickListener {
                                         st.spinIcon();
                                         st.setMaxAlpha();
                                         st.show();
-                                        eventData.remove(position);
-                                        if(eventData!=null)
-                                            mAdapter.setEventData(eventData);
+                                        data.remove(position);
+                                        if(data!=null)
+                                            mAdapter.setEventData(data);
                                         //Toast.makeText(getContext(), mAdapter.getObject().get(position).getString("event_id"), Toast.LENGTH_SHORT).show();
 
 

@@ -16,7 +16,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="2dp"
-        card_view:cardElevation="3dp"
+        card_view:cardElevation="2dp"
         android:paddingBottom="1dp">
 
         <RelativeLayout
@@ -101,8 +101,8 @@
         android:id="@+id/back_view">
 
         <ImageView
-            android:layout_width="60dp"
-            android:layout_height="60dp"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
             android:scaleType="fitXY"
             android:id="@+id/iv_event_image_back"
             />
@@ -129,7 +129,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/event_preference_back"
-        android:textSize="15sp"
+        android:textSize="12sp"
         android:layout_marginLeft="2dp"
         android:text="Event Preference"
         android:layout_toRightOf="@id/iv_event_image_back"
