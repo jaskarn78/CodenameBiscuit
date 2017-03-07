@@ -1,6 +1,8 @@
 package com.example.codenamebiscuit.eventfragments;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -210,36 +212,14 @@ public class SavedEventsFrag extends Fragment implements ClickListener {
 
                             @Override
                             public boolean canSwipeRight(int i) {
-                                return true;
+                                return false;
                             }
 
                             @Override
                             public void onDismissedBySwipeLeft(RecyclerView recyclerView, int[] ints) {
-                                StyleableToast st = new StyleableToast(getActivity().getApplicationContext(), "Restoring...", Toast.LENGTH_SHORT);
                                 for (int position : ints) {
-                                    //eventData.remove(position);
-                                    mAdapter.notifyItemRemoved(position);
-                                    try {
-                                        restoreEvent.put("user_id", mAdapter.getObject().get(position).get("user_id"));
-                                        restoreEvent.put("event_id", mAdapter.getObject().get(position).getString("event_id"));
-                                        Log.i("postion", position+"");
-                                        //Custom stylable toast*
-
-                                       // mAdapter.setEventData(eventData);
-
-
-                                    } catch (JSONException e) {
-                                        e.printStackTrace();
-                                    }
-                                    st.setBackgroundColor(Color.GREEN);
-                                    st.setTextColor(Color.WHITE);
-                                    st.spinIcon();
-                                    st.setMaxAlpha();
-                                    st.show();
-                                    data.remove(position);
-                                    mAdapter.setEventData(data);
-
-
+                                    AlertDialog alert = AskOption(position);
+                                    alert.show();
                                 }
                                 new UpdateDbOnSwipe(getString(R.string.DATABASE_RESTORE_SAVED_EVENTS)).execute(restoreEvent);
 
@@ -251,6 +231,65 @@ public class SavedEventsFrag extends Fragment implements ClickListener {
                             }
                         });
         mRecyclerView.addOnItemTouchListener(swipeTouchListener);
+    }
+
+    /**********************************************************************************************
+     * Alert dialog is prompted on each swipe to restore deleted or saved event
+     * if 'restore' is clicked, the event will be removed from the saved/deleted event list
+     * back to the main event list
+     **********************************************************************************************/
+
+    private AlertDialog AskOption(final int position)
+    {
+        final StyleableToast st = new StyleableToast(getActivity().getApplicationContext(), "Restoring...", Toast.LENGTH_SHORT);
+        AlertDialog myQuittingDialogBox =new AlertDialog.Builder(getActivity())
+                //set message, title, and icon
+                .setTitle("Remove")
+                .setMessage("Do you want to remove this event from saved events?")
+                .setIcon(R.drawable.ic_restore_black_24dp)
+
+                .setPositiveButton("Remove", new DialogInterface.OnClickListener() {
+
+                    public void onClick(DialogInterface dialog, int whichButton) {
+                        //your deleting code
+                        //eventData.remove(position);
+                        mAdapter.notifyItemRemoved(position);
+                        try {
+                            restoreEvent.put("user_id", mAdapter.getObject().get(position).get("user_id"));
+                            restoreEvent.put("event_id", mAdapter.getObject().get(position).getString("event_id"));
+                            Log.i("postion", position+"");
+                            //Custom stylable toast*
+
+                            // mAdapter.setEventData(eventData);
+
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                        st.setBackgroundColor(Color.GREEN);
+                        st.setTextColor(Color.WHITE);
+                        st.spinIcon();
+                        st.setMaxAlpha();
+                        st.show();
+                        data.remove(position);
+                        mAdapter.setEventData(data);
+
+
+                        dialog.dismiss();
+                    }
+
+                })
+
+                .setNegativeButton("cancel", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+
+                        dialog.dismiss();
+
+                    }
+                })
+                .create();
+        return myQuittingDialogBox;
+
     }
 
 

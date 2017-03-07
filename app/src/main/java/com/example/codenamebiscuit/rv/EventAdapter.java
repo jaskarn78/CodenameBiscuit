@@ -270,7 +270,7 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
             eventAdapterViewHolder.mLinkImageButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    eventAdapterViewHolder.mWebView.loadUrl("https://youtube.com");
+                    eventAdapterViewHolder.mWebView.loadUrl("https://www.google.com");
                     if(eventAdapterViewHolder.mWebView.getVisibility()==View.GONE){
                         eventAdapterViewHolder.mWebView.setVisibility(View.VISIBLE);
                         StyleableToast st = new StyleableToast(context.getApplicationContext(), "Loading Website...", Toast.LENGTH_SHORT);
