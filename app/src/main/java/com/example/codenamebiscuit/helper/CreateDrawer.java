@@ -63,12 +63,9 @@ public class CreateDrawer {
 
     public CreateDrawer(String fName, String lName, String pic, String email, Bundle savedState,
                         Toolbar toolbar, Context context, Activity activity, FragmentManager fragmentManager) {
-        this.fName=fName;
-        this.lName=lName;
-        this.pic=pic;
-        this.email=email;
-        this.savedState=savedState;
-        this.toolbar=toolbar;
+        this.fName=fName; this.lName=lName;
+        this.pic=pic; this.email=email;
+        this.savedState=savedState; this.toolbar=toolbar;
         this.context=context;
         this.activity=activity;
         this.fragmentManager=fragmentManager;
@@ -116,7 +113,7 @@ public class CreateDrawer {
                             Intent intent = null;
 
                             if (drawerItem.getIdentifier() == 1) {
-                                fragment = new MainEventsFrag();
+                                fragment = new GridMainEventsFrag();
                             } else if (drawerItem.getIdentifier() == 2) {
                                 fragment = new SwipeEvents();
                             } else if (drawerItem.getIdentifier() == 3) {
@@ -128,15 +125,14 @@ public class CreateDrawer {
                             } else if (drawerItem.getIdentifier() == 6) {
                                 fragment = new GridMainEventsFrag();
                             } else if (drawerItem.getIdentifier() == 7) {
-                                getLocation();
-                            }
+                                getLocation(); }
                             if (intent != null) {
                                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                                 context.startActivity(intent); }
-
                             if (fragment != null) {
                                 fragmentManager.beginTransaction().replace(R.id.fragment_container, fragment)
-                                        .commit(); } }
+                                        .commit();
+                            } }
                         return false; }
                 }) .withSavedInstance(savedState).withShowDrawerOnFirstLaunch(true).build();
     }

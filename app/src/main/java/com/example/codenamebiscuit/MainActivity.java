@@ -98,27 +98,21 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onResume() {  // After a pause OR at startup
         super.onResume();
-        //loadData();
 
     }
     @Override
     public void onPause(){
         super.onPause();
-        //loadData();
     }
 
     @Override
     public void onBackPressed() {
         moveTaskToBack(true);
-        //loadData();
     }
 
     @Override
     public void onStart() {
         super.onStart();
-        //loadData();
-
-        //loadData();
     }
 
 
@@ -159,7 +153,6 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onDestroy() {
         super.onDestroy();
-
     }
 
     @Override

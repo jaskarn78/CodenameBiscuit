@@ -26,6 +26,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.daimajia.androidanimations.library.fading_entrances.FadeInLeftAnimator;
 import com.example.codenamebiscuit.R;
 import com.example.codenamebiscuit.helper.QueryEventList;
 import com.example.codenamebiscuit.helper.UpdateDbOnSwipe;
@@ -61,7 +62,6 @@ public class SavedEventsFrag extends Fragment implements ClickListener {
     public interface GetSavedDataInterface {
         ArrayList<JSONObject> getSavedEventList();
         ArrayList<JSONObject> getUpdatedSavedEventList();
-
     }
 
     @Override
@@ -70,8 +70,7 @@ public class SavedEventsFrag extends Fragment implements ClickListener {
         try {
             sGetDataInterface = (GetSavedDataInterface) context;
         } catch (ClassCastException e) {
-            throw new ClassCastException(context.toString() + "must implement GetDataInterface Interface");
-        }
+            throw new ClassCastException(context.toString() + "must implement GetDataInterface Interface"); }
     }
 
 
@@ -84,13 +83,8 @@ public class SavedEventsFrag extends Fragment implements ClickListener {
         try {
             currentUserId.put("user_id", user_id);
         } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
-        //initialize event dataset
-
+            e.printStackTrace(); }
         eventData = new ArrayList<JSONObject>();
-
     }
 
     @Override
@@ -118,12 +112,11 @@ public class SavedEventsFrag extends Fragment implements ClickListener {
             TextView tv = (TextView) getActivity().findViewById(R.id.toolbar_title);
             tv.setText("Saved Events");
 
-            mAdapter = new EventAdapter(getActivity().getApplicationContext(), 1);
+            mAdapter = new EventAdapter(getActivity().getApplicationContext(), 1, "saved");
             LinearLayoutManager mLinearLayoutManager = new LinearLayoutManager(getActivity().getApplicationContext());
             mRecyclerView.setAdapter(mAdapter);
             LinearLayoutManager layoutManager
                     = new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false);
-
 
             mRecyclerView.setLayoutManager(layoutManager);
             mRecyclerView.setHasFixedSize(true);
@@ -131,11 +124,6 @@ public class SavedEventsFrag extends Fragment implements ClickListener {
             mRecyclerView.setDrawingCacheEnabled(true);
             mRecyclerView.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_LOW);
             mRecyclerView.setItemAnimator(new DefaultItemAnimator());
-
-        enableCardSwiping();
-
-
-        //mAdapter.setClickListener(getContext());
     }
 
     /**********************************************************************************************
@@ -156,15 +144,12 @@ public class SavedEventsFrag extends Fragment implements ClickListener {
         } catch (ExecutionException e) {
             e.printStackTrace();
         }
-        //loadEventData();
-
     }
 
 
     @Override
     public void onStart() {
         super.onStart();
-       // loadEventData();
     }
     public void setData(ArrayList<JSONObject> sData){
         data=sData;
@@ -197,102 +182,7 @@ public class SavedEventsFrag extends Fragment implements ClickListener {
         swipeContainer.setColorSchemeResources(android.R.color.holo_blue_bright,
                 android.R.color.holo_green_light,
                 android.R.color.holo_orange_light,
-                android.R.color.holo_red_light);
-    }
-
-
-    private void enableCardSwiping() {
-        SwipeableRecyclerViewTouchListener swipeTouchListener =
-                new SwipeableRecyclerViewTouchListener(mRecyclerView,
-                        new SwipeableRecyclerViewTouchListener.SwipeListener() {
-                            @Override
-                            public boolean canSwipeLeft(int i) {
-                                return true;
-                            }
-
-                            @Override
-                            public boolean canSwipeRight(int i) {
-                                return false;
-                            }
-
-                            @Override
-                            public void onDismissedBySwipeLeft(RecyclerView recyclerView, int[] ints) {
-                                for (int position : ints) {
-                                    AlertDialog alert = AskOption(position);
-                                    alert.show();
-                                }
-                                new UpdateDbOnSwipe(getString(R.string.DATABASE_RESTORE_SAVED_EVENTS)).execute(restoreEvent);
-
-                            }
-
-                            @Override
-                            public void onDismissedBySwipeRight(RecyclerView recyclerView, int[] ints) {
-
-                            }
-                        });
-        mRecyclerView.addOnItemTouchListener(swipeTouchListener);
-    }
-
-    /**********************************************************************************************
-     * Alert dialog is prompted on each swipe to restore deleted or saved event
-     * if 'restore' is clicked, the event will be removed from the saved/deleted event list
-     * back to the main event list
-     **********************************************************************************************/
-
-    private AlertDialog AskOption(final int position)
-    {
-        final StyleableToast st = new StyleableToast(getActivity().getApplicationContext(), "Restoring...", Toast.LENGTH_SHORT);
-        AlertDialog myQuittingDialogBox =new AlertDialog.Builder(getActivity())
-                //set message, title, and icon
-                .setTitle("Remove")
-                .setMessage("Do you want to remove this event from saved events?")
-                .setIcon(R.drawable.ic_restore_black_24dp)
-
-                .setPositiveButton("Remove", new DialogInterface.OnClickListener() {
-
-                    public void onClick(DialogInterface dialog, int whichButton) {
-                        //your deleting code
-                        //eventData.remove(position);
-                        mAdapter.notifyItemRemoved(position);
-                        try {
-                            restoreEvent.put("user_id", mAdapter.getObject().get(position).get("user_id"));
-                            restoreEvent.put("event_id", mAdapter.getObject().get(position).getString("event_id"));
-                            Log.i("postion", position+"");
-                            //Custom stylable toast*
-
-                            // mAdapter.setEventData(eventData);
-
-
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-                        st.setBackgroundColor(Color.GREEN);
-                        st.setTextColor(Color.WHITE);
-                        st.spinIcon();
-                        st.setMaxAlpha();
-                        st.show();
-                        data.remove(position);
-                        mAdapter.setEventData(data);
-
-
-                        dialog.dismiss();
-                    }
-
-                })
-
-                .setNegativeButton("cancel", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-
-                        dialog.dismiss();
-
-                    }
-                })
-                .create();
-        return myQuittingDialogBox;
-
-    }
-
-
+                android.R.color.holo_red_light); }
 
 
     /**********************************************************************************************

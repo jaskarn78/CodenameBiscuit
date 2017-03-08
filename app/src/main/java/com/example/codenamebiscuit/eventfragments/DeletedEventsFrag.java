@@ -89,14 +89,6 @@ public class DeletedEventsFrag extends Fragment implements ClickListener{
 
         eventData = new ArrayList<JSONObject>();
 
-        /*Custom stylable toast*
-        StyleableToast st = new StyleableToast(getContext(), "Loading Removed Events...Please Wait", Toast.LENGTH_SHORT);
-        st.setBackgroundColor(Color.parseColor("#ff9dfc"));
-        st.setTextColor(Color.WHITE);
-        st.setIcon(R.drawable.ic_autorenew_white_24dp);
-        st.spinIcon();
-        st.setMaxAlpha();
-        st.show();*/
 
     }
 
@@ -121,7 +113,7 @@ public class DeletedEventsFrag extends Fragment implements ClickListener{
     @Override
     public void onActivityCreated(Bundle savedInstanceState){
         super.onActivityCreated(savedInstanceState);
-        mAdapter = new EventAdapter(getActivity().getApplicationContext(), 1);
+        mAdapter = new EventAdapter(getActivity().getApplicationContext(), 1, "deleted");
         LinearLayoutManager mLinearLayoutManager = new LinearLayoutManager(getContext());
         mRecyclerView.setAdapter(mAdapter);
         LinearLayoutManager layoutManager
@@ -135,8 +127,6 @@ public class DeletedEventsFrag extends Fragment implements ClickListener{
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
         TextView tv = (TextView)getActivity().findViewById(R.id.toolbar_title);
         tv.setText("Deleted Events");
-        enableCardSwiping();
-        //mAdapter.setClickListener(getContext());
     }
 
     /**********************************************************************************************
@@ -151,100 +141,16 @@ public class DeletedEventsFrag extends Fragment implements ClickListener{
         try {
             data = new QueryEventList(getString(R.string.DATABASE_DELETED_EVENTS_PULLER)).execute(currentUserId).get();
             mAdapter.setEventData(data);
-
         } catch (InterruptedException e) {
             e.printStackTrace();
         } catch (ExecutionException e) {
             e.printStackTrace();
         }
-        //loadEventData();
-
     }
 
     @Override
     public void onStart() {
         super.onStart();
-        //loadEventData();
-    }
-    private void enableCardSwiping() {
-        SwipeableRecyclerViewTouchListener swipeTouchListener =
-                new SwipeableRecyclerViewTouchListener(mRecyclerView,
-                        new SwipeableRecyclerViewTouchListener.SwipeListener() {
-                            @Override
-                            public boolean canSwipeLeft(int i) {
-                                return true;
-                            }
-
-                            @Override
-                            public boolean canSwipeRight(int i) {
-                                return true;
-                            }
-
-                            @Override
-                            public void onDismissedBySwipeLeft(RecyclerView recyclerView, int[] ints) {
-                                StyleableToast st = new StyleableToast(getContext(), "Restoring...", Toast.LENGTH_SHORT);
-                                for (int position : ints) {
-                                    //eventData.remove(position);
-                                    AlertDialog alert = AskOption(position);
-                                    alert.show();
-                                }
-                                new UpdateDbOnSwipe(getString(R.string.DATABASE_RESTORE_DELETED_EVENTS)).execute(restoreEvent);
-                            }
-
-                            @Override
-                            public void onDismissedBySwipeRight(RecyclerView recyclerView, int[] ints) {}
-                });
-        mRecyclerView.addOnItemTouchListener(swipeTouchListener);
-    }
-
-
-    /**********************************************************************************************
-     * Alert dialog is prompted on each swipe to restore deleted or saved event
-     * if 'restore' is clicked, the event will be removed from the saved/deleted event list
-     * back to the main event list
-     **********************************************************************************************/
-    private AlertDialog AskOption(final int position)
-    {
-        final StyleableToast st = new StyleableToast(getActivity().getApplicationContext(), "Restoring...", Toast.LENGTH_SHORT);
-        AlertDialog myQuittingDialogBox =new AlertDialog.Builder(getActivity())
-                //set message, title, and icon
-                .setTitle("Remove")
-                .setMessage("Do you want to remove this event from saved events?")
-                .setIcon(R.drawable.ic_restore_black_24dp)
-                .setPositiveButton("Remove", new DialogInterface.OnClickListener() {
-
-                    public void onClick(DialogInterface dialog, int whichButton) {
-                        //your deleting code
-                        mAdapter.notifyItemRemoved(position);
-                        try {
-                            restoreEvent.put("user_id", mAdapter.getObject().get(position).get("user_id"));
-                            restoreEvent.put("event_id", mAdapter.getObject().get(position).getString("event_id"));
-                            Log.i("postion", position+"");
-
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-                        st.setBackgroundColor(Color.GREEN);
-                        st.setTextColor(Color.WHITE);
-                        st.spinIcon();
-                        st.setMaxAlpha();
-                        st.show();
-                        data.remove(position);
-                        mAdapter.setEventData(data);
-                        dialog.dismiss(); }
-
-                })
-
-                .setNegativeButton("cancel", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-
-                        dialog.dismiss();
-
-                    }
-                })
-                .create();
-        return myQuittingDialogBox;
-
     }
 
     /**********************************************************************************************

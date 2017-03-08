@@ -7,7 +7,9 @@ import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
+import android.location.Address;
 import android.location.Geocoder;
+import android.location.Location;
 import android.os.AsyncTask;
 import android.provider.CalendarContract;
 import android.support.v7.widget.CardView;
@@ -18,15 +20,21 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.daimajia.androidanimations.library.Techniques;
+import com.daimajia.androidanimations.library.YoYo;
+import com.daimajia.swipe.SimpleSwipeListener;
+import com.daimajia.swipe.SwipeLayout;
 import com.example.codenamebiscuit.R;
 import com.example.codenamebiscuit.helper.FlipAnimation;
-import com.example.codenamebiscuit.swipedeck.layouts.SwipeFrameLayout;
+import com.example.codenamebiscuit.helper.GPSTracker;
+import com.example.codenamebiscuit.helper.UpdateDbOnSwipe;
 import com.google.android.gms.maps.model.LatLng;
 import com.muddzdev.styleabletoastlibrary.StyleableToast;
 import com.squareup.picasso.NetworkPolicy;
@@ -37,18 +45,21 @@ import java.util.ArrayList;
 import java.util.Calendar;
 
 
+
 public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapterViewHolder> {
     private ArrayList<JSONObject> mEventData;
     private Context context;
     private Typeface typeface;
     private ClickListener clickListener = null;
+    private String message;
     private int type;
 
 
-    public EventAdapter(Context context, int type) {
+    public EventAdapter(Context context, int type, String message) {
         this.context = context;
         mEventData = new ArrayList<>();
         typeface = Typeface.createFromAsset(context.getAssets(), "fonts/Raleway-Black.ttf");
+        this.message=message;
         this.type=type;
     }
 
@@ -81,50 +92,47 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
         public final TextView mEventCost, mEventCostBack;
         public final ImageView mEventImage, mEventImageback;
         public final TextView mEventStartDate, mEventStartTime;
-        public final TextView mEventInfoBack;
+        public final TextView mEventInfoBack, mEventInfo;
         public final ImageButton mSaveImageButton, mLinkImageButton;
-        public final TextView mEventHoster;
-        // public final ImageView mFeaturedImage;
+        public final TextView mEventHoster, mEventDistanceBack;
         public final TextView mEventDistance;
         public final CardView cardView;
         public final RelativeLayout layout;
         public final WebView mWebView;
-        SwipeFrameLayout swipeLayout;
+        SwipeLayout mSwipeLayout;
+        Button buttonDelete;
 
 
-
-        public EventAdapterViewHolder(final View view) {
+        public EventAdapterViewHolder(View view) {
             super(view);
+
+            mEventDistance = (TextView)view.findViewById(R.id.event_distance);
+            mEventDistanceBack = (TextView)view.findViewById(R.id.event_distance_back);
+            mEventInfo = (TextView)view.findViewById(R.id.extra_info);
+
+            mSwipeLayout = (SwipeLayout) itemView.findViewById(R.id.swipe);
+            buttonDelete = (Button) itemView.findViewById(R.id.delete);
 
             mEventPreferenceTV = (TextView) view.findViewById(R.id.tv_event_preference);
             mEventPreferenceTVBack = (TextView) view.findViewById(R.id.event_preference_back);
 
-            //mEventPreferenceTV.setTypeface(typeface);
-
             mEventLocationTV = (TextView) view.findViewById(R.id.tv_event_location);
             mEventLocationTVBack = (TextView) view.findViewById(R.id.event_location_back);
-
-            //mEventLocationTV.setTypeface(typeface);
 
             mEventName = (TextView) view.findViewById(R.id.tv_event_name);
             mEventNameBack = (TextView) view.findViewById(R.id.event_name_back);
 
-            //mEventName.setTypeface(typeface);
-
             mEventAge = (TextView) view.findViewById(R.id.age);
             mEventAgeBack = (TextView)view.findViewById(R.id.event_age_back);
-            //mEventAge.setTypeface(typeface);
 
             mEventCost = (TextView) view.findViewById(R.id.cost);
             mEventCostBack = (TextView)view.findViewById(R.id.event_cost_back);
-            // mEventCost.setTypeface(typeface);
 
             mEventStartDate = (TextView)view.findViewById(R.id.start_date);
             mEventStartTime = (TextView)view.findViewById(R.id.start_time);
 
             mSaveImageButton = (ImageButton)view.findViewById(R.id.saveButton);
 
-            mEventDistance = (TextView) view.findViewById(R.id.event_distance);
             mEventInfoBack = (TextView)view.findViewById(R.id.event_info_back);
             mEventImageback = (ImageView)view.findViewById(R.id.iv_event_image_back);
 
@@ -145,14 +153,9 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
                 view.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(final View v) {
-                        Log.i("Layer type: ", Integer.toString(v.getLayerType()));
-                        Log.i("Hardware Accel type:", Integer.toString(View.LAYER_TYPE_HARDWARE));
-
-                        //Picasso.with(context).load(R.drawable.liv1).fit().centerCrop().into(imageView);
                         final CardView cv = (CardView) v.findViewById(R.id.cardview);
                         final CardView cvBack = (CardView) v.findViewById(R.id.card_view_back);
                         FlipAnimation flipAnimation = new FlipAnimation(cv, cvBack);
-
                         if (cv.getVisibility() == View.GONE)
                             flipAnimation.reverse();
                         v.startAnimation(flipAnimation);}
@@ -161,42 +164,21 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
         }
 
         @Override
-        public void onClick(final View v) {
-            if (clickListener != null) {
-                clickListener.itemClicked(v, getAdapterPosition());
-            }
-            StyleableToast st = new StyleableToast(context, "EVENT LONG CLICKED", Toast.LENGTH_SHORT);
-            st.setBackgroundColor(Color.parseColor("#ff9dfc"));
-            st.setTextColor(Color.WHITE);
-            st.setIcon(R.drawable.ic_check_circle_white_24dp);
-            st.setMaxAlpha();
-            st.show();
-        }
-
+        public void onClick(final View v) {}
 
         @Override
         public boolean onLongClick(View v) {
-            return true;
-        }
-    }
+            return true;}}
 
 
     @Override
-    public void onBindViewHolder(final EventAdapterViewHolder eventAdapterViewHolder, int position) {
+    public void onBindViewHolder(final EventAdapterViewHolder eventAdapterViewHolder, final int position) {
 
-        String eventLocation = null;
-        String eventPref = null;
-        String eventPath = null;
-        String event = null;
-        String eventInfo = "";
-        String startDate=null;
-        String startTime=null;
-        String eventid = null;
-        LatLng latLng = null;
-        String eventDistance = null;
-        String eventHoster=null;
-        String cost=null;
-
+        String eventLocation = null;    String eventPref = null;    String eventPath = null;
+        String event = null;            String eventInfo = "";      String startDate=null;
+        String startTime=null;          String eventid = null;      String userId=null;
+        String eventHoster=null;        String cost=null;           Double lat=0.0;
+        Double lng=0.0;                 final JSONObject restoreEvent = new JSONObject();
 
         try {
             eventLocation = mEventData.get(position).getString("event_location");
@@ -208,27 +190,44 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
             startDate=mEventData.get(position).getString("start_date");
             startTime=mEventData.get(position).getString("start_time");
             eventid = mEventData.get(position).getString("event_id");
-            //if(type==2)
+            userId=mEventData.get(position).getString("event_id");
+            lat = mEventData.get(position).getDouble("lat");
+            lng=mEventData.get(position).getDouble("lng");
             eventInfo = mEventData.get(position).getString("event_description");
         } catch (JSONException e) {
-            e.printStackTrace();
-        }
+            e.printStackTrace(); }
 
         eventAdapterViewHolder.mEventPreferenceTV.setText(eventPref);
         eventAdapterViewHolder.mEventLocationTV.setText(eventLocation);
         eventAdapterViewHolder.mEventName.setText(event);
 
-        final String finalEvent = event;
-        final String finalEventInfo = eventInfo;
-        final String finalEventLocation = eventLocation;
-        final String finalEventInfo1 = eventInfo;
-
+        final String finalEvent = event;          final String finalEventInfo = eventInfo;
+        final String finalEventInfo1 = eventInfo; final String finalEventLocation = eventLocation;
 
         if(type==1){
+            /********************************************************************************
+             * assigns distance from current location to event location
+             *******************************************************************************/
+            eventAdapterViewHolder.mEventDistance.setText("Distance: "+getLocation(lat, lng)+" miles");
+
+            /********************************************************************************
+             * Loads event image from url obtained from database and assigns
+             * the loaded image to the event imageview in the layout
+             *******************************************************************************/
             Picasso.with(context.getApplicationContext())
                     .load(getImageURL(eventPath))
                     .resize(90, 90)
+                    .error( R.drawable.cast_album_art_placeholder)
+                    .placeholder(R.drawable.progress)
                     .into(eventAdapterViewHolder.mEventImage);
+
+            eventAdapterViewHolder.mEventInfo.setText("Additional Event Information");
+
+            /********************************************************************************
+             * Implements add to calendar funcitonality, will add event to
+             * internal mobile calendar with the event name, date, time, and
+             * event description
+             *******************************************************************************/
             eventAdapterViewHolder.mSaveImageButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -247,6 +246,37 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
                 }
             });
 
+            /***************************************************************************************
+             * Handles the swipe to restore operation in saved events and deleted events
+             ***************************************************************************************/
+            eventAdapterViewHolder.mSwipeLayout.setShowMode(SwipeLayout.ShowMode.LayDown);
+            eventAdapterViewHolder.mSwipeLayout.addSwipeListener(new SimpleSwipeListener() {
+                @Override
+                public void onOpen(SwipeLayout layout) {
+                    YoYo.with(Techniques.Tada).duration(500).delay(100).playOn(layout.findViewById(R.id.trash)); } });
+
+            /*****************************************************************************************
+             * Swiping on the cardview will display a remove button, when pressed
+             * swiped event will be removed from saved/deleted events and placed into
+             * the main events list
+             ****************************************************************************************/
+            eventAdapterViewHolder.buttonDelete.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    try {
+                        restoreEvent.put("user_id", mEventData.get(position).get("user_id"));
+                        restoreEvent.put("event_id", mEventData.get(position).get("event_id"));
+                    } catch (JSONException e) {
+                        e.printStackTrace(); }
+                    mEventData.remove(position);
+                    notifyItemRemoved(position);
+                    notifyItemRangeChanged(position, mEventData.size());
+                    if(message.equals("saved"))
+                        new UpdateDbOnSwipe(context.getString(R.string.DATABASE_RESTORE_SAVED_EVENTS)).execute(restoreEvent);
+                    else
+                        new UpdateDbOnSwipe(context.getString(R.string.DATABASE_RESTORE_DELETED_EVENTS)).execute(restoreEvent);} });
+
+
             eventAdapterViewHolder.mEventHoster.setText("Presented By: "+eventHoster);
             eventAdapterViewHolder.mEventCost.setText("Entry Fee: $"+cost);
             eventAdapterViewHolder.mWebView.getSettings().setJavaScriptEnabled(true);
@@ -262,11 +292,14 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
                     return true;
                 }
                 @Override
-                public void onPageFinished(WebView view, final String url) {
-                    //progDailog.dismiss();
+                public void onPageFinished(WebView view, final String url) { } });
 
-                }
-            });
+
+            /*****************************************************************************************
+             * Clicking on the link icon in the expanded cardview will
+             * open a webpage with the specified url. Event poster can post
+             * ticket sale link along with other event information
+             ****************************************************************************************/
             eventAdapterViewHolder.mLinkImageButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -278,28 +311,25 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
                         st.setTextColor(context.getColor(R.color.livinWhite));
                         st.show();
                     }else{
-                        eventAdapterViewHolder.mWebView.setVisibility(View.GONE);
-                    }
+                        eventAdapterViewHolder.mWebView.setVisibility(View.GONE);}} });
 
-                }
-            });
-            eventAdapterViewHolder.itemView.setOnClickListener(new View.OnClickListener() {
+
+            /*****************************************************************************************
+             * Clicking on the cardview item will expand the card to
+             * revieal additional information as well as additional buttons
+             * which will perform the share, webview, and add to calendar functions
+             * ****************************************************************************************/
+            eventAdapterViewHolder.cardView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-
                     if (eventAdapterViewHolder.layout.getVisibility() == View.GONE) {
                         eventAdapterViewHolder.layout.setVisibility(View.VISIBLE);
                     } else {
-                        eventAdapterViewHolder.layout.setVisibility(View.GONE);}
-                }
-            });
-
+                        eventAdapterViewHolder.layout.setVisibility(View.GONE);} } });
         }
-
-            //if(startDate!=null)
-                //eventAdapterViewHolder.mEventStartDate.setText(startDate);
-            //if(startTime!=null)
-                //eventAdapterViewHolder.mEventStartTime.setText("Time: "+startTime);
+        /*****************************************************************************************
+         * Type 2 represents the grid layout and its corresponding views are set
+         * ****************************************************************************************/
         if(type==2) {
             eventAdapterViewHolder.mEventPreferenceTVBack.setText(eventPref);
             eventAdapterViewHolder.mEventNameBack.setText(event);
@@ -307,32 +337,54 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
             eventAdapterViewHolder.mEventCostBack.setText("Event Price: $20.00");
             eventAdapterViewHolder.mEventAgeBack.setText("Age Restriction: 21+");
             eventAdapterViewHolder.mEventInfoBack.setText("Description: "+eventInfo);
+            eventAdapterViewHolder.mEventDistanceBack.setText("Distance: "+getLocation(lat, lng)+" miles");
 
             Picasso.with(context.getApplicationContext())
                     .load(getImageURL(eventPath))
+                    .error( R.drawable.cast_album_art_placeholder)
+                    .placeholder(R.drawable.progress)
                     .into(eventAdapterViewHolder.mEventImage);
 
             Picasso.with(context.getApplicationContext())
                     .load(getImageURL(eventPath))
                     .networkPolicy(NetworkPolicy.OFFLINE)
-                    .into(eventAdapterViewHolder.mEventImageback); }
-
+                    .error( R.drawable.cast_album_art_placeholder)
+                    .placeholder(R.drawable.progress)
+                    .into(eventAdapterViewHolder.mEventImageback);}
     }
 
-        /**
+    /*****************************************************************************************
+     * Retrieve lat and lng from database and creates location object with event location
+     * location2 created with users current lat and lng location
+     * distance between location1 and location2 is calculated and returned
+     ****************************************************************************************/
+    private int getLocation(double lat, double lng){
+        Location location2 = new Location("location2");
+        double distance=0.0;
+        GPSTracker gps = new GPSTracker(context.getApplicationContext());
+        if(gps.canGetLocation()){
+            location2.setLatitude(gps.getLatitude());
+            location2.setLongitude(gps.getLongitude());
+            Location location1 = new Location("");
+            location1.setLongitude(lng);
+            location1.setLatitude(lat);
+            distance=location1.distanceTo(location2);
+        }
+        return (int)Math.round(distance*0.000621371192); }
+
+
+    /*****************************************************************************************
      * This method simply returns the number of items to display. It is used behind the scenes
      * to help layout our Views and for animations.
      *
      * @return The number of items available in our forecast
-     */
+     ****************************************************************************************/
     @Override
     public int getItemCount() {
         if(mEventData==null)
             return 0;
         else
-            return mEventData.size();
-    }
-
+            return mEventData.size();}
 
 
     /**

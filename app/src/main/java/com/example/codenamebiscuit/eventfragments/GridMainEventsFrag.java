@@ -108,13 +108,10 @@ public class GridMainEventsFrag extends Fragment implements ClickListener {
 
         mRecyclerView = (RecyclerView)rootView.findViewById(R.id.recyclerview_events);
 
-
-
-        mAdapter = new EventAdapter(getActivity().getApplicationContext(), 2);
+        mAdapter = new EventAdapter(getActivity().getApplicationContext(), 2, "");
         mLinearLayoutManager = new LinearLayoutManager(getContext());
         StaggeredGridLayoutManager staggeredGridLayoutManager = new StaggeredGridLayoutManager(2, 1);
         mRecyclerView.setAdapter(mAdapter);
-        //mRecyclerViewFeatured.setAdapter(mAdapter);
 
         mRecyclerView.setLayoutManager(staggeredGridLayoutManager);
         mRecyclerView.setHasFixedSize(false);
