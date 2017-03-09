@@ -11,19 +11,19 @@
         xmlns:swipedeck="http://schemas.android.com/apk/res-auto"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:background="@color/livinBlack"
+        android:background="@color/cardview_dark_background"
         android:id="@+id/swipeLayout"
         android:orientation="vertical"
         tools:layout_constraintTop_creator="1"
         tools:layout_constraintRight_creator="1"
         tools:layout_constraintBottom_creator="1"
-        android:layout_marginStart="8dp"
+        android:layout_marginStart="1dp"
         swipedeck:layout_constraintBottom_toBottomOf="parent"
-        android:layout_marginEnd="8dp"
+        android:layout_marginEnd="1dp"
         swipedeck:layout_constraintRight_toRightOf="parent"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="1dp"
         tools:layout_constraintLeft_creator="1"
-        android:layout_marginBottom="8dp"
+        android:layout_marginBottom="1dp"
         swipedeck:layout_constraintLeft_toLeftOf="parent"
         swipedeck:layout_constraintTop_toTopOf="parent">
 
@@ -32,10 +32,10 @@
         <com.example.codenamebiscuit.swipedeck.SwipeDeck
             android:id="@+id/swipe_deck"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            swipedeck:max_visible="3"
+            android:layout_height="wrap_content"
+            swipedeck:max_visible="2"
             swipedeck:render_above="false"
-            swipedeck:card_spacing="15dp">
+            swipedeck:card_spacing="6dp">
 
         </com.example.codenamebiscuit.swipedeck.SwipeDeck>
 

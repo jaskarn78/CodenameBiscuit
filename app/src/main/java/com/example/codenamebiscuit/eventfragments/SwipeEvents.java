@@ -86,7 +86,7 @@ public class SwipeEvents extends android.support.v4.app.Fragment{
 
         //alter toolbar title
         TextView textView = (TextView)getActivity().findViewById(R.id.toolbar_title);
-        textView.setText("Fullscreen Events");
+        textView.setText("LIV IT");
 
         return rootView;
 

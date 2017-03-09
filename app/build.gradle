@@ -70,6 +70,8 @@ dependencies {
     compile 'com.mikepenz:octicons-typeface:3.0.0.1@aar'
     compile 'com.mikepenz:itemanimators:0.5.0@aar'
     compile 'com.asha.nightowllib:nightowllib:0.2'
+    compile 'jp.wasabeef:recyclerview-animators:2.2.5'
+
 
     compile('com.mikepenz:materialdrawer:5.8.1@aar') {
         transitive = true

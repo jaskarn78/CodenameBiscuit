@@ -27,6 +27,9 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.view.animation.OvershootInterpolator;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Button;
@@ -38,6 +41,7 @@ import android.widget.Toast;
 
 import com.daimajia.androidanimations.library.Techniques;
 import com.daimajia.androidanimations.library.YoYo;
+import com.daimajia.androidanimations.library.sliders.SlideInUpAnimator;
 import com.daimajia.swipe.SimpleSwipeListener;
 import com.daimajia.swipe.SwipeLayout;
 import com.example.codenamebiscuit.Manifest;
@@ -67,6 +71,8 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
     private ClickListener clickListener = null;
     private String message;
     private int type;
+    private int lastPosition = -1;
+
 
 
     public EventAdapter(Context context, int type, String message) {
@@ -212,6 +218,7 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
             eventInfo = mEventData.get(position).getString("event_description");
         } catch (JSONException e) {
             e.printStackTrace(); }
+        setAnimation(eventAdapterViewHolder.itemView, position);
 
         eventAdapterViewHolder.mEventPreferenceTV.setText(eventPref);
         eventAdapterViewHolder.mEventLocationTV.setText(eventLocation);
@@ -448,6 +455,16 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
     public void addAll(ArrayList<JSONObject> list) {
         mEventData.addAll(list);
         notifyDataSetChanged();
+    }
+    private void setAnimation(View viewToAnimate, int position)
+    {
+        // If the bound view wasn't previously displayed on screen, it's animated
+        if (position > lastPosition)
+        {
+            Animation animation = AnimationUtils.loadAnimation(context, R.anim.enter);
+            viewToAnimate.startAnimation(animation);
+            lastPosition = position;
+        }
     }
 
     public ArrayList<JSONObject> getObject() {

@@ -115,13 +115,13 @@ public class GridMainEventsFrag extends Fragment implements ClickListener {
 
         mRecyclerView.setLayoutManager(staggeredGridLayoutManager);
         mRecyclerView.setHasFixedSize(false);
-        mRecyclerView.setItemViewCacheSize(80);
+        mRecyclerView.setItemViewCacheSize(10);
         mRecyclerView.setDrawingCacheEnabled(true);
         mRecyclerView.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_LOW);
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
         //alter toolbar title
         TextView textView = (TextView)getActivity().findViewById(R.id.toolbar_title);
-        textView.setText("UpComing Events-Grid");
+        textView.setText("LIV IT");
 
         return rootView;
 
@@ -158,7 +158,8 @@ public class GridMainEventsFrag extends Fragment implements ClickListener {
         if(!isNetworkAvailable())
             st.show();
 
-        enableCardSwiping();}
+        enableCardSwiping();
+    }
 
 
     /**********************************************************************************************

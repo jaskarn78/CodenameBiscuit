@@ -113,8 +113,8 @@ public class MainEventsFrag extends Fragment implements ClickListener {
         mRecyclerView.setAdapter(mAdapter);
 
         mRecyclerView.setLayoutManager(mLinearLayoutManager);
-        mRecyclerView.setHasFixedSize(true);
-        mRecyclerView.setItemViewCacheSize(80);
+        mRecyclerView.setHasFixedSize(false);
+        mRecyclerView.setItemViewCacheSize(10);
         mRecyclerView.setDrawingCacheEnabled(true);
         mRecyclerView.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_LOW);
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());

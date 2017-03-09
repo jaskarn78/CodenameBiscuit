@@ -15,8 +15,8 @@
         android:id="@+id/cardview"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="2dp"
-        card_view:cardElevation="2dp"
+        android:layout_margin="1dp"
+        card_view:cardElevation="1dp"
         android:paddingBottom="1dp">
 
         <RelativeLayout
@@ -89,10 +89,10 @@
         android:id="@+id/card_view_back"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        card_view:cardCornerRadius="4dp"
-        card_view:cardElevation="4dp"
+        card_view:cardCornerRadius="1dp"
+        card_view:cardElevation="1dp"
         android:visibility="gone"
-        android:layout_margin="2dp">
+        android:layout_margin="1dp">
 
     <RelativeLayout
         android:layout_width="match_parent"

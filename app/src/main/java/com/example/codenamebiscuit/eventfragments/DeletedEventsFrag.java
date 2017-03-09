@@ -120,13 +120,13 @@ public class DeletedEventsFrag extends Fragment implements ClickListener{
                 = new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false);
 
         mRecyclerView.setLayoutManager(layoutManager);
-        mRecyclerView.setHasFixedSize(true);
-        mRecyclerView.setItemViewCacheSize(80);
+        mRecyclerView.setHasFixedSize(false);
+        mRecyclerView.setItemViewCacheSize(10);
         mRecyclerView.setDrawingCacheEnabled(true);
         mRecyclerView.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_LOW);
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
         TextView tv = (TextView)getActivity().findViewById(R.id.toolbar_title);
-        tv.setText("Deleted Events");
+        tv.setText("Removed");
     }
 
     public static DeletedEventsFrag newInstance() {
