@@ -143,43 +143,38 @@
                 android:id="@+id/additional_info"
                 android:textSize="30sp"/>
 
-            <RelativeLayout
-                android:layout_width="match_parent"
+            <LinearLayout android:id="@+id/footer"
+                android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:id="@+id/navview">
+                android:orientation="horizontal"
+                android:background="@color/livinBlack"
+                android:layout_alignParentBottom="true" style="@android:style/Theme.NoTitleBar">
 
-
-                <LinearLayout android:id="@+id/footer"
-                    android:layout_width="fill_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
+                <ImageButton android:id="@+id/saveButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="30dp"
+                    android:layout_weight="1"
+                    android:src="@drawable/calendar"
                     android:background="@color/livinPink"
-                    android:layout_alignParentBottom="true" style="@android:style/Theme.NoTitleBar">
+                    android:text="Add to Calendar" />
 
-                    <ImageButton android:id="@+id/saveButton"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:src="@drawable/ic_library_add_white_24dp"
-                        android:background="@color/livinPink"
-                        android:text="Add to Calendar" />
-
-                    <ImageButton android:id="@+id/likeButton"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:src="@drawable/ic_favorite_white_24dp"
-                        android:background="@color/livinPink"
-                        android:text="Save" />
-                    <ImageButton android:id="@+id/deleteButton"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:src="@drawable/ic_delete_white_24dp"
-                        android:background="@color/livinPink"
-                        android:text="Save" />
-                </LinearLayout>
-            </RelativeLayout>
+                <ImageButton android:id="@+id/shareButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="30dp"
+                    android:layout_weight="1"
+                    android:layout_marginStart="1dp"
+                    android:layout_marginEnd="1dp"
+                    android:src="@drawable/share"
+                    android:background="@color/livinPink"
+                    android:text="Save" />
+                <ImageButton android:id="@+id/linkButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="30dp"
+                    android:layout_weight="1"
+                    android:src="@drawable/linkvariant"
+                    android:background="@color/livinPink"
+                    android:text="Save" />
+            </LinearLayout>
 
         </RelativeLayout>
 

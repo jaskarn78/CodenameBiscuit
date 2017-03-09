@@ -13,11 +13,15 @@ import android.os.Bundle;
 import android.support.annotation.RequiresApi;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
+import android.support.v4.view.GravityCompat;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.asha.nightowllib.NightOwl;
 import com.example.codenamebiscuit.MainActivity;
 import com.example.codenamebiscuit.R;
 import com.example.codenamebiscuit.eventfragments.DeletedEventsFrag;
@@ -27,19 +31,30 @@ import com.example.codenamebiscuit.eventfragments.SavedEventsFrag;
 import com.example.codenamebiscuit.eventfragments.SwipeEvents;
 import com.example.codenamebiscuit.settings.UserSettingsActivity;
 import com.google.android.gms.maps.model.LatLng;
+import com.mikepenz.crossfadedrawerlayout.view.CrossfadeDrawerLayout;
+import com.mikepenz.fontawesome_typeface_library.FontAwesome;
+import com.mikepenz.google_material_typeface_library.GoogleMaterial;
+import com.mikepenz.itemanimators.AlphaCrossFadeAnimator;
 import com.mikepenz.materialdrawer.AccountHeader;
 import com.mikepenz.materialdrawer.AccountHeaderBuilder;
 import com.mikepenz.materialdrawer.Drawer;
 import com.mikepenz.materialdrawer.DrawerBuilder;
+import com.mikepenz.materialdrawer.MiniDrawer;
+import com.mikepenz.materialdrawer.interfaces.ICrossfader;
 import com.mikepenz.materialdrawer.model.DividerDrawerItem;
+import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
 import com.mikepenz.materialdrawer.model.ProfileDrawerItem;
 import com.mikepenz.materialdrawer.model.SecondaryDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IProfile;
+import com.mikepenz.materialdrawer.model.interfaces.Nameable;
 import com.mikepenz.materialdrawer.util.AbstractDrawerImageLoader;
 import com.mikepenz.materialdrawer.util.DrawerImageLoader;
+import com.mikepenz.materialdrawer.util.DrawerUIUtils;
+import com.mikepenz.materialize.util.UIUtils;
 import com.muddzdev.styleabletoastlibrary.StyleableToast;
 import com.squareup.picasso.Picasso;
+
 import android.support.v4.app.FragmentManager;
 
 import java.io.IOException;
@@ -57,7 +72,11 @@ public class CreateDrawer {
     private Toolbar toolbar;
     private Context context;
     private Activity activity;
+    Drawer result=null;
+    AccountHeader headerResult=null;
     private FragmentManager fragmentManager;
+    private CrossfadeDrawerLayout crossfadeDrawerLayout = null;
+
     GPSTracker gps;
     LatLng latLng;
 
@@ -83,28 +102,34 @@ public class CreateDrawer {
 
         IProfile profile = new ProfileDrawerItem().withName(fName + " " + lName).withIcon(Uri.parse(pic)).withEmail(email).withIdentifier(100);
 
-        AccountHeader headerResult = new AccountHeaderBuilder().withActivity(activity).withTranslucentStatusBar(true).withHeaderBackground(R.drawable.header)
-                .addProfiles(profile).withActivity(activity).withSavedInstance(savedState).build();
+        headerResult = new AccountHeaderBuilder()
+                .withActivity(activity)
+                .withHeaderBackground(R.drawable.header)
+                .addProfiles(profile)
+                .withSavedInstance(savedState)
+                .build();
 
         //create the drawer and remember the `Drawer` result object
-        Drawer result = new DrawerBuilder().withActivity(activity).withToolbar(toolbar)
-                .withAccountHeader(headerResult).addDrawerItems(
-                        new SecondaryDrawerItem().withName("Home").withIcon(R.drawable.ic_home_black_24dp).withIdentifier(1),
+        result = new DrawerBuilder()
+                .withActivity(activity)
+                .withToolbar(toolbar)
+                //.withDrawerLayout(R.layout.crossfade_drawer)
+                //.withDrawerWidthDp(70)
+                .withAccountHeader(headerResult)
+                .addDrawerItems(
+                        new PrimaryDrawerItem().withName("Grid Events").withIcon(GoogleMaterial.Icon.gmd_home).withIdentifier(1).withSelectable(true),
                         new DividerDrawerItem(),
-                        new SecondaryDrawerItem().withName("Full Screen").withIcon(R.drawable.ic_fullscreen_black_24dp).withIdentifier(2),
+                        new PrimaryDrawerItem().withName("Full Screen").withIcon(GoogleMaterial.Icon.gmd_fullscreen).withIdentifier(2).withSelectable(true),
                         new DividerDrawerItem(),
-                        new SecondaryDrawerItem().withName("Saved Events").withIcon(R.drawable.ic_save_black_24dp).withIdentifier(3),
+                        new PrimaryDrawerItem().withName("Saved Events").withIcon(GoogleMaterial.Icon.gmd_save).withIdentifier(3).withSelectable(true),
                         new DividerDrawerItem(),
-                        new SecondaryDrawerItem().withName("Deleted Events").withIcon(R.drawable.ic_delete_black_24dp).withIdentifier(4),
+                        new PrimaryDrawerItem().withName("Deleted Events").withIcon(GoogleMaterial.Icon.gmd_delete).withIdentifier(4).withSelectable(true),
                         new DividerDrawerItem(),
-                        new SecondaryDrawerItem().withName("Preferences").withIcon(R.drawable.ic_settings_black_24dp).withIdentifier(5),
+                        new PrimaryDrawerItem().withName("Preferences").withIcon(GoogleMaterial.Icon.gmd_settings).withIdentifier(5).withSelectable(false),
                         new DividerDrawerItem(),
-                        new SecondaryDrawerItem().withName("Grid Events").withIcon(R.drawable.ic_grid_on_black_24dp).withIdentifier(6),
-                        new DividerDrawerItem(),
-                        new SecondaryDrawerItem().withName("Current coordinates").withIcon(R.drawable.ic_gps_fixed_black_24dp).withIdentifier(7)
+                        new PrimaryDrawerItem().withName("Current coordinates").withIcon(GoogleMaterial.Icon.gmd_gps).withIdentifier(7).withSelectable(false)
                 )
                 .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
-                    @RequiresApi(api = Build.VERSION_CODES.M)
                     @Override
                     public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
                         // do something with the clicked item :D
@@ -112,29 +137,58 @@ public class CreateDrawer {
                         if (drawerItem != null) {
                             Intent intent = null;
 
-                            if (drawerItem.getIdentifier() == 1) {
-                                fragment = new GridMainEventsFrag();
-                            } else if (drawerItem.getIdentifier() == 2) {
-                                fragment = new SwipeEvents();
-                            } else if (drawerItem.getIdentifier() == 3) {
-                                fragment = new SavedEventsFrag();
-                            } else if (drawerItem.getIdentifier() == 4) {
-                                fragment = new DeletedEventsFrag();
-                            } else if (drawerItem.getIdentifier() == 5) {
+                            if (drawerItem.getIdentifier()==1) {
+                                fragment = new GridMainEventsFrag().newInstance();
+                            } else if (drawerItem.getIdentifier()==2) {
+                                fragment = new SwipeEvents().newInstance();
+                            } else if (drawerItem.getIdentifier()==3) {
+                                fragment = new SavedEventsFrag().newInstance();
+                            } else if (drawerItem.getIdentifier()==4) {
+                                fragment = new DeletedEventsFrag().newInstance();
+                            } else if (drawerItem.getIdentifier()==5) {
                                 intent = new Intent(activity, UserSettingsActivity.class);
-                            } else if (drawerItem.getIdentifier() == 6) {
-                                fragment = new GridMainEventsFrag();
-                            } else if (drawerItem.getIdentifier() == 7) {
-                                getLocation(); }
+                            } else if (drawerItem.getIdentifier()==6) {
+                                //fragment = new GridMainEventsFrag();
+                            }else if(drawerItem.getIdentifier()==7){
+                                getLocation();
+                            }
                             if (intent != null) {
                                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                                 context.startActivity(intent); }
-                            if (fragment != null) {
-                                fragmentManager.beginTransaction().replace(R.id.fragment_container, fragment)
-                                        .commit();
+                            if(fragment!=null){
+                                FragmentTransaction ft = fragmentManager.beginTransaction();
+                                ft.setCustomAnimations(R.anim.enter, R.anim.exit, R.anim.pop_enter, R.anim.pop_exit);
+                                ft.replace(R.id.fragment_container, fragment);
+                                ft.addToBackStack(null);
+                                ft.commit();
+                                fragmentManager.executePendingTransactions();
+                                result.closeDrawer();
+                                return true;
                             } }
-                        return false; }
-                }) .withSavedInstance(savedState).withShowDrawerOnFirstLaunch(true).build();
+                        return true; }
+                })
+                .withGenerateMiniDrawer(true)
+                .withSavedInstance(savedState)
+                .withShowDrawerOnFirstLaunch(true)
+                .build();
+
+        //get the CrossfadeDrawerLayout which will be used as alternative DrawerLayout for the Drawer
+        //the CrossfadeDrawerLayout library can be found here: https://github.com/mikepenz/CrossfadeDrawerLayout
+        //crossfadeDrawerLayout = (CrossfadeDrawerLayout) result.getDrawerLayout();
+
+        //define maxDrawerWidth
+        //crossfadeDrawerLayout.setMaxWidthPx(DrawerUIUtils.getOptimalDrawerWidth(context.getApplicationContext()));
+        //add second view (which is the miniDrawer)
+        //final MiniDrawer miniResult = result.getMiniDrawer();
+        //build the view for the MiniDrawer
+        //View view = miniResult.build(context);
+        //set the background of the MiniDrawer as this would be transparent
+        //view.setBackgroundColor(UIUtils.getThemeColorFromAttrOrRes(context, com.mikepenz.materialdrawer.R.attr.material_drawer_background,
+                //com.mikepenz.materialdrawer.R.color.material_drawer_dark_primary_icon));
+        //we do not have the MiniDrawer view during CrossfadeDrawerLayout creation so we will add it here
+        //crossfadeDrawerLayout.getSmallView().addView(view, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+        //define the crossfader to be used with the miniDrawer. This is required to be able to automatically toggle open / close
+
     }
     /**********************************************************************************************
      * Obtains the users current location via GPS location services
@@ -151,7 +205,7 @@ public class CreateDrawer {
             latLng = new LatLng(latitude, longitude);
             Geocoder geocoder;
             List<Address> addresses;
-            geocoder = new Geocoder(context, Locale.getDefault());
+            geocoder = new Geocoder(activity.getApplicationContext(), Locale.getDefault());
             try {
                 addresses = geocoder.getFromLocation(latitude, longitude, 1);
                 StyleableToast st = new StyleableToast(context.getApplicationContext(),
@@ -166,6 +220,12 @@ public class CreateDrawer {
             }
         }
 
+    }
+    public Drawer getResult(){
+        return result;
+    }
+    public AccountHeader getHeader(){
+        return headerResult;
     }
 
 }

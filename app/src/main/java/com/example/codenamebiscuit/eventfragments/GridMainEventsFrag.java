@@ -126,6 +126,10 @@ public class GridMainEventsFrag extends Fragment implements ClickListener {
         return rootView;
 
     }
+    public static GridMainEventsFrag newInstance() {
+        GridMainEventsFrag myFragment = new GridMainEventsFrag();
+        return myFragment;
+    }
     private boolean isNetworkAvailable() {
         ConnectivityManager connectivityManager
                 = (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -191,9 +195,14 @@ public class GridMainEventsFrag extends Fragment implements ClickListener {
             @Override
             public void onRefresh() {
                 swipeContainer.setRefreshing(true);
-                data = sGetDataInterface.getMainEventList();
+                try {
+                    data = new QueryEventList(getString(R.string.DATABASE_MAIN_EVENTS_PULLER)).execute(currentUserId).get();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                } catch (ExecutionException e) {
+                    e.printStackTrace();
+                }
                 mAdapter.setEventData(data);
-                mAdapter.notifyDataSetChanged();
                 swipeContainer.setRefreshing(false);
             }
 
@@ -268,7 +277,6 @@ public class GridMainEventsFrag extends Fragment implements ClickListener {
 
                                 for (int position : ints) {
                                     //eventData.remove(position);
-                                    mAdapter.notifyItemRemoved(position);
                                     try {
                                         deleteEvent.put("user_id", mAdapter.getObject().get(position).getString("user_id"));
                                         deleteEvent.put("event_id", mAdapter.getObject().get(position).getString("event_id"));
@@ -280,8 +288,10 @@ public class GridMainEventsFrag extends Fragment implements ClickListener {
                                         st.setMaxAlpha();
                                         st.show();
                                         data.remove(position);
-                                        if(data!=null)
-                                            mAdapter.setEventData(data);
+                                        mAdapter.notifyItemRemoved(position);
+
+                                        //if(data!=null)
+                                            //mAdapter.setEventData(data);
 
 
                                     } catch (JSONException e) {
@@ -308,8 +318,10 @@ public class GridMainEventsFrag extends Fragment implements ClickListener {
                                         st.setMaxAlpha();
                                         st.show();
                                         data.remove(position);
-                                        if(data!=null)
-                                            mAdapter.setEventData(data);
+                                        mAdapter.notifyItemRemoved(position);
+
+                                        //if(data!=null)
+                                            //mAdapter.setEventData(data);
                                         //Toast.makeText(getContext(), mAdapter.getObject().get(position).getString("event_id"), Toast.LENGTH_SHORT).show();
 
                                     } catch (JSONException e) {

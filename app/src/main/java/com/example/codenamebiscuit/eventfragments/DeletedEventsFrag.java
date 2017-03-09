@@ -129,6 +129,11 @@ public class DeletedEventsFrag extends Fragment implements ClickListener{
         tv.setText("Deleted Events");
     }
 
+    public static DeletedEventsFrag newInstance() {
+        DeletedEventsFrag myFragment = new DeletedEventsFrag();
+        return myFragment;
+    }
+
     /**********************************************************************************************
      * When activity resumes after a pause, check to see if any new events have been added
      * set swipeContainer.setRefreshing to true

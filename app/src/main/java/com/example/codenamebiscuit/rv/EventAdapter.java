@@ -3,17 +3,26 @@ package com.example.codenamebiscuit.rv;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Typeface;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
+import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Environment;
 import android.provider.CalendarContract;
+import android.provider.MediaStore;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
+import android.text.Html;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -31,6 +40,7 @@ import com.daimajia.androidanimations.library.Techniques;
 import com.daimajia.androidanimations.library.YoYo;
 import com.daimajia.swipe.SimpleSwipeListener;
 import com.daimajia.swipe.SwipeLayout;
+import com.example.codenamebiscuit.Manifest;
 import com.example.codenamebiscuit.R;
 import com.example.codenamebiscuit.helper.FlipAnimation;
 import com.example.codenamebiscuit.helper.GPSTracker;
@@ -41,6 +51,10 @@ import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
 
@@ -94,6 +108,7 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
         public final TextView mEventStartDate, mEventStartTime;
         public final TextView mEventInfoBack, mEventInfo;
         public final ImageButton mSaveImageButton, mLinkImageButton;
+        public final ImageButton mShareButton;
         public final TextView mEventHoster, mEventDistanceBack;
         public final TextView mEventDistance;
         public final CardView cardView;
@@ -132,6 +147,7 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
             mEventStartTime = (TextView)view.findViewById(R.id.start_time);
 
             mSaveImageButton = (ImageButton)view.findViewById(R.id.saveButton);
+            mShareButton = (ImageButton)view.findViewById(R.id.shareButton);
 
             mEventInfoBack = (TextView)view.findViewById(R.id.event_info_back);
             mEventImageback = (ImageView)view.findViewById(R.id.iv_event_image_back);
@@ -205,6 +221,7 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
         final String finalEventInfo1 = eventInfo; final String finalEventLocation = eventLocation;
 
         if(type==1){
+
             /********************************************************************************
              * assigns distance from current location to event location
              *******************************************************************************/
@@ -326,6 +343,15 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
                         eventAdapterViewHolder.layout.setVisibility(View.VISIBLE);
                     } else {
                         eventAdapterViewHolder.layout.setVisibility(View.GONE);} } });
+            final Uri image = getLocalBitmapUri(eventAdapterViewHolder.mEventImage);
+            eventAdapterViewHolder.mShareButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    try {
+                        shareIntent(image);
+                    } catch (IOException e) {
+                        e.printStackTrace(); } }
+            });
         }
         /*****************************************************************************************
          * Type 2 represents the grid layout and its corresponding views are set
@@ -351,6 +377,7 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
                     .error( R.drawable.cast_album_art_placeholder)
                     .placeholder(R.drawable.progress)
                     .into(eventAdapterViewHolder.mEventImageback);}
+
     }
 
     /*****************************************************************************************
@@ -373,6 +400,17 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
         return (int)Math.round(distance*0.000621371192); }
 
 
+    private void shareIntent(final Uri eventPath) throws IOException {
+        if (eventPath != null) {
+            // Construct a ShareIntent with link to image
+            Intent shareIntent = new Intent();
+            shareIntent.setAction(Intent.ACTION_SEND);
+            shareIntent.putExtra(Intent.EXTRA_STREAM, eventPath);
+            shareIntent.setType("image/*");
+            // Launch sharing dialog for image
+            shareIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            context.startActivity(shareIntent);}}
+
     /*****************************************************************************************
      * This method simply returns the number of items to display. It is used behind the scenes
      * to help layout our Views and for animations.
@@ -387,12 +425,12 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
             return mEventData.size();}
 
 
-    /**
+    /************************************************************************************
      * This method is used to set the event data if we haven't set it yet. This is handy when we
      * get new data from the web but don't want to create a new EventAdapter to display it.
      *
      * @param eventData The new weather data to be displayed.
-     */
+     ***********************************************************************************/
     public void setEventData(ArrayList<JSONObject> eventData) {
         mEventData = eventData;
         notifyDataSetChanged();
@@ -414,6 +452,35 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
 
     public ArrayList<JSONObject> getObject() {
         return mEventData;
+    }
+
+    public Uri getLocalBitmapUri(ImageView imageView) {
+        // Extract Bitmap from ImageView drawable
+        Drawable drawable = imageView.getDrawable();
+        Bitmap bmp = null;
+
+        if (drawable instanceof BitmapDrawable){
+            bmp = ((BitmapDrawable) imageView.getDrawable()).getBitmap();
+        } else {
+            bmp = Bitmap.createBitmap(drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
+            Canvas canvas = new Canvas(bmp);
+            drawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
+            drawable.draw(canvas);
+        }
+        // Store image to default external storage directory
+        Uri bmpUri = null;
+        try {
+            File file =  new File(Environment.getExternalStoragePublicDirectory(
+                    Environment.DIRECTORY_DOWNLOADS), "share_image_" + System.currentTimeMillis() + ".png");
+            file.getParentFile().mkdirs();
+            FileOutputStream out = new FileOutputStream(file);
+            bmp.compress(Bitmap.CompressFormat.PNG, 90, out);
+            out.close();
+            bmpUri = Uri.fromFile(file);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return bmpUri;
     }
 
 }

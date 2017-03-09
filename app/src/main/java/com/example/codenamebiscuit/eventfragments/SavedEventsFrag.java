@@ -86,6 +86,11 @@ public class SavedEventsFrag extends Fragment implements ClickListener {
             e.printStackTrace(); }
         eventData = new ArrayList<JSONObject>();
     }
+    public static SavedEventsFrag newInstance() {
+        SavedEventsFrag myFragment = new SavedEventsFrag();
+
+        return myFragment;
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,

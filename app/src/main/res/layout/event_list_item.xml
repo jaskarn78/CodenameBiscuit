@@ -14,7 +14,7 @@
         android:id="@+id/swipe"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="2dp"
+        android:padding="1dp"
         swipe:leftEdgeSwipeOffset="0dp"
         swipe:rightEdgeSwipeOffset="0dp">
         <LinearLayout
@@ -60,7 +60,7 @@
         android:layout_height="wrap_content"
         android:layout_margin="1dp"
         card_view:cardElevation="2dp"
-        card_view:contentPadding="2dp"
+        card_view:contentPadding="1dp"
        >
 
     <RelativeLayout
@@ -84,7 +84,6 @@
             android:id="@+id/tv_event_name"
             android:layout_toRightOf="@+id/iv_event_image"
             android:layout_alignParentTop="true"
-            android:layout_marginTop="2dp"
             android:textSize="20sp"
             />
         <TextView
@@ -195,7 +194,7 @@
                 </ScrollView>
 
                 <LinearLayout android:id="@+id/footer"
-                    android:layout_width="fill_parent"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
                     android:background="@color/livinBlack"
@@ -209,12 +208,12 @@
                         android:background="@color/livinPink"
                         android:text="Add to Calendar" />
 
-                    <ImageButton android:id="@+id/likeButton"
+                    <ImageButton android:id="@+id/shareButton"
                         android:layout_width="wrap_content"
                         android:layout_height="30dp"
                         android:layout_weight="1"
-                        android:layout_marginStart="2dp"
-                        android:layout_marginEnd="2dp"
+                        android:layout_marginStart="1dp"
+                        android:layout_marginEnd="1dp"
                         android:src="@drawable/share"
                         android:background="@color/livinPink"
                         android:text="Save" />

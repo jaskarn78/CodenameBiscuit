@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.AppCompatDelegate;
@@ -18,6 +19,7 @@ import android.view.WindowManager;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
+import com.asha.nightowllib.NightOwl;
 import com.example.codenamebiscuit.eventfragments.DeletedEventsFrag;
 import com.example.codenamebiscuit.eventfragments.GridMainEventsFrag;
 import com.example.codenamebiscuit.eventfragments.MainEventsFrag;
@@ -45,6 +47,10 @@ public class MainActivity extends AppCompatActivity
     private Toolbar toolbar;
     private ArrayList<JSONObject> data, deletedData, savedData;
     private static final int RC_LOCATION_SERVICE=123;
+    static {
+        AppCompatDelegate.setDefaultNightMode(
+                AppCompatDelegate.MODE_NIGHT_YES);
+    }
 
 
     /**********************************************************************************************
@@ -56,7 +62,7 @@ public class MainActivity extends AppCompatActivity
      **********************************************************************************************/
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         //Remove notification bar
         this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
@@ -68,10 +74,17 @@ public class MainActivity extends AppCompatActivity
             String perms[] = {Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION};
             EasyPermissions.requestPermissions(MainActivity.this, "This app requires location services", RC_LOCATION_SERVICE, perms); }
 
+        if (!EasyPermissions.hasPermissions(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+            String perms[] = {Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.ACCESS_COARSE_LOCATION};
+            EasyPermissions.requestPermissions(MainActivity.this, "This app requires location services", RC_LOCATION_SERVICE, perms); }
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 103);
+
         // Handle Toolbar
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         this.getSupportActionBar().setDisplayShowTitleEnabled(false);
+
 
         TextView tv = (TextView) findViewById(R.id.toolbar_title);
         Typeface typeface = Typeface.createFromAsset(getApplicationContext().getAssets(), "fonts/Raleway-Black.ttf");
@@ -96,7 +109,7 @@ public class MainActivity extends AppCompatActivity
 
 
     @Override
-    public void onResume() {  // After a pause OR at startup
+    protected void onResume() {  // After a pause OR at startup
         super.onResume();
 
     }
@@ -107,7 +120,7 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onBackPressed() {
-        moveTaskToBack(true);
+        super.onBackPressed();
     }
 
     @Override
@@ -134,7 +147,9 @@ public class MainActivity extends AppCompatActivity
                 currentUserId.put("user_id", pref.getString("user_id", null));
             } catch (JSONException e) {
                 e.printStackTrace(); }
-            loadDrawer(savedstate); }
+            loadDrawer(savedstate);
+
+        }
     }
 
    /*********************************************************************************
@@ -191,6 +206,7 @@ public class MainActivity extends AppCompatActivity
             e.printStackTrace();
         }
     }
+
 
     @Override
     public ArrayList<JSONObject> getDeletedEventList() {

@@ -59,6 +59,18 @@ dependencies {
     compile "com.daimajia.swipelayout:library:1.2.0@aar"
     compile 'com.daimajia.easing:library:2.0@aar'
     compile 'com.daimajia.androidanimations:library:2.2@aar'
+    compile 'com.mikepenz:fastadapter:2.1.0@aar'
+    compile 'com.mikepenz:iconics-core:2.8.0@aar'
+    compile 'com.mikepenz:materialize:1.0.0@aar'
+    compile('com.mikepenz:crossfadedrawerlayout:1.0.0@aar')
+    // icon fonts used inside the sample
+    // https://github.com/mikepenz/Android-Iconics
+    compile 'com.mikepenz:google-material-typeface:2.2.0.1@aar'
+    compile 'com.mikepenz:fontawesome-typeface:4.6.0.3@aar'
+    compile 'com.mikepenz:octicons-typeface:3.0.0.1@aar'
+    compile 'com.mikepenz:itemanimators:0.5.0@aar'
+    compile 'com.asha.nightowllib:nightowllib:0.2'
+
     compile('com.mikepenz:materialdrawer:5.8.1@aar') {
         transitive = true
     }

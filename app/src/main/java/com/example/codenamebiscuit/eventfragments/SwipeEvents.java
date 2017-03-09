@@ -58,6 +58,11 @@ public class SwipeEvents extends android.support.v4.app.Fragment{
             throw new ClassCastException(context.toString() + "must implement GetDataInterface Interface");
         }
     }
+    public static SwipeEvents newInstance() {
+        SwipeEvents myFragment = new SwipeEvents();
+
+        return myFragment;
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
