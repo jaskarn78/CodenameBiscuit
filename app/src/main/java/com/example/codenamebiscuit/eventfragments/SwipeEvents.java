@@ -10,6 +10,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -42,6 +44,8 @@ public class SwipeEvents extends android.support.v4.app.Fragment{
     private SharedPreferences pref;
     private JSONObject user;
     private ArrayList<JSONObject> data;
+    private int lastPosition = -1;
+
     GetMainSwipeDataInterface sGetDataInterface;
 
     public interface GetMainSwipeDataInterface {
@@ -60,7 +64,6 @@ public class SwipeEvents extends android.support.v4.app.Fragment{
     }
     public static SwipeEvents newInstance() {
         SwipeEvents myFragment = new SwipeEvents();
-
         return myFragment;
     }
 
@@ -247,7 +250,7 @@ public class SwipeEvents extends android.support.v4.app.Fragment{
             Picasso.with(context).load(image).into(frontCardImage);
 
             ImageView flippedCardImage = (ImageView) v.findViewById(R.id.back_image);
-            Picasso.with(context).load(image).resize(80, 80).into(flippedCardImage);
+            Picasso.with(context).load(image).into(flippedCardImage);
 
             TextView event_location_tv = (TextView) v.findViewById(R.id.event_location_back);
             event_location_tv.setText(event_location);
@@ -281,4 +284,3 @@ public class SwipeEvents extends android.support.v4.app.Fragment{
         }
     }
 }
-

@@ -73,6 +73,7 @@
         <ImageView
             android:layout_width="95dp"
             android:layout_height="95dp"
+            android:scaleType="fitXY"
             android:id="@+id/iv_event_image"
             android:layout_alignParentLeft="true"
             android:layout_marginRight="16dp"

@@ -242,9 +242,7 @@ public class ChooseLogin extends FragmentActivity implements GoogleApiClient.OnC
                     AccessToken oldAccessToken,
                     AccessToken currentAccessToken) {
                 // Change tracked AccessToken to currentAccessToken
-                AccessToken.setCurrentAccessToken(currentAccessToken);
-            }
-        };
+                AccessToken.setCurrentAccessToken(currentAccessToken); } };
 
         // Initialize ProfileTracker
         mProfileTracker = new ProfileTracker() {
@@ -253,17 +251,15 @@ public class ChooseLogin extends FragmentActivity implements GoogleApiClient.OnC
                     Profile oldProfile,
                     Profile currentProfile) {
                 // Change tracked Profile to currentProfile
-                Profile.setCurrentProfile(currentProfile);
-            }
-        };
-
+                // Profile.setCurrentProfile(currentProfile);
+            }};
         mAccessTokenTracker.startTracking();
     }
 
     private void nextActivity() {
-            Intent main = new Intent(this, MainActivity.class);
-            startActivity(main);
-    }
+        Intent main = new Intent(this, MainActivity.class);
+        this.finish();
+        startActivity(main); }
 
     private JSONObject createNormalizedJSONObject(JSONObject object) {
 
@@ -271,7 +267,6 @@ public class ChooseLogin extends FragmentActivity implements GoogleApiClient.OnC
             JSONObject normalizedObj = new JSONObject();
             String id = object.getString("id");
             pref.edit().putString("user_id", id).apply();
-
             try {
                 URL profile_pic = new URL("https://graph.facebook.com/" + id + "/picture?width=200&height=150");
                 Log.i("profile_pic", profile_pic + "");
@@ -281,8 +276,7 @@ public class ChooseLogin extends FragmentActivity implements GoogleApiClient.OnC
 
             } catch (MalformedURLException e) {
                 e.printStackTrace();
-                return null;
-            }
+                return null; }
 
             normalizedObj.put("user_id", id);
             if (object.has("first_name")) {
@@ -318,11 +312,7 @@ public class ChooseLogin extends FragmentActivity implements GoogleApiClient.OnC
 
 
     @Override
-    protected void onResume() {
-        super.onResume();
-        //Facebook login
-        //nextActivity();
-    }
+    protected void onResume() { super.onResume(); }
 
     @Override
     protected void onPause() {
@@ -345,8 +335,6 @@ public class ChooseLogin extends FragmentActivity implements GoogleApiClient.OnC
     @Override
     protected void onActivityResult(int requestCode, int responseCode, Intent intent) {
         super.onActivityResult(requestCode, responseCode, intent);
-
-
         // Result returned from launching the Intent from GoogleSignInApi.getSignInIntent(...);
         if (requestCode == RC_SIGN_IN) {
             GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(intent);

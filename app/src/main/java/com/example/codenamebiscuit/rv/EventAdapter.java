@@ -1,35 +1,28 @@
 package com.example.codenamebiscuit.rv;
 
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
+
 import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Typeface;
+
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
-import android.location.Address;
-import android.location.Geocoder;
 import android.location.Location;
 import android.net.Uri;
-import android.os.AsyncTask;
-import android.os.Environment;
+
+import android.os.Handler;
+import android.os.HandlerThread;
 import android.provider.CalendarContract;
-import android.provider.MediaStore;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
+
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
-import android.text.Html;
-import android.util.Log;
+
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-import android.view.animation.OvershootInterpolator;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Button;
@@ -41,34 +34,29 @@ import android.widget.Toast;
 
 import com.daimajia.androidanimations.library.Techniques;
 import com.daimajia.androidanimations.library.YoYo;
-import com.daimajia.androidanimations.library.sliders.SlideInUpAnimator;
 import com.daimajia.swipe.SimpleSwipeListener;
 import com.daimajia.swipe.SwipeLayout;
-import com.example.codenamebiscuit.Manifest;
 import com.example.codenamebiscuit.R;
 import com.example.codenamebiscuit.helper.FlipAnimation;
 import com.example.codenamebiscuit.helper.GPSTracker;
 import com.example.codenamebiscuit.helper.UpdateDbOnSwipe;
-import com.google.android.gms.maps.model.LatLng;
 import com.muddzdev.styleabletoastlibrary.StyleableToast;
+import com.squareup.picasso.Callback;
 import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
+import com.squareup.picasso.Target;
+
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
-
 
 
 public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapterViewHolder> {
     private ArrayList<JSONObject> mEventData;
     private Context context;
     private Typeface typeface;
-    private ClickListener clickListener = null;
     private String message;
     private int type;
     private int lastPosition = -1;
@@ -180,7 +168,8 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
                         FlipAnimation flipAnimation = new FlipAnimation(cv, cvBack);
                         if (cv.getVisibility() == View.GONE)
                             flipAnimation.reverse();
-                        v.startAnimation(flipAnimation);}
+                        v.startAnimation(flipAnimation);
+                    }
                 });
             }
         }
@@ -218,7 +207,6 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
             eventInfo = mEventData.get(position).getString("event_description");
         } catch (JSONException e) {
             e.printStackTrace(); }
-        setAnimation(eventAdapterViewHolder.itemView, position);
 
         eventAdapterViewHolder.mEventPreferenceTV.setText(eventPref);
         eventAdapterViewHolder.mEventLocationTV.setText(eventLocation);
@@ -227,23 +215,24 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
         final String finalEvent = event;          final String finalEventInfo = eventInfo;
         final String finalEventInfo1 = eventInfo; final String finalEventLocation = eventLocation;
 
-        if(type==1){
-
+        if(type==1) {
+            setAnimation(eventAdapterViewHolder.itemView, position);
             /********************************************************************************
              * assigns distance from current location to event location
              *******************************************************************************/
-            eventAdapterViewHolder.mEventDistance.setText("Distance: "+getLocation(lat, lng)+" miles");
+            //eventAdapterViewHolder.mEventDistance.setText("Distance: " + getLocation(lat, lng) + " miles");
 
             /********************************************************************************
              * Loads event image from url obtained from database and assigns
              * the loaded image to the event imageview in the layout
-             *******************************************************************************/
-            Picasso.with(context.getApplicationContext())
+             ******************************************************************************/
+            /*Picasso.with(context.getApplicationContext())
                     .load(getImageURL(eventPath))
-                    .resize(90, 90)
-                    .error( R.drawable.cast_album_art_placeholder)
+                    //.resize(90, 90)
+                    .error(R.drawable.cast_album_art_placeholder)
                     .placeholder(R.drawable.progress)
-                    .into(eventAdapterViewHolder.mEventImage);
+                    .into(eventAdapterViewHolder.mEventImage);*/
+            loadImage(eventAdapterViewHolder.mEventImage, getImageURL(eventPath));
 
             eventAdapterViewHolder.mEventInfo.setText("Additional Event Information");
 
@@ -261,7 +250,7 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
                     intent.putExtra("beginTime", cal.getTimeInMillis());
                     intent.putExtra("allDay", false);
                     intent.putExtra("rrule", "FREQ=DAILY");
-                    intent.putExtra("endTime", cal.getTimeInMillis()+60*60*1000);
+                    intent.putExtra("endTime", cal.getTimeInMillis() + 60 * 60 * 1000);
                     intent.putExtra("title", finalEvent);
                     intent.putExtra(CalendarContract.Events.EVENT_LOCATION, finalEventLocation);
                     intent.putExtra(CalendarContract.Events.DESCRIPTION, finalEventInfo1);
@@ -277,7 +266,9 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
             eventAdapterViewHolder.mSwipeLayout.addSwipeListener(new SimpleSwipeListener() {
                 @Override
                 public void onOpen(SwipeLayout layout) {
-                    YoYo.with(Techniques.Tada).duration(500).delay(100).playOn(layout.findViewById(R.id.trash)); } });
+                    YoYo.with(Techniques.Tada).duration(500).delay(100).playOn(layout.findViewById(R.id.trash));
+                }
+            });
 
             /*****************************************************************************************
              * Swiping on the cardview will display a remove button, when pressed
@@ -291,32 +282,38 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
                         restoreEvent.put("user_id", mEventData.get(position).get("user_id"));
                         restoreEvent.put("event_id", mEventData.get(position).get("event_id"));
                     } catch (JSONException e) {
-                        e.printStackTrace(); }
+                        e.printStackTrace();
+                    }
                     mEventData.remove(position);
                     notifyItemRemoved(position);
                     notifyItemRangeChanged(position, mEventData.size());
-                    if(message.equals("saved"))
+                    if (message.equals("saved"))
                         new UpdateDbOnSwipe(context.getString(R.string.DATABASE_RESTORE_SAVED_EVENTS)).execute(restoreEvent);
                     else
-                        new UpdateDbOnSwipe(context.getString(R.string.DATABASE_RESTORE_DELETED_EVENTS)).execute(restoreEvent);} });
+                        new UpdateDbOnSwipe(context.getString(R.string.DATABASE_RESTORE_DELETED_EVENTS)).execute(restoreEvent);
+                }
+            });
 
 
-            eventAdapterViewHolder.mEventHoster.setText("Presented By: "+eventHoster);
-            eventAdapterViewHolder.mEventCost.setText("Entry Fee: $"+cost);
+            eventAdapterViewHolder.mEventHoster.setText("Presented By: " + eventHoster);
+            eventAdapterViewHolder.mEventCost.setText("Entry Fee: $" + cost);
             eventAdapterViewHolder.mWebView.getSettings().setJavaScriptEnabled(true);
             eventAdapterViewHolder.mWebView.getSettings().setLoadWithOverviewMode(true);
             eventAdapterViewHolder.mWebView.getSettings().setUseWideViewPort(true);
             eventAdapterViewHolder.mWebView.setVerticalScrollBarEnabled(true);
             eventAdapterViewHolder.mWebView.setHorizontalScrollBarEnabled(true);
-            eventAdapterViewHolder.mWebView.setWebViewClient(new WebViewClient(){
+            eventAdapterViewHolder.mWebView.setWebViewClient(new WebViewClient() {
 
                 @Override
                 public boolean shouldOverrideUrlLoading(WebView view, String url) {
                     view.loadUrl(url);
                     return true;
                 }
+
                 @Override
-                public void onPageFinished(WebView view, final String url) { } });
+                public void onPageFinished(WebView view, final String url) {
+                }
+            });
 
 
             /*****************************************************************************************
@@ -328,14 +325,17 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
                 @Override
                 public void onClick(View v) {
                     eventAdapterViewHolder.mWebView.loadUrl("https://www.google.com");
-                    if(eventAdapterViewHolder.mWebView.getVisibility()==View.GONE){
+                    if (eventAdapterViewHolder.mWebView.getVisibility() == View.GONE) {
                         eventAdapterViewHolder.mWebView.setVisibility(View.VISIBLE);
                         StyleableToast st = new StyleableToast(context.getApplicationContext(), "Loading Website...", Toast.LENGTH_SHORT);
                         st.setBackgroundColor(context.getColor(R.color.livinPink));
                         st.setTextColor(context.getColor(R.color.livinWhite));
                         st.show();
-                    }else{
-                        eventAdapterViewHolder.mWebView.setVisibility(View.GONE);}} });
+                    } else {
+                        eventAdapterViewHolder.mWebView.setVisibility(View.GONE);
+                    }
+                }
+            });
 
 
             /*****************************************************************************************
@@ -349,21 +349,16 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
                     if (eventAdapterViewHolder.layout.getVisibility() == View.GONE) {
                         eventAdapterViewHolder.layout.setVisibility(View.VISIBLE);
                     } else {
-                        eventAdapterViewHolder.layout.setVisibility(View.GONE);} } });
-            final Uri image = getLocalBitmapUri(eventAdapterViewHolder.mEventImage);
-            eventAdapterViewHolder.mShareButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    try {
-                        shareIntent(image);
-                    } catch (IOException e) {
-                        e.printStackTrace(); } }
+                        eventAdapterViewHolder.layout.setVisibility(View.GONE);
+                    }
+                }
             });
         }
         /*****************************************************************************************
          * Type 2 represents the grid layout and its corresponding views are set
          * ****************************************************************************************/
         if(type==2) {
+            //setGridAnimation(eventAdapterViewHolder.itemView, position);
             eventAdapterViewHolder.mEventPreferenceTVBack.setText(eventPref);
             eventAdapterViewHolder.mEventNameBack.setText(event);
             eventAdapterViewHolder.mEventLocationTVBack.setText("1234 Example St. "+eventLocation);
@@ -372,6 +367,8 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
             eventAdapterViewHolder.mEventInfoBack.setText("Description: "+eventInfo);
             eventAdapterViewHolder.mEventDistanceBack.setText("Distance: "+getLocation(lat, lng)+" miles");
 
+
+            //loadImage(eventAdapterViewHolder.mEventImage, getImageURL(eventPath));
             Picasso.with(context.getApplicationContext())
                     .load(getImageURL(eventPath))
                     .error( R.drawable.cast_album_art_placeholder)
@@ -416,7 +413,8 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
             shareIntent.setType("image/*");
             // Launch sharing dialog for image
             shareIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            context.startActivity(shareIntent);}}
+            context.startActivity(shareIntent);
+        }}
 
     /*****************************************************************************************
      * This method simply returns the number of items to display. It is used behind the scenes
@@ -446,6 +444,25 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
     public String getImageURL(String path) {
         return "http://athena.ecs.csus.edu/~teamone/AndroidUploadImage/uploads/" + path; }
 
+    public void loadImage(final ImageView imageView, final String URL) {
+        final Handler mainThreadHandler = new Handler();
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                mainThreadHandler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        Picasso.with(imageView.getContext())
+                                .load(URL)
+                                .placeholder(R.drawable.progress)
+                                .error(R.drawable.cast_album_art_placeholder)
+                                .into(imageView); }
+            }, 300);
+            }
+        }).start();
+    }
+
+
     public void clear() {
         mEventData.clear();
         notifyDataSetChanged();
@@ -456,14 +473,18 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
         mEventData.addAll(list);
         notifyDataSetChanged();
     }
-    private void setAnimation(View viewToAnimate, int position)
-    {
+    private void setAnimation(View viewToAnimate, int position) {
         // If the bound view wasn't previously displayed on screen, it's animated
-        if (position > lastPosition)
-        {
+        if (position > lastPosition) {
             Animation animation = AnimationUtils.loadAnimation(context, R.anim.enter);
             viewToAnimate.startAnimation(animation);
-            lastPosition = position;
+            lastPosition = position; }
+    }
+    private void setGridAnimation(View viewToAnimate, int position){
+        if(position>lastPosition){
+            Animation animation = AnimationUtils.loadAnimation(context, R.anim.swing_up_left);
+            viewToAnimate.startAnimation(animation);
+            lastPosition=position;
         }
     }
 
@@ -471,33 +492,7 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
         return mEventData;
     }
 
-    public Uri getLocalBitmapUri(ImageView imageView) {
-        // Extract Bitmap from ImageView drawable
-        Drawable drawable = imageView.getDrawable();
-        Bitmap bmp = null;
 
-        if (drawable instanceof BitmapDrawable){
-            bmp = ((BitmapDrawable) imageView.getDrawable()).getBitmap();
-        } else {
-            bmp = Bitmap.createBitmap(drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
-            Canvas canvas = new Canvas(bmp);
-            drawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
-            drawable.draw(canvas);
-        }
-        // Store image to default external storage directory
-        Uri bmpUri = null;
-        try {
-            File file =  new File(Environment.getExternalStoragePublicDirectory(
-                    Environment.DIRECTORY_DOWNLOADS), "share_image_" + System.currentTimeMillis() + ".png");
-            file.getParentFile().mkdirs();
-            FileOutputStream out = new FileOutputStream(file);
-            bmp.compress(Bitmap.CompressFormat.PNG, 90, out);
-            out.close();
-            bmpUri = Uri.fromFile(file);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return bmpUri;
-    }
+
 
 }

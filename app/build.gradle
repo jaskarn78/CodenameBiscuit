@@ -48,7 +48,6 @@ dependencies {
     compile 'com.squareup.picasso:picasso:2.5.2'
     compile 'com.squareup.okhttp:okhttp-urlconnection:2.0.0'
     compile 'com.squareup.okhttp3:okhttp:3.6.0'
-    compile 'com.android.support:support-v4:25.2.0'
     compile 'com.google.android.gms:play-services-auth:10.2.0'
     compile 'com.android.support:design:25.2.0'
     compile 'com.muddzdev:styleabletoast:1.0.6'
@@ -62,6 +61,7 @@ dependencies {
     compile 'com.mikepenz:fastadapter:2.1.0@aar'
     compile 'com.mikepenz:iconics-core:2.8.0@aar'
     compile 'com.mikepenz:materialize:1.0.0@aar'
+    compile 'com.mikepenz:crossfader:1.5.0@aar'
     compile('com.mikepenz:crossfadedrawerlayout:1.0.0@aar')
     // icon fonts used inside the sample
     // https://github.com/mikepenz/Android-Iconics
@@ -69,15 +69,17 @@ dependencies {
     compile 'com.mikepenz:fontawesome-typeface:4.6.0.3@aar'
     compile 'com.mikepenz:octicons-typeface:3.0.0.1@aar'
     compile 'com.mikepenz:itemanimators:0.5.0@aar'
-    compile 'com.asha.nightowllib:nightowllib:0.2'
     compile 'jp.wasabeef:recyclerview-animators:2.2.5'
-
-
+    compile 'com.sothree.slidinguppanel:library:3.3.1'
+    compile 'com.truizlop.fabreveallayout:library:1.0.0'
+    compile 'com.wunderlist:sliding-layer:1.2.5'
+    compile 'net.colindodd:toggleimagebutton:1.2'
+    compile 'com.github.medyo:fancybuttons:1.8.3'
     compile('com.mikepenz:materialdrawer:5.8.1@aar') {
         transitive = true
     }
 
-    testCompile 'junit:junit:4.12'
+    //testCompile 'junit:junit:4.12'
     compile 'com.android.support.constraint:constraint-layout:1.0.0-beta5'
 }
 apply plugin: 'com.google.gms.google-services'

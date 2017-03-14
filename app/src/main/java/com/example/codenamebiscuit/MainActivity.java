@@ -1,42 +1,68 @@
 package com.example.codenamebiscuit;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.graphics.Typeface;
+import android.graphics.drawable.Drawable;
+import android.net.Uri;
+import android.nfc.Tag;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
+import android.support.v4.widget.SlidingPaneLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.AppCompatDelegate;
 import android.support.v7.preference.PreferenceManager;
 import android.support.v7.widget.Toolbar;
+import android.text.Html;
+import android.text.method.LinkMovementMethod;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
-import com.asha.nightowllib.NightOwl;
 import com.example.codenamebiscuit.eventfragments.DeletedEventsFrag;
 import com.example.codenamebiscuit.eventfragments.GridMainEventsFrag;
 import com.example.codenamebiscuit.eventfragments.MainEventsFrag;
 import com.example.codenamebiscuit.eventfragments.SavedEventsFrag;
 import com.example.codenamebiscuit.eventfragments.SwipeEvents;
 
+import com.example.codenamebiscuit.helper.ChangePreferences;
 import com.example.codenamebiscuit.helper.CreateDrawer;
 import com.example.codenamebiscuit.helper.QueryEventList;
 import com.example.codenamebiscuit.login.ChooseLogin;
 import com.facebook.FacebookSdk;
+import com.sothree.slidinguppanel.SlidingUpPanelLayout;
+import com.wunderlist.slidinglayer.LayerTransformer;
+import com.wunderlist.slidinglayer.SlidingLayer;
+import com.wunderlist.slidinglayer.transformer.AlphaTransformer;
+import com.wunderlist.slidinglayer.transformer.RotationTransformer;
+import com.wunderlist.slidinglayer.transformer.SlideJoyTransformer;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 
+import mehdi.sakout.fancybuttons.FancyButton;
 import pub.devrel.easypermissions.EasyPermissions;
 
 public class MainActivity extends AppCompatActivity
@@ -47,6 +73,16 @@ public class MainActivity extends AppCompatActivity
     private Toolbar toolbar;
     private ArrayList<JSONObject> data, deletedData, savedData;
     private static final int RC_LOCATION_SERVICE=123;
+    private static final int RC_STORAGE_SERVICE=124;
+    private SlidingLayer mSlidingLayer;
+    private TextView swipeText;
+    private SlidingUpPanelLayout mLayout;
+    private FancyButton musicFancyButton, sportsButton, foodButton;
+    private FancyButton healthButton, outdoorButton, entertainmentButton;
+    private FancyButton familyButton, retailButton, performingButton;
+    private JSONObject preferences = new JSONObject();
+    private boolean isActive = false;
+    List<JSONObject> prefList;
     static {
         AppCompatDelegate.setDefaultNightMode(
                 AppCompatDelegate.MODE_NIGHT_YES);
@@ -69,15 +105,14 @@ public class MainActivity extends AppCompatActivity
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
         setContentView(R.layout.launch_layout);
 
+
+
         pref = PreferenceManager.getDefaultSharedPreferences(this);
+
         if (!EasyPermissions.hasPermissions(this, Manifest.permission.ACCESS_FINE_LOCATION)) {
             String perms[] = {Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION};
             EasyPermissions.requestPermissions(MainActivity.this, "This app requires location services", RC_LOCATION_SERVICE, perms); }
 
-        if (!EasyPermissions.hasPermissions(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-            String perms[] = {Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.ACCESS_COARSE_LOCATION};
-            EasyPermissions.requestPermissions(MainActivity.this, "This app requires location services", RC_LOCATION_SERVICE, perms); }
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 103);
 
         // Handle Toolbar
         toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -95,13 +130,18 @@ public class MainActivity extends AppCompatActivity
         /**verify that user is logged in either through fb or google
         //if not looged in, redirect to chooseLogin activity*/
         checkIfFbOrGoogleLogin(savedInstanceState);
+        bindViews();
 
-       // MainEventsFrag eventsFrag = new MainEventsFrag();
+        swipeText.setTypeface(typeface);
+
         GridMainEventsFrag eventsFrag = new GridMainEventsFrag();
         // Normal app init code..
         if (savedInstanceState == null) {
-            android.app.FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
-            getSupportFragmentManager().beginTransaction().add(R.id.fragment_container, eventsFrag, "mainFrag").commit();}
+            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+            ft.setCustomAnimations(R.anim.swing_up_left, R.anim.exit);
+            ft.add(R.id.fragment_container, eventsFrag, "mainFrag");
+            ft.commit();
+        }
 
         if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
             return;}
@@ -109,10 +149,9 @@ public class MainActivity extends AppCompatActivity
 
 
     @Override
-    protected void onResume() {  // After a pause OR at startup
-        super.onResume();
+    protected void onResume() {
+        super.onResume(); }
 
-    }
     @Override
     public void onPause(){
         super.onPause();
@@ -121,6 +160,97 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onBackPressed() {
         super.onBackPressed();
+        if (getSupportFragmentManager().getBackStackEntryCount() > 0) {
+            getSupportFragmentManager().popBackStackImmediate();
+        }
+    }
+
+    /**
+     * View binding
+     */
+    private void bindViews() {
+        mSlidingLayer = (SlidingLayer) findViewById(R.id.slidingLayer1);
+        swipeText = (TextView) findViewById(R.id.swipeText);
+        mSlidingLayer.setLayerTransformer(new AlphaTransformer());
+        musicFancyButton = (FancyButton)findViewById(R.id.btn_music);
+        sportsButton = (FancyButton)findViewById(R.id.btn_sports);
+        foodButton = (FancyButton)findViewById(R.id.btn_food);
+        outdoorButton=(FancyButton)findViewById(R.id.btn_outdoors);
+        healthButton=(FancyButton)findViewById(R.id.btn_health);
+        entertainmentButton=(FancyButton)findViewById(R.id.btn_entertainment);
+        performingButton=(FancyButton)findViewById(R.id.btn_performing);
+        retailButton=(FancyButton)findViewById(R.id.btn_retail);
+        familyButton=(FancyButton)findViewById(R.id.btn_family);
+        final List<FancyButton> btnList = new ArrayList();
+        btnList.add(musicFancyButton);btnList.add(foodButton); btnList.add(sportsButton);
+        btnList.add(outdoorButton); btnList.add(healthButton); btnList.add(familyButton);
+        btnList.add(retailButton); btnList.add(performingButton); btnList.add(entertainmentButton);
+        try {
+            preferences.put("user_id", pref.getString("user_id", null));
+            prefList = new QueryEventList(getString(R.string.PULL_USER_PREFERENCES)).execute(currentUserId).get();
+            for(int i=0; i<prefList.size(); i++) {
+                Log.i("preferences" + i, prefList.get(i).getString("preference_id"));
+                if(Integer.parseInt(prefList.get(i).getString("preference_id"))>0) {
+                    btnList.get(i).setBackgroundColor(getColor(R.color.livinPink));
+                    btnList.get(i).setSelected(true);
+
+                }
+
+            }
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        }
+        for(int i=0; i<btnList.size(); i++){
+            final int finalI = i;
+            //btnList.get(i).setSelected(false);
+            btnList.get(i).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (!btnList.get(finalI).isSelected()){
+                        btnList.get(finalI).setBackgroundColor(getColor(R.color.livinPink));
+                        btnList.get(finalI).setSelected(true);
+                        try {
+                            preferences.put("pref_id"+(finalI+1), 1);
+                            Log.i("pref_id"+(finalI), preferences.getString("pref_id"+(finalI+1)));
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                    else{
+                        btnList.get(finalI).setBackgroundColor(getColor(R.color.translivinPink));
+                        btnList.get(finalI).setSelected(false);
+                        try {
+                            preferences.put("pref_id"+(finalI+1), 0);
+                            Log.i("pref_id"+(finalI), preferences.getString("pref_id"+(finalI+1)));
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                    new ChangePreferences().execute(preferences); } });
+        }
+
+    }
+
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        switch (keyCode) {
+            case KeyEvent.KEYCODE_BACK:
+                if (mSlidingLayer.isOpened()) {
+                    mSlidingLayer.closeLayer(true);
+                    return true;
+                }
+
+            default:
+                return super.onKeyDown(keyCode, event);
+        }
     }
 
     @Override
@@ -148,6 +278,9 @@ public class MainActivity extends AppCompatActivity
             } catch (JSONException e) {
                 e.printStackTrace(); }
             loadDrawer(savedstate);
+            bindViews();
+
+
 
         }
     }
@@ -155,14 +288,40 @@ public class MainActivity extends AppCompatActivity
    /*********************************************************************************
      Create Menu
      **********************************************************************************************/
+   @Override
+   public boolean onCreateOptionsMenu(Menu menu) {
+       // Inflate the menu; this adds items to the action bar if it is present.
+       getMenuInflater().inflate(R.menu.sliding_panel, menu);
+       MenuItem item = menu.findItem(R.id.action_toggle);
+       if (mLayout != null) {
+           if (mLayout.getPanelState() == SlidingUpPanelLayout.PanelState.HIDDEN) {
+               item.setTitle("Toggle Preferences");
+           } else {
+               item.setTitle("Toggle Preferences");
+           }
+       }
+       return true;
+   }
+
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        return true;
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        return super.onPrepareOptionsMenu(menu);
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        return false;
+        switch (item.getItemId()) {
+            case R.id.action_anchor:
+                mSlidingLayer.openLayer(true);
+                break;
+            case R.id.action_toggle:
+               if(mSlidingLayer.getVisibility()==View.VISIBLE)
+                   mSlidingLayer.setVisibility(View.GONE);
+                else
+                    mSlidingLayer.setVisibility(View.VISIBLE);
+
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -185,6 +344,9 @@ public class MainActivity extends AppCompatActivity
         FragmentManager manager = getSupportFragmentManager();
         CreateDrawer createDrawer = new CreateDrawer(fName, lName, pic, email, savedState, toolbar, getApplicationContext(), this, manager);
         createDrawer.loadDrawer();
+
+        EmbeddedFragment embeddedFragment = new EmbeddedFragment(getApplicationContext(), this, savedState);
+        embeddedFragment.setupSideDrawer();
 
 
     }

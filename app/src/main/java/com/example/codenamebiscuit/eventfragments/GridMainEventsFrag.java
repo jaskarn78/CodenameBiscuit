@@ -68,6 +68,7 @@ public class GridMainEventsFrag extends Fragment implements ClickListener {
         super.onAttach(context);
         try {
             sGetDataInterface = (GetMainDataInterface) context;
+
         } catch (ClassCastException e) {
             throw new ClassCastException(context.toString() + "must implement GetDataInterface Interface");
         }
@@ -81,16 +82,21 @@ public class GridMainEventsFrag extends Fragment implements ClickListener {
         saveEvent = new JSONObject();
         deleteEvent=new JSONObject();
 
-
         String user_id = pref.getString("user_id", null);
         try {
             currentUserId.put("user_id", user_id);
         } catch (JSONException e) {
             e.printStackTrace();
         }
-
-        //initialize event dataset
         eventData = new ArrayList<JSONObject>();
+        mAdapter = new EventAdapter(getContext().getApplicationContext(), 2, "");
+        try {
+            data = new QueryEventList(getString(R.string.DATABASE_MAIN_EVENTS_PULLER)).execute(currentUserId).get();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        }
 
         //Custom stylable toast*
         if (savedInstanceState == null) {}
@@ -102,27 +108,19 @@ public class GridMainEventsFrag extends Fragment implements ClickListener {
                              Bundle savedInstanceState){
 
         View rootView = inflater.inflate(R.layout.activity_main, container, false);
-
+        //initialize event dataset
         swipeContainer = (SwipeRefreshLayout) rootView.findViewById(R.id.swipeContainer);
         setupSwipeDownRefresh();
-
         mRecyclerView = (RecyclerView)rootView.findViewById(R.id.recyclerview_events);
 
-        mAdapter = new EventAdapter(getActivity().getApplicationContext(), 2, "");
-        mLinearLayoutManager = new LinearLayoutManager(getContext());
-        StaggeredGridLayoutManager staggeredGridLayoutManager = new StaggeredGridLayoutManager(2, 1);
-        mRecyclerView.setAdapter(mAdapter);
 
-        mRecyclerView.setLayoutManager(staggeredGridLayoutManager);
-        mRecyclerView.setHasFixedSize(false);
-        mRecyclerView.setItemViewCacheSize(10);
-        mRecyclerView.setDrawingCacheEnabled(true);
-        mRecyclerView.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_LOW);
-        mRecyclerView.setItemAnimator(new DefaultItemAnimator());
+
+        //mRecyclerView.setItemAnimator(new DefaultItemAnimator());
+        //mRecyclerView.setHasFixedSize(false);
+        //mRecyclerView.setItemViewCacheSize(10);
+        //mRecyclerView.setDrawingCacheEnabled(true);
+        //mRecyclerView.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_LOW);
         //alter toolbar title
-        TextView textView = (TextView)getActivity().findViewById(R.id.toolbar_title);
-        textView.setText("LIV IT");
-
         return rootView;
 
     }
@@ -148,6 +146,13 @@ public class GridMainEventsFrag extends Fragment implements ClickListener {
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
+        mAdapter.setEventData(data);
+        mRecyclerView.setAdapter(mAdapter);
+
+        StaggeredGridLayoutManager staggeredGridLayoutManager = new StaggeredGridLayoutManager(2, 1);
+        mRecyclerView.setLayoutManager(staggeredGridLayoutManager);
+        TextView textView = (TextView)getActivity().findViewById(R.id.toolbar_title);
+        textView.setText("LIV IT");
         StyleableToast st = new StyleableToast(getContext(), "Network not detected!", Toast.LENGTH_LONG);
         //Custom stylable toast*
         st.setBackgroundColor(Color.RED);
@@ -171,14 +176,8 @@ public class GridMainEventsFrag extends Fragment implements ClickListener {
     @Override
     public void onResume() {  // After a pause OR at startup
         super.onResume();
-        try {
-            data = new QueryEventList(getString(R.string.DATABASE_MAIN_EVENTS_PULLER)).execute(currentUserId).get();
-            mAdapter.setEventData(data);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (ExecutionException e) {
-            e.printStackTrace();
-        } }
+        mAdapter.notifyDataSetChanged();
+    }
 
     @Override
     public void onStart() {

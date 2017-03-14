@@ -88,7 +88,7 @@ public class QueryEventList extends AsyncTask<JSONObject, Void, ArrayList<JSONOb
 
             // Read Server Response
             while ((line = reader.readLine()) != null) {
-                Log.v("PrintLine", line);
+                //Log.v("PrintLine", line);
                 sb.append(line);
             }
 

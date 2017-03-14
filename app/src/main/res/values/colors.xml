@@ -2,8 +2,10 @@
 <resources>
     <color name="colorAccent">#5694f7</color>
     <color name="livinWhite">#ffffff</color>
-    <color name="livinBlack">#000000</color>
+    <color name="livinBlack">#dd000000</color>
     <color name="livinPink">#ff9dfc</color>
+    <color name="gray_overlay">#99303030</color>
+    <color name="black_overlay">#88000000</color>
+    <color name="translivinPink">#55ff9dfc</color>
 
-    <color name="black_overlay">#66000000</color>
 </resources>

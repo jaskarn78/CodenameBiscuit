@@ -33,6 +33,7 @@ import com.example.codenamebiscuit.helper.UpdateDbOnSwipe;
 import com.example.codenamebiscuit.rv.ClickListener;
 import com.example.codenamebiscuit.rv.EventAdapter;
 import com.github.brnunes.swipeablerecyclerview.SwipeableRecyclerViewTouchListener;
+import com.mikepenz.itemanimators.AlphaInAnimator;
 import com.muddzdev.styleabletoastlibrary.StyleableToast;
 
 
@@ -85,10 +86,20 @@ public class SavedEventsFrag extends Fragment implements ClickListener {
         } catch (JSONException e) {
             e.printStackTrace(); }
         eventData = new ArrayList<JSONObject>();
+        mAdapter = new EventAdapter(getActivity().getApplicationContext(), 1, "saved");
+        try {
+            data = new QueryEventList(getString(R.string.DATABASE_SAVED_EVENTS_PULLER)).execute(currentUserId).get();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        }
+
+
     }
+
     public static SavedEventsFrag newInstance() {
         SavedEventsFrag myFragment = new SavedEventsFrag();
-
         return myFragment;
     }
 
@@ -99,6 +110,7 @@ public class SavedEventsFrag extends Fragment implements ClickListener {
         swipeContainer = (SwipeRefreshLayout) rootView.findViewById(R.id.swipeContainer);
         setupSwipeDownRefresh();
         mRecyclerView = (RecyclerView) rootView.findViewById(R.id.recyclerview_events);
+
 
         return rootView;
 
@@ -114,21 +126,20 @@ public class SavedEventsFrag extends Fragment implements ClickListener {
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-            TextView tv = (TextView) getActivity().findViewById(R.id.toolbar_title);
-            tv.setText("Attending");
+        TextView tv = (TextView) getActivity().findViewById(R.id.toolbar_title);
+        tv.setText("Attending");
+        mAdapter.setEventData(data);
+        mRecyclerView.setAdapter(mAdapter);
+        LinearLayoutManager layoutManager
+                = new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false);
 
-            mAdapter = new EventAdapter(getActivity().getApplicationContext(), 1, "saved");
-            LinearLayoutManager mLinearLayoutManager = new LinearLayoutManager(getActivity().getApplicationContext());
-            mRecyclerView.setAdapter(mAdapter);
-            LinearLayoutManager layoutManager
-                    = new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false);
+        mRecyclerView.setLayoutManager(layoutManager);
+        //mRecyclerView.setItemAnimator(new AlphaInAnimator());
 
-            mRecyclerView.setLayoutManager(layoutManager);
-            mRecyclerView.setHasFixedSize(false);
-            mRecyclerView.setItemViewCacheSize(10);
-            mRecyclerView.setDrawingCacheEnabled(true);
-            mRecyclerView.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_LOW);
-            mRecyclerView.setItemAnimator(new DefaultItemAnimator());
+        //mRecyclerView.setHasFixedSize(false);
+        //mRecyclerView.setItemViewCacheSize(10);
+        //mRecyclerView.setDrawingCacheEnabled(true);
+        //mRecyclerView.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_LOW);
 
     }
 
@@ -141,15 +152,14 @@ public class SavedEventsFrag extends Fragment implements ClickListener {
     @Override
     public void onResume() {  // After a pause OR at startup
         super.onResume();
-        try {
-            data = new QueryEventList(getString(R.string.DATABASE_SAVED_EVENTS_PULLER)).execute(currentUserId).get();
-            mAdapter.setEventData(data);
-
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (ExecutionException e) {
-            e.printStackTrace();
-        }
+        //try {
+            //data = new QueryEventList(getString(R.string.DATABASE_SAVED_EVENTS_PULLER)).execute(currentUserId).get();
+            mAdapter.notifyDataSetChanged();
+        //}
+        /*catch (InterruptedException e) {
+            e.printStackTrace();}
+        catch (ExecutionException e) {
+            e.printStackTrace(); }*/
     }
 
 

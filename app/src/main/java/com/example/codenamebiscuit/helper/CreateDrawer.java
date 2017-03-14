@@ -8,56 +8,49 @@ import android.graphics.drawable.Drawable;
 import android.location.Address;
 import android.location.Geocoder;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.RequiresApi;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v4.view.GravityCompat;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
-import android.view.ViewGroup;
+import android.widget.CompoundButton;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
-import com.asha.nightowllib.NightOwl;
-import com.example.codenamebiscuit.MainActivity;
+import com.example.codenamebiscuit.EmbeddedFragment;
 import com.example.codenamebiscuit.R;
 import com.example.codenamebiscuit.eventfragments.DeletedEventsFrag;
 import com.example.codenamebiscuit.eventfragments.GridMainEventsFrag;
-import com.example.codenamebiscuit.eventfragments.MainEventsFrag;
 import com.example.codenamebiscuit.eventfragments.SavedEventsFrag;
 import com.example.codenamebiscuit.eventfragments.SwipeEvents;
 import com.example.codenamebiscuit.settings.UserSettingsActivity;
 import com.google.android.gms.maps.model.LatLng;
-import com.mikepenz.crossfadedrawerlayout.view.CrossfadeDrawerLayout;
 import com.mikepenz.fontawesome_typeface_library.FontAwesome;
 import com.mikepenz.google_material_typeface_library.GoogleMaterial;
-import com.mikepenz.itemanimators.AlphaCrossFadeAnimator;
 import com.mikepenz.materialdrawer.AccountHeader;
 import com.mikepenz.materialdrawer.AccountHeaderBuilder;
 import com.mikepenz.materialdrawer.Drawer;
 import com.mikepenz.materialdrawer.DrawerBuilder;
 import com.mikepenz.materialdrawer.MiniDrawer;
-import com.mikepenz.materialdrawer.interfaces.ICrossfader;
+import com.mikepenz.materialdrawer.interfaces.OnCheckedChangeListener;
 import com.mikepenz.materialdrawer.model.DividerDrawerItem;
 import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
 import com.mikepenz.materialdrawer.model.ProfileDrawerItem;
-import com.mikepenz.materialdrawer.model.SecondaryDrawerItem;
+import com.mikepenz.materialdrawer.model.SwitchDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IProfile;
 import com.mikepenz.materialdrawer.model.interfaces.Nameable;
 import com.mikepenz.materialdrawer.util.AbstractDrawerImageLoader;
 import com.mikepenz.materialdrawer.util.DrawerImageLoader;
-import com.mikepenz.materialdrawer.util.DrawerUIUtils;
-import com.mikepenz.materialize.util.UIUtils;
+import com.mikepenz.materialize.Materialize;
 import com.muddzdev.styleabletoastlibrary.StyleableToast;
 import com.squareup.picasso.Picasso;
 
-import android.support.v4.app.FragmentManager;
-
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
@@ -73,10 +66,12 @@ public class CreateDrawer {
     private Context context;
     private Activity activity;
     Drawer result=null;
+    private Drawer resultAppended = null;
     AccountHeader headerResult=null;
     private FragmentManager fragmentManager;
-    private CrossfadeDrawerLayout crossfadeDrawerLayout = null;
-
+    private MiniDrawer miniResult = null;
+    private int livinPink, overlay;
+    private int livinBlack, livinWhite;
     GPSTracker gps;
     LatLng latLng;
 
@@ -88,6 +83,12 @@ public class CreateDrawer {
         this.context=context;
         this.activity=activity;
         this.fragmentManager=fragmentManager;
+        livinPink=context.getColor(R.color.livinPink);
+        overlay=context.getColor(R.color.black_overlay);
+        livinBlack=context.getColor(R.color.livinBlack);
+        livinWhite=context.getColor(R.color.livinWhite);
+
+
 
     }
 
@@ -101,7 +102,6 @@ public class CreateDrawer {
         });
 
         IProfile profile = new ProfileDrawerItem().withName(fName + " " + lName).withIcon(Uri.parse(pic)).withEmail(email).withIdentifier(100);
-
         headerResult = new AccountHeaderBuilder()
                 .withActivity(activity)
                 .withHeaderBackground(R.drawable.header)
@@ -113,83 +113,139 @@ public class CreateDrawer {
         result = new DrawerBuilder()
                 .withActivity(activity)
                 .withToolbar(toolbar)
-                //.withDrawerLayout(R.layout.crossfade_drawer)
-                //.withDrawerWidthDp(70)
+                .withSliderBackgroundColor(context.getColor(R.color.black_overlay))
+                .withDelayDrawerClickEvent(40)
+                //.withDelayOnDrawerClose(300)
                 .withAccountHeader(headerResult)
                 .addDrawerItems(
-                        new PrimaryDrawerItem().withName("Grid Events").withIcon(GoogleMaterial.Icon.gmd_home).withIdentifier(1).withSelectable(true),
+                        new PrimaryDrawerItem()
+                                .withName("Grid Events").withIcon(GoogleMaterial.Icon.gmd_home)
+                                .withIdentifier(1)
+                                .withTextColor(livinWhite)
+                                .withIconColor(livinWhite)
+                                .withSelectedTextColor(livinPink)
+                                .withSelectedIconColor(livinPink)
+                                .withSelectedColor(context.getColor(R.color.translivinPink)) .withSetSelected(true),
                         new DividerDrawerItem(),
-                        new PrimaryDrawerItem().withName("Full Screen").withIcon(GoogleMaterial.Icon.gmd_fullscreen).withIdentifier(2).withSelectable(true),
+                        new PrimaryDrawerItem()
+                                .withName("Full Screen").withIcon(GoogleMaterial.Icon.gmd_fullscreen).withIdentifier(2)
+                                .withTextColor(livinWhite)
+                                .withIconColor(livinWhite)
+                                .withSelectedTextColor(livinPink)
+                                .withSelectedIconColor(livinPink)
+                                .withSelectedColor(livinBlack) .withSetSelected(true),
                         new DividerDrawerItem(),
-                        new PrimaryDrawerItem().withName("Saved Events").withIcon(GoogleMaterial.Icon.gmd_save).withIdentifier(3).withSelectable(true),
+
+                        new PrimaryDrawerItem()
+                                .withName("Saved Events").withIcon(GoogleMaterial.Icon.gmd_save).withIdentifier(3)
+                                .withTextColor(livinWhite)
+                                .withIconColor(livinWhite)
+                                .withSelectedTextColor(livinPink)
+                                .withSelectedIconColor(livinPink)
+                                .withSelectedColor(livinBlack) .withSetSelected(true),
                         new DividerDrawerItem(),
-                        new PrimaryDrawerItem().withName("Deleted Events").withIcon(GoogleMaterial.Icon.gmd_delete).withIdentifier(4).withSelectable(true),
+                        new PrimaryDrawerItem()
+                                .withName("Deleted Events").withIcon(GoogleMaterial.Icon.gmd_delete).withIdentifier(4)
+                                .withTextColor(livinWhite)
+                                .withIconColor(livinWhite)
+                                .withSelectedTextColor(livinPink)
+                                .withSelectedIconColor(livinPink)
+                                .withSelectedColor(livinBlack) .withSetSelected(true),
                         new DividerDrawerItem(),
-                        new PrimaryDrawerItem().withName("Preferences").withIcon(GoogleMaterial.Icon.gmd_settings).withIdentifier(5).withSelectable(false),
+                        new PrimaryDrawerItem()
+                                .withName("Preferences").withIcon(GoogleMaterial.Icon.gmd_settings).withIdentifier(5)
+                                .withTextColor(livinWhite)
+                                .withIconColor(livinWhite)
+                                .withSelectedTextColor(livinPink)
+                                .withSelectedIconColor(livinPink)
+                                .withSelectable(false),
+
                         new DividerDrawerItem(),
-                        new PrimaryDrawerItem().withName("Current coordinates").withIcon(GoogleMaterial.Icon.gmd_gps).withIdentifier(7).withSelectable(false)
+                        new PrimaryDrawerItem()
+                                .withName("Current coordinates").withIcon(GoogleMaterial.Icon.gmd_gps).withIdentifier(7)
+                                .withTextColor(livinWhite)
+                                .withIconColor(livinWhite)
+                                .withSelectedTextColor(livinPink)
+                                .withSelectedIconColor(livinPink)
+                                .withSelectable(false),
+                        new DividerDrawerItem(),
+                        new SwitchDrawerItem().withName("Day/Night").withIcon(FontAwesome.Icon.faw_sun_o).withIdentifier(8)
+                                .withChecked(true).withOnCheckedChangeListener(onCheckedChangeListener)
+                                .withTextColor(livinWhite)
+                                .withIconColor(livinWhite)
+                                .withSelectedTextColor(livinPink)
+                                .withSelectedIconColor(livinPink)
+                                .withSelectedColor(livinBlack) .withSetSelected(true)
+
                 )
                 .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
                     @Override
                     public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
                         // do something with the clicked item :D
+
                         Fragment fragment = null;
                         if (drawerItem != null) {
                             Intent intent = null;
 
-                            if (drawerItem.getIdentifier()==1) {
+                            if (drawerItem.getIdentifier()==1)
                                 fragment = new GridMainEventsFrag().newInstance();
-                            } else if (drawerItem.getIdentifier()==2) {
+                            else if (drawerItem.getIdentifier()==2)
                                 fragment = new SwipeEvents().newInstance();
-                            } else if (drawerItem.getIdentifier()==3) {
+                            else if (drawerItem.getIdentifier()==3)
                                 fragment = new SavedEventsFrag().newInstance();
-                            } else if (drawerItem.getIdentifier()==4) {
+                            else if (drawerItem.getIdentifier()==4)
                                 fragment = new DeletedEventsFrag().newInstance();
-                            } else if (drawerItem.getIdentifier()==5) {
+                            else if (drawerItem.getIdentifier()==5)
                                 intent = new Intent(activity, UserSettingsActivity.class);
-                            } else if (drawerItem.getIdentifier()==6) {
+                            else if (drawerItem.getIdentifier()==6) {}
                                 //fragment = new GridMainEventsFrag();
-                            }else if(drawerItem.getIdentifier()==7){
+                            else if(drawerItem.getIdentifier()==7)
                                 getLocation();
-                            }
+                            //result.closeDrawer();
+
                             if (intent != null) {
                                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                                 context.startActivity(intent); }
                             if(fragment!=null){
                                 FragmentTransaction ft = fragmentManager.beginTransaction();
-                                ft.setCustomAnimations(R.anim.enter, R.anim.exit, R.anim.pop_enter, R.anim.pop_exit);
+                                ft.setCustomAnimations(R.anim.enter, R.anim.exit);
                                 ft.replace(R.id.fragment_container, fragment);
+
+                                //if (fragmentManager.getBackStackEntryCount() > 0) {
+                                 //  fragmentManager.popBackStackImmediate(); }
                                 ft.addToBackStack(null);
                                 ft.commit();
                                 fragmentManager.executePendingTransactions();
-                                result.closeDrawer();
-                                return true;
+
+                                return false;
                             } }
-                        return true; }
+                        return false; }
                 })
-                .withGenerateMiniDrawer(true)
                 .withSavedInstance(savedState)
                 .withShowDrawerOnFirstLaunch(true)
                 .build();
 
-        //get the CrossfadeDrawerLayout which will be used as alternative DrawerLayout for the Drawer
-        //the CrossfadeDrawerLayout library can be found here: https://github.com/mikepenz/CrossfadeDrawerLayout
-        //crossfadeDrawerLayout = (CrossfadeDrawerLayout) result.getDrawerLayout();
-
-        //define maxDrawerWidth
-        //crossfadeDrawerLayout.setMaxWidthPx(DrawerUIUtils.getOptimalDrawerWidth(context.getApplicationContext()));
-        //add second view (which is the miniDrawer)
-        //final MiniDrawer miniResult = result.getMiniDrawer();
-        //build the view for the MiniDrawer
-        //View view = miniResult.build(context);
-        //set the background of the MiniDrawer as this would be transparent
-        //view.setBackgroundColor(UIUtils.getThemeColorFromAttrOrRes(context, com.mikepenz.materialdrawer.R.attr.material_drawer_background,
-                //com.mikepenz.materialdrawer.R.color.material_drawer_dark_primary_icon));
-        //we do not have the MiniDrawer view during CrossfadeDrawerLayout creation so we will add it here
-        //crossfadeDrawerLayout.getSmallView().addView(view, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
-        //define the crossfader to be used with the miniDrawer. This is required to be able to automatically toggle open / close
 
     }
+
+    private OnCheckedChangeListener onCheckedChangeListener = new OnCheckedChangeListener() {
+        @Override
+        public void onCheckedChanged(IDrawerItem drawerItem, CompoundButton buttonView, boolean isChecked) {
+            View v = result.getSlider();
+            List<IDrawerItem> primaryDrawerItem = result.getDrawerItems();
+            TextView title = (TextView)activity.findViewById(R.id.toolbar_title);
+            if (drawerItem.getIdentifier()==8) {
+                if(isChecked) {
+                    Log.i("material-drawer", "DrawerItem: " + ((Nameable) drawerItem).getName() + " - toggleChecked: " + isChecked);
+                    toolbar.setBackgroundColor(context.getColor(R.color.livinBlack));
+                    v.setBackgroundColor(context.getColor(R.color.livinBlack));
+                    title.setTextColor(livinPink);
+
+                }else {
+                    toolbar.setBackgroundColor(context.getColor(R.color.livinPink));
+                    v.setBackgroundColor(context.getColor(R.color.material_drawer_background));
+                    title.setTextColor(context.getColor(R.color.livinBlack)); } } } };
+
     /**********************************************************************************************
      * Obtains the users current location via GPS location services
      * Location is converted into Lat and Lng coordinates
