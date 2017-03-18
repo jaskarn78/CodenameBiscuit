@@ -69,6 +69,13 @@
         android:layout_margin="3dp"
         android:id="@+id/card_relative_layout"
         >
+        <ImageView
+            android:id="@+id/row_menu"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_alignParentEnd="true"
+            android:layout_margin="5dp"
+            android:src="@drawable/ic_action_more_vert" />
 
         <ImageView
             android:layout_width="95dp"
@@ -180,15 +187,11 @@
                 <ScrollView android:id="@+id/swipeView"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:layout_below="@id/footer"
                     android:orientation="vertical">
                 <WebView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:id="@+id/webView"
-                    android:layout_alignParentTop="true"
-                    android:layout_alignParentLeft="true"
-                    android:layout_alignParentStart="true"
                     android:visibility="gone"
                     >
                 </WebView>

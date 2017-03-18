@@ -58,6 +58,7 @@ public class SavedEventsFrag extends Fragment implements ClickListener {
     private SwipeRefreshLayout swipeContainer;
     private JSONObject restoreEvent;
     private ArrayList<JSONObject> data;
+    private double currentLat, currentLng;
     GetSavedDataInterface sGetDataInterface;
 
     public interface GetSavedDataInterface {
@@ -85,13 +86,12 @@ public class SavedEventsFrag extends Fragment implements ClickListener {
             currentUserId.put("user_id", user_id);
         } catch (JSONException e) {
             e.printStackTrace(); }
+
         eventData = new ArrayList<JSONObject>();
-        mAdapter = new EventAdapter(getActivity().getApplicationContext(), 1, "saved");
+        mAdapter = new EventAdapter(getActivity().getApplicationContext(), 1, "saved", getFragmentManager(), getActivity());
         try {
             data = new QueryEventList(getString(R.string.DATABASE_SAVED_EVENTS_PULLER)).execute(currentUserId).get();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (ExecutionException e) {
+        } catch (InterruptedException | ExecutionException e) {
             e.printStackTrace();
         }
 
@@ -110,7 +110,6 @@ public class SavedEventsFrag extends Fragment implements ClickListener {
         swipeContainer = (SwipeRefreshLayout) rootView.findViewById(R.id.swipeContainer);
         setupSwipeDownRefresh();
         mRecyclerView = (RecyclerView) rootView.findViewById(R.id.recyclerview_events);
-
 
         return rootView;
 

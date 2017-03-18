@@ -105,7 +105,7 @@ public class MainEventsFrag extends Fragment implements ClickListener {
         setupSwipeDownRefresh();
 
         mRecyclerView = (RecyclerView)rootView.findViewById(R.id.recyclerview_events);
-        mAdapter = new EventAdapter(getContext().getApplicationContext(), 1, "");
+        mAdapter = new EventAdapter(getContext().getApplicationContext(), 1, "", getFragmentManager(), getActivity());
 
         mLinearLayoutManager = new LinearLayoutManager(getContext());
         StaggeredGridLayoutManager staggeredGridLayoutManager = new StaggeredGridLayoutManager(3, 1);

@@ -1,5 +1,6 @@
 package com.example.codenamebiscuit.rv;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 
@@ -11,14 +12,20 @@ import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.net.Uri;
 
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.provider.CalendarContract;
 
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.CardView;
+import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 
+import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
@@ -37,14 +44,18 @@ import com.daimajia.androidanimations.library.YoYo;
 import com.daimajia.swipe.SimpleSwipeListener;
 import com.daimajia.swipe.SwipeLayout;
 import com.example.codenamebiscuit.R;
+import com.example.codenamebiscuit.eventfragments.DisplayEvent;
 import com.example.codenamebiscuit.helper.FlipAnimation;
 import com.example.codenamebiscuit.helper.GPSTracker;
 import com.example.codenamebiscuit.helper.UpdateDbOnSwipe;
+import com.mikepenz.iconics.view.IconicsImageView;
 import com.muddzdev.styleabletoastlibrary.StyleableToast;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
+
+import net.colindodd.toggleimagebutton.ToggleImageButton;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -59,16 +70,24 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
     private Typeface typeface;
     private String message;
     private int type;
+    private FragmentManager fragmentManager;
     private int lastPosition = -1;
+    private ImageView rowMenu;
+    private Activity activity;
+    private Bundle eventBundle;
+    private String currentLat, currentLng;
 
 
-
-    public EventAdapter(Context context, int type, String message) {
+    public EventAdapter(Context context, int type, String message,
+                        FragmentManager fragmentManager, Activity activity) {
         this.context = context;
         mEventData = new ArrayList<>();
         typeface = Typeface.createFromAsset(context.getAssets(), "fonts/Raleway-Black.ttf");
         this.message=message;
         this.type=type;
+        this.fragmentManager=fragmentManager;
+        this.activity=activity;
+        eventBundle = new Bundle();
     }
 
 
@@ -106,6 +125,8 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
         public final TextView mEventHoster, mEventDistanceBack;
         public final TextView mEventDistance;
         public final CardView cardView;
+        public IconicsImageView infoIcon;
+        public TextView moreInfo;
         public final RelativeLayout layout;
         public final WebView mWebView;
         SwipeLayout mSwipeLayout;
@@ -114,6 +135,12 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
 
         public EventAdapterViewHolder(View view) {
             super(view);
+
+            rowMenu = (ImageView)view.findViewById(R.id.row_menu);
+
+            moreInfo = (TextView) view.findViewById(R.id.more_info);
+
+            infoIcon = (IconicsImageView)view.findViewById(R.id.info_icon);
 
             mEventDistance = (TextView)view.findViewById(R.id.event_distance);
             mEventDistanceBack = (TextView)view.findViewById(R.id.event_distance_back);
@@ -212,11 +239,58 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
         eventAdapterViewHolder.mEventLocationTV.setText(eventLocation);
         eventAdapterViewHolder.mEventName.setText(event);
 
-        final String finalEvent = event;          final String finalEventInfo = eventInfo;
-        final String finalEventInfo1 = eventInfo; final String finalEventLocation = eventLocation;
+        final String finalEvent = event;
+        final String finalEventInfo1 = eventInfo;
+        final String finalEventLocation = eventLocation;
+        final String finalEvent1 = event; final String finalEventPath = eventPath;
+        final String finalStartDate = startDate; final String finalStartTime = startTime;
+        final String finalEventLocation1 = eventLocation; final String finalEventPref = eventPref;
+        final String finalEventInfo = eventInfo; final String finalEventHoster = eventHoster;
+        final Double finalLat = lat; final Double finalLng = lng;
+        final String finalCost = cost; final String finalEventid = eventid;
 
         if(type==1) {
             setAnimation(eventAdapterViewHolder.itemView, position);
+            final Double finalLat1 = lat;
+            final Double finalLng1 = lng;
+            rowMenu.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    PopupMenu popupMenu = new PopupMenu(activity, v);
+                    popupMenu.getMenuInflater().inflate(R.menu.list_menu, popupMenu.getMenu());
+                    popupMenu.show();
+                    popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                        @Override
+                        public boolean onMenuItemClick(MenuItem item) {
+                            switch (item.getItemId()){
+                                case R.id.info:
+                                    DisplayEvent displayEvent = DisplayEvent.newInstance();
+                                    Bundle bundle = new Bundle();
+                                    bundle.putString("eventName", finalEvent1);
+                                    bundle.putString("eventImage", finalEventPath);
+                                    bundle.putString("eventDate", finalStartDate);
+                                    bundle.putString("eventTime", finalStartTime);
+                                    bundle.putString("eventLocation", finalEventLocation1);
+                                    bundle.putString("eventPreference", finalEventPref);
+                                    bundle.putString("eventDescription", finalEventInfo);
+                                    bundle.putString("eventHoster", finalEventHoster);
+                                    bundle.putString("eventDistance", getLocation(finalLat, finalLng)+" mi");
+                                    bundle.putString("eventCost", finalCost);
+                                    bundle.putString("eventId", finalEventid);
+                                    bundle.putDouble("eventLat", finalLat1);
+                                    bundle.putDouble("eventLng", finalLng1);
+                                    displayEvent.setArguments(bundle);
+
+                                    FragmentTransaction ft = fragmentManager.beginTransaction();
+                                    ft.replace(R.id.fragment_container, displayEvent);
+                                    ft.addToBackStack(null);
+                                    ft.commit();
+                                    break;
+                            }
+                            return true; }
+                    });
+                }
+            });
             /********************************************************************************
              * assigns distance from current location to event location
              *******************************************************************************/
@@ -226,14 +300,8 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
              * Loads event image from url obtained from database and assigns
              * the loaded image to the event imageview in the layout
              ******************************************************************************/
-            /*Picasso.with(context.getApplicationContext())
-                    .load(getImageURL(eventPath))
-                    //.resize(90, 90)
-                    .error(R.drawable.cast_album_art_placeholder)
-                    .placeholder(R.drawable.progress)
-                    .into(eventAdapterViewHolder.mEventImage);*/
-            loadImage(eventAdapterViewHolder.mEventImage, getImageURL(eventPath));
 
+            loadImage(eventAdapterViewHolder.mEventImage, getImageURL(eventPath));
             eventAdapterViewHolder.mEventInfo.setText("Additional Event Information");
 
             /********************************************************************************
@@ -368,7 +436,42 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
             eventAdapterViewHolder.mEventDistanceBack.setText("Distance: "+getLocation(lat, lng)+" miles");
 
 
-            //loadImage(eventAdapterViewHolder.mEventImage, getImageURL(eventPath));
+            /****************************************************************************
+             *Sets up Bundle object to pass to DisplayEvent fragment
+             * DisplayEvent fragment displays all event information
+             ***************************************************************************/
+            final Double finalLat2 = lat;
+            final Double finalLng2 = lng;
+            eventAdapterViewHolder.moreInfo.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Toast.makeText(context, "info icon clicked at position "+finalEvent, Toast.LENGTH_SHORT).show();
+                    DisplayEvent displayEvent = DisplayEvent.newInstance();
+                    Bundle bundle = new Bundle();
+                    bundle.putString("eventName", finalEvent1);
+                    bundle.putString("eventImage", finalEventPath);
+                    bundle.putString("eventDate", finalStartDate);
+                    bundle.putString("eventTime", finalStartTime);
+                    bundle.putString("eventLocation", finalEventLocation1);
+                    bundle.putString("eventPreference", finalEventPref);
+                    bundle.putString("eventDescription", finalEventInfo);
+                    bundle.putString("eventHoster", finalEventHoster);
+                    bundle.putString("eventDistance", getLocation(finalLat, finalLng)+" mi");
+                    bundle.putString("eventCost", finalCost);
+                    bundle.putString("eventId", finalEventid);
+                    bundle.putDouble("eventLat", finalLat2);
+                    bundle.putDouble("eventLng", finalLng2);
+                    Log.i("adapter coords", finalLat+", "+finalLng);
+                    displayEvent.setArguments(bundle);
+
+                    FragmentTransaction ft = fragmentManager.beginTransaction();
+                    ft.replace(R.id.fragment_container, displayEvent);
+                    ft.addToBackStack(null);
+                    ft.commit();
+                }
+            });
+
+
             Picasso.with(context.getApplicationContext())
                     .load(getImageURL(eventPath))
                     .error( R.drawable.cast_album_art_placeholder)
@@ -404,17 +507,12 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
         return (int)Math.round(distance*0.000621371192); }
 
 
-    private void shareIntent(final Uri eventPath) throws IOException {
-        if (eventPath != null) {
-            // Construct a ShareIntent with link to image
-            Intent shareIntent = new Intent();
-            shareIntent.setAction(Intent.ACTION_SEND);
-            shareIntent.putExtra(Intent.EXTRA_STREAM, eventPath);
-            shareIntent.setType("image/*");
-            // Launch sharing dialog for image
-            shareIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            context.startActivity(shareIntent);
-        }}
+    private void setupEventBundle(Bundle bundle){
+        eventBundle=bundle;
+    }
+    private Bundle getEventBundle(){
+        return eventBundle;
+    }
 
     /*****************************************************************************************
      * This method simply returns the number of items to display. It is used behind the scenes
@@ -457,9 +555,7 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
                                 .placeholder(R.drawable.progress)
                                 .error(R.drawable.cast_album_art_placeholder)
                                 .into(imageView); }
-            }, 300);
-            }
-        }).start();
+            }, 300);}}).start();
     }
 
 

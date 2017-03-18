@@ -80,7 +80,7 @@ public class DeletedEventsFrag extends Fragment implements ClickListener{
         catch (JSONException e) {
             e.printStackTrace(); }
         eventData = new ArrayList<JSONObject>();
-        mAdapter = new EventAdapter(getActivity().getApplicationContext(), 1, "deleted");
+        mAdapter = new EventAdapter(getActivity().getApplicationContext(), 1, "deleted", getFragmentManager(), getActivity());
         try {
             data = new QueryEventList(getString(R.string.DATABASE_DELETED_EVENTS_PULLER)).execute(currentUserId).get();
         } catch (InterruptedException e) {

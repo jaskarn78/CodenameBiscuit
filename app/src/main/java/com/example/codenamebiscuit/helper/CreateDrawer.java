@@ -72,23 +72,27 @@ public class CreateDrawer {
     private MiniDrawer miniResult = null;
     private int livinPink, overlay;
     private int livinBlack, livinWhite;
+    private String currentLat, currentLng;
     GPSTracker gps;
     LatLng latLng;
 
     public CreateDrawer(String fName, String lName, String pic, String email, Bundle savedState,
-                        Toolbar toolbar, Context context, Activity activity, FragmentManager fragmentManager) {
+                        Toolbar toolbar, Context context, Activity activity,
+                        FragmentManager fragmentManager, String currentLat, String currentLng) {
+
         this.fName=fName; this.lName=lName;
         this.pic=pic; this.email=email;
         this.savedState=savedState; this.toolbar=toolbar;
         this.context=context;
         this.activity=activity;
         this.fragmentManager=fragmentManager;
+        this.currentLat=currentLat;
+        this.currentLng=currentLng;
+
         livinPink=context.getColor(R.color.livinPink);
         overlay=context.getColor(R.color.black_overlay);
         livinBlack=context.getColor(R.color.livinBlack);
         livinWhite=context.getColor(R.color.livinWhite);
-
-
 
     }
 
@@ -133,7 +137,7 @@ public class CreateDrawer {
                                 .withIconColor(livinWhite)
                                 .withSelectedTextColor(livinPink)
                                 .withSelectedIconColor(livinPink)
-                                .withSelectedColor(livinBlack) .withSetSelected(true),
+                                .withSelectedColor(context.getColor(R.color.translivinPink)) .withSetSelected(true),
                         new DividerDrawerItem(),
 
                         new PrimaryDrawerItem()
@@ -142,7 +146,7 @@ public class CreateDrawer {
                                 .withIconColor(livinWhite)
                                 .withSelectedTextColor(livinPink)
                                 .withSelectedIconColor(livinPink)
-                                .withSelectedColor(livinBlack) .withSetSelected(true),
+                                .withSelectedColor(context.getColor(R.color.translivinPink)) .withSetSelected(true),
                         new DividerDrawerItem(),
                         new PrimaryDrawerItem()
                                 .withName("Deleted Events").withIcon(GoogleMaterial.Icon.gmd_delete).withIdentifier(4)
@@ -150,7 +154,7 @@ public class CreateDrawer {
                                 .withIconColor(livinWhite)
                                 .withSelectedTextColor(livinPink)
                                 .withSelectedIconColor(livinPink)
-                                .withSelectedColor(livinBlack) .withSetSelected(true),
+                                .withSelectedColor(context.getColor(R.color.translivinPink)) .withSetSelected(true),
                         new DividerDrawerItem(),
                         new PrimaryDrawerItem()
                                 .withName("Preferences").withIcon(GoogleMaterial.Icon.gmd_settings).withIdentifier(5)
@@ -207,12 +211,13 @@ public class CreateDrawer {
                                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                                 context.startActivity(intent); }
                             if(fragment!=null){
+                                Bundle bundle = new Bundle();
+                                bundle.putString("currentLat", currentLat);
+                                bundle.putString("currentLng", currentLng);
+                                fragment.setArguments(bundle);
                                 FragmentTransaction ft = fragmentManager.beginTransaction();
                                 ft.setCustomAnimations(R.anim.enter, R.anim.exit);
                                 ft.replace(R.id.fragment_container, fragment);
-
-                                //if (fragmentManager.getBackStackEntryCount() > 0) {
-                                 //  fragmentManager.popBackStackImmediate(); }
                                 ft.addToBackStack(null);
                                 ft.commit();
                                 fragmentManager.executePendingTransactions();

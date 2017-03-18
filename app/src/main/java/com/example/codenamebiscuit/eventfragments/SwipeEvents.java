@@ -4,6 +4,8 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.preference.PreferenceManager;
 import android.support.v7.widget.CardView;
 import android.util.Log;
@@ -16,11 +18,21 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.example.codenamebiscuit.R;
 import com.example.codenamebiscuit.helper.FlipAnimation;
 import com.example.codenamebiscuit.helper.QueryEventList;
 import com.example.codenamebiscuit.helper.UpdateDbOnSwipe;
 import com.example.codenamebiscuit.swipedeck.SwipeDeck;
+import com.google.android.gms.maps.CameraUpdate;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapView;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.muddzdev.styleabletoastlibrary.StyleableToast;
 import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
@@ -41,11 +53,14 @@ public class SwipeEvents extends android.support.v4.app.Fragment{
     private String event_preference;
     private String event_name;
     private String event_description;
+    private String lat, lng;
     private SharedPreferences pref;
     private JSONObject user;
     private ArrayList<JSONObject> data;
     private int lastPosition = -1;
-
+    private FloatingActionButton floatingActionButton;
+    MapView mapView;
+    private GoogleMap googleMap;
     GetMainSwipeDataInterface sGetDataInterface;
 
     public interface GetMainSwipeDataInterface {
@@ -97,7 +112,7 @@ public class SwipeEvents extends android.support.v4.app.Fragment{
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        setupOnCreate();
+        setupOnCreate(savedInstanceState);
     }
 
     /**
@@ -115,6 +130,7 @@ public class SwipeEvents extends android.support.v4.app.Fragment{
         } catch (ExecutionException e) {
             e.printStackTrace();
         }
+
     }
     @Override
     public void onStart(){
@@ -126,11 +142,11 @@ public class SwipeEvents extends android.support.v4.app.Fragment{
      * method initalizes the card stack view and loads event information from intent
      * event information is added into custom swipe deck adapter
      */
-    private void setupOnCreate() {
+    private void setupOnCreate(Bundle savedInstanceState) {
         saveEvent = new JSONObject();
         deleteEvent=new JSONObject();
 
-        adapter = new SwipeDeckAdapter(data, getActivity().getApplicationContext());
+        adapter = new SwipeDeckAdapter(data, getActivity().getApplicationContext(), savedInstanceState);
         cardStack.setAdapter(adapter);
 
         cardStack.setCallback(new SwipeDeck.SwipeDeckCallback() {
@@ -187,6 +203,29 @@ public class SwipeEvents extends android.support.v4.app.Fragment{
     }
 
 
+    @Override
+    public void onStop() {
+        super.onStop();
+        ((AppCompatActivity)getActivity()).getSupportActionBar().show();
+    }
+    @Override
+    public void onPause() {
+        super.onPause();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+    }
+
+    @Override
+    public void onLowMemory() {
+        super.onLowMemory();
+    }
+
+
+
+
     /**
      * Assigns values to views within the cards
      * Handles flip animation to reveal additional event information
@@ -196,10 +235,12 @@ public class SwipeEvents extends android.support.v4.app.Fragment{
 
         private List<JSONObject> data;
         private Context context;
+        private Bundle savedInstanceState;
 
-        public SwipeDeckAdapter(List<JSONObject> data, Context context) {
+        public SwipeDeckAdapter(List<JSONObject> data, Context context, Bundle savedInstanceState) {
             this.data = data;
             this.context = context;
+            this.savedInstanceState=savedInstanceState;
         }
         public void setData(List<JSONObject> eventData){
             data=eventData;
@@ -227,9 +268,8 @@ public class SwipeEvents extends android.support.v4.app.Fragment{
         public View getView(final int position, View convertView, final ViewGroup parent) {
             View v = convertView;
 
-            if (v == null) {
                 LayoutInflater inflater = getActivity().getLayoutInflater();
-                v = inflater.inflate(R.layout.cards, parent, false);}
+                v = inflater.inflate(R.layout.cards, parent, false);
             try {
                 image = getImageURL(data.get(position).getString("img_path"));
                 event_id = data.get(position).getString("event_id");
@@ -238,6 +278,8 @@ public class SwipeEvents extends android.support.v4.app.Fragment{
                 event_name = data.get(position).getString("event_name");
                 event_preference = data.get(position).getString("preference_name");
                 event_description = data.get(position).getString("event_description");
+                lat = data.get(position).getString("lat");
+                lng = data.get(position).getString("lng");
             } catch (JSONException e) {
                 e.printStackTrace();}
 
@@ -246,13 +288,20 @@ public class SwipeEvents extends android.support.v4.app.Fragment{
              * assign values to all views
              * event information retrieved from json array testData
              */
+            mapView = (MapView)v.findViewById(R.id.mapView);
+
+
             ImageView frontCardImage = (ImageView) v.findViewById(R.id.offer_image);
-            Picasso.with(context).load(image).into(frontCardImage);
+            Picasso.with(context).load(image).placeholder(R.drawable.progress).into(frontCardImage);
+            //Glide.with(SwipeEvents.this).load(image).diskCacheStrategy(DiskCacheStrategy.ALL)
+             //       .placeholder(R.drawable.progress).into(frontCardImage);
 
-            ImageView flippedCardImage = (ImageView) v.findViewById(R.id.back_image);
-            Picasso.with(context).load(image).into(flippedCardImage);
+            final ImageView flippedCardImage = (ImageView) v.findViewById(R.id.back_image);
+            Picasso.with(context).load(image).placeholder(R.drawable.progress).centerCrop().fit().into(flippedCardImage);
+            //Glide.with(SwipeEvents.this).load(image).centerCrop()
+            //        .placeholder(R.drawable.progress).into(flippedCardImage);
 
-            TextView event_location_tv = (TextView) v.findViewById(R.id.event_location_back);
+            TextView event_location_tv = (TextView) v.findViewById(R.id.display_event_location);
             event_location_tv.setText(event_location);
 
             TextView event_name_tv = (TextView) v.findViewById(R.id.event_name_back);
@@ -261,8 +310,20 @@ public class SwipeEvents extends android.support.v4.app.Fragment{
             TextView event_preference_tv = (TextView) v.findViewById(R.id.event_preference_back);
             event_preference_tv.setText(event_preference);
 
-            TextView event_info = (TextView)v.findViewById(R.id.additional_info);
+            TextView event_info = (TextView)v.findViewById(R.id.display_event_description);
             event_info.setText(event_description);
+
+            final CardView cv = (CardView) v.findViewById(R.id.card_view);
+            final CardView cvBack = (CardView) v.findViewById(R.id.card_view_back);
+            final View finalV = v;
+            flippedCardImage.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    FlipAnimation flipAnimation = new FlipAnimation(cv, cvBack);
+                    flipAnimation.reverse();
+                    finalV.startAnimation(flipAnimation);
+                }
+            });
 
             v.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -271,16 +332,23 @@ public class SwipeEvents extends android.support.v4.app.Fragment{
                     Log.i("Hardware Accel type:", Integer.toString(View.LAYER_TYPE_HARDWARE));
 
                     //Picasso.with(context).load(R.drawable.liv1).fit().centerCrop().into(imageView);
-                    final CardView cv = (CardView) v.findViewById(R.id.card_view);
-                    final CardView cvBack = (CardView) v.findViewById(R.id.card_view_back);
+
                     FlipAnimation flipAnimation = new FlipAnimation(cv, cvBack);
 
                     if (cv.getVisibility() == View.GONE) {
-                        flipAnimation.reverse();}
+                        flipAnimation.reverse();
+                    }
                     v.startAnimation(flipAnimation);
+
                 }
             });
             return v;
+        }
+        private double getLat(){
+            return Double.parseDouble(lat);
+        }
+        private double getLng(){
+            return Double.parseDouble(lng);
         }
     }
 }

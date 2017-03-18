@@ -89,7 +89,7 @@ public class GridMainEventsFrag extends Fragment implements ClickListener {
             e.printStackTrace();
         }
         eventData = new ArrayList<JSONObject>();
-        mAdapter = new EventAdapter(getContext().getApplicationContext(), 2, "");
+        mAdapter = new EventAdapter(getContext().getApplicationContext(), 2, "", getFragmentManager(), getActivity());
         try {
             data = new QueryEventList(getString(R.string.DATABASE_MAIN_EVENTS_PULLER)).execute(currentUserId).get();
         } catch (InterruptedException e) {
@@ -113,14 +113,6 @@ public class GridMainEventsFrag extends Fragment implements ClickListener {
         setupSwipeDownRefresh();
         mRecyclerView = (RecyclerView)rootView.findViewById(R.id.recyclerview_events);
 
-
-
-        //mRecyclerView.setItemAnimator(new DefaultItemAnimator());
-        //mRecyclerView.setHasFixedSize(false);
-        //mRecyclerView.setItemViewCacheSize(10);
-        //mRecyclerView.setDrawingCacheEnabled(true);
-        //mRecyclerView.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_LOW);
-        //alter toolbar title
         return rootView;
 
     }

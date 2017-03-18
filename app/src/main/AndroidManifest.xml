@@ -78,6 +78,10 @@
             android:screenOrientation="portrait" />
         <activity android:name=".login.ChooseLogin" />
 
+        <activity
+            android:name=".eventfragments.DisplayEvent"
+            android:screenOrientation="portrait" />
+
         <provider
             android:name="com.facebook.FacebookContentProvider"
             android:authorities="com.facebook.app.FacebookContentProvider173299886485207"

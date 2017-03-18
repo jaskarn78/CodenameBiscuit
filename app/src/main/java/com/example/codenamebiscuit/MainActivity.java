@@ -1,39 +1,25 @@
 package com.example.codenamebiscuit;
 
-import android.app.AlertDialog;
-import android.content.DialogInterface;
+
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.graphics.Typeface;
-import android.graphics.drawable.Drawable;
-import android.net.Uri;
-import android.nfc.Tag;
+import android.location.Location;
 import android.os.Bundle;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v4.widget.SlidingPaneLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.AppCompatDelegate;
 import android.support.v7.preference.PreferenceManager;
 import android.support.v7.widget.Toolbar;
-import android.text.Html;
-import android.text.method.LinkMovementMethod;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.Button;
-import android.widget.ImageButton;
-import android.widget.ListView;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.example.codenamebiscuit.eventfragments.DeletedEventsFrag;
 import com.example.codenamebiscuit.eventfragments.GridMainEventsFrag;
@@ -43,22 +29,19 @@ import com.example.codenamebiscuit.eventfragments.SwipeEvents;
 
 import com.example.codenamebiscuit.helper.ChangePreferences;
 import com.example.codenamebiscuit.helper.CreateDrawer;
+import com.example.codenamebiscuit.helper.GPSTracker;
 import com.example.codenamebiscuit.helper.QueryEventList;
 import com.example.codenamebiscuit.login.ChooseLogin;
 import com.facebook.FacebookSdk;
+import com.google.android.gms.maps.MapsInitializer;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
-import com.wunderlist.slidinglayer.LayerTransformer;
 import com.wunderlist.slidinglayer.SlidingLayer;
 import com.wunderlist.slidinglayer.transformer.AlphaTransformer;
-import com.wunderlist.slidinglayer.transformer.RotationTransformer;
-import com.wunderlist.slidinglayer.transformer.SlideJoyTransformer;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
@@ -83,6 +66,7 @@ public class MainActivity extends AppCompatActivity
     private JSONObject preferences = new JSONObject();
     private boolean isActive = false;
     List<JSONObject> prefList;
+    GPSTracker gps = new GPSTracker(this);
     static {
         AppCompatDelegate.setDefaultNightMode(
                 AppCompatDelegate.MODE_NIGHT_YES);
@@ -106,6 +90,7 @@ public class MainActivity extends AppCompatActivity
         setContentView(R.layout.launch_layout);
 
 
+        MapsInitializer.initialize(getApplicationContext());
 
         pref = PreferenceManager.getDefaultSharedPreferences(this);
 
@@ -172,6 +157,7 @@ public class MainActivity extends AppCompatActivity
         mSlidingLayer = (SlidingLayer) findViewById(R.id.slidingLayer1);
         swipeText = (TextView) findViewById(R.id.swipeText);
         mSlidingLayer.setLayerTransformer(new AlphaTransformer());
+        mSlidingLayer.setVisibility(View.INVISIBLE);
         musicFancyButton = (FancyButton)findViewById(R.id.btn_music);
         sportsButton = (FancyButton)findViewById(R.id.btn_sports);
         foodButton = (FancyButton)findViewById(R.id.btn_food);
@@ -207,7 +193,6 @@ public class MainActivity extends AppCompatActivity
         }
         for(int i=0; i<btnList.size(); i++){
             final int finalI = i;
-            //btnList.get(i).setSelected(false);
             btnList.get(i).setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -216,25 +201,24 @@ public class MainActivity extends AppCompatActivity
                         btnList.get(finalI).setSelected(true);
                         try {
                             preferences.put("pref_id"+(finalI+1), 1);
-                            Log.i("pref_id"+(finalI), preferences.getString("pref_id"+(finalI+1)));
+                           // Log.i("pref_id"+(finalI), preferences.getString("pref_id"+(finalI+1)));
 
                         } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
+                            e.printStackTrace(); }
                     }
                     else{
                         btnList.get(finalI).setBackgroundColor(getColor(R.color.translivinPink));
                         btnList.get(finalI).setSelected(false);
                         try {
                             preferences.put("pref_id"+(finalI+1), 0);
-                            Log.i("pref_id"+(finalI), preferences.getString("pref_id"+(finalI+1)));
+                            //Log.i("pref_id"+(finalI), preferences.getString("pref_id"+(finalI+1)));
 
                         } catch (JSONException e) {
                             e.printStackTrace();
-                        }
-                    }
+                        } }
                     new ChangePreferences().execute(preferences); } });
         }
+        mSlidingLayer.animate().alpha(1.0f);
 
     }
 
@@ -316,10 +300,9 @@ public class MainActivity extends AppCompatActivity
                 break;
             case R.id.action_toggle:
                if(mSlidingLayer.getVisibility()==View.VISIBLE)
-                   mSlidingLayer.setVisibility(View.GONE);
+                   mSlidingLayer.setVisibility(View.INVISIBLE);
                 else
                     mSlidingLayer.setVisibility(View.VISIBLE);
-
         }
         return super.onOptionsItemSelected(item);
     }
@@ -332,7 +315,6 @@ public class MainActivity extends AppCompatActivity
     @Override
     public boolean onLongClick(View v) {
         Log.i("view long clicked", v.getHeight()+"");
-
         return true;
     }
 
@@ -342,13 +324,26 @@ public class MainActivity extends AppCompatActivity
         final String lName = pref.getString("lName", null);
         final String email = pref.getString("email", null);
         FragmentManager manager = getSupportFragmentManager();
-        CreateDrawer createDrawer = new CreateDrawer(fName, lName, pic, email, savedState, toolbar, getApplicationContext(), this, manager);
+        CreateDrawer createDrawer = new CreateDrawer(fName, lName, pic, email, savedState, toolbar,
+                getApplicationContext(), this, manager, getLat(), getLng());
         createDrawer.loadDrawer();
 
-        EmbeddedFragment embeddedFragment = new EmbeddedFragment(getApplicationContext(), this, savedState);
-        embeddedFragment.setupSideDrawer();
+    }
 
+    private String getLat(){
+        double currentLat=0.0;
+        if(gps.canGetLocation()){
+            currentLat=gps.getLatitude();
+        }
+        return currentLat+"";
+    }
 
+    private String getLng(){
+        double currentLng=0.0;
+        if(gps.canGetLocation()){
+            currentLng=gps.getLongitude();
+        }
+        return currentLng+"";
     }
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {

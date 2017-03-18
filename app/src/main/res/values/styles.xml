@@ -72,6 +72,11 @@
         <item name="android:background">@drawable/button_red_selector</item>
     </style>
 
+    <style name="Rating" parent="Theme.AppCompat.DayNight">
+        <item name="colorControlNormal">@color/gray_overlay</item>
+        <item name="colorControlActivated">@color/livinPink</item>
+    </style>
+
 
 
 
