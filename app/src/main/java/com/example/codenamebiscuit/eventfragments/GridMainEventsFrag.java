@@ -13,12 +13,14 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.preference.PreferenceManager;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
@@ -26,12 +28,14 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.codenamebiscuit.R;
+import com.example.codenamebiscuit.helper.FlipAnimation;
 import com.example.codenamebiscuit.helper.QueryEventList;
 import com.example.codenamebiscuit.helper.UpdateDbOnSwipe;
 import com.example.codenamebiscuit.rv.ClickListener;
 import com.example.codenamebiscuit.rv.EventAdapter;
 import com.github.brnunes.swipeablerecyclerview.SwipeableRecyclerViewTouchListener;
 import com.muddzdev.styleabletoastlibrary.StyleableToast;
+import com.rohit.recycleritemclicksupport.RecyclerItemClickSupport;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -89,6 +93,7 @@ public class GridMainEventsFrag extends Fragment implements ClickListener {
             e.printStackTrace();
         }
         eventData = new ArrayList<JSONObject>();
+
         mAdapter = new EventAdapter(getContext().getApplicationContext(), 2, "", getFragmentManager(), getActivity());
         try {
             data = new QueryEventList(getString(R.string.DATABASE_MAIN_EVENTS_PULLER)).execute(currentUserId).get();
@@ -97,8 +102,6 @@ public class GridMainEventsFrag extends Fragment implements ClickListener {
         } catch (ExecutionException e) {
             e.printStackTrace();
         }
-
-        //Custom stylable toast*
         if (savedInstanceState == null) {}
 
     }
@@ -112,6 +115,10 @@ public class GridMainEventsFrag extends Fragment implements ClickListener {
         swipeContainer = (SwipeRefreshLayout) rootView.findViewById(R.id.swipeContainer);
         setupSwipeDownRefresh();
         mRecyclerView = (RecyclerView)rootView.findViewById(R.id.recyclerview_events);
+        mRecyclerView.setHasFixedSize(false);
+        mRecyclerView.setItemViewCacheSize(100);
+        mRecyclerView.setDrawingCacheEnabled(true);
+        mRecyclerView.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_HIGH);
 
         return rootView;
 
@@ -125,6 +132,11 @@ public class GridMainEventsFrag extends Fragment implements ClickListener {
                 = (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
         return activeNetworkInfo != null && activeNetworkInfo.isConnected();
+    }
+    @Override
+    public void onPrepareOptionsMenu(Menu menu) {
+        menu.findItem(R.id.flip_action).setVisible(false);
+
     }
 
 
@@ -141,6 +153,7 @@ public class GridMainEventsFrag extends Fragment implements ClickListener {
         mAdapter.setEventData(data);
         mRecyclerView.setAdapter(mAdapter);
 
+
         StaggeredGridLayoutManager staggeredGridLayoutManager = new StaggeredGridLayoutManager(2, 1);
         mRecyclerView.setLayoutManager(staggeredGridLayoutManager);
         TextView textView = (TextView)getActivity().findViewById(R.id.toolbar_title);
@@ -151,6 +164,18 @@ public class GridMainEventsFrag extends Fragment implements ClickListener {
         st.setTextColor(Color.WHITE);
         st.spinIcon();
         st.setMaxAlpha();
+        RecyclerItemClickSupport.addTo(mRecyclerView).setOnItemClickListener(
+                new RecyclerItemClickSupport.OnItemClickListener() {
+                    @Override
+                    public void onItemClicked(RecyclerView recyclerView, int position, View view) {
+                        Toast.makeText(getActivity().getApplicationContext(), "CLick" + position, Toast.LENGTH_SHORT).show();
+                        final CardView cv = (CardView) view.findViewById(R.id.cardview);
+                        final CardView cvBack = (CardView) view.findViewById(R.id.card_view_back);
+                        FlipAnimation flipAnimation = new FlipAnimation(cv, cvBack);
+                        if (cv.getVisibility() == View.GONE)
+                            flipAnimation.reverse();
+                        view.startAnimation(flipAnimation); }
+                });
 
         if(!isNetworkAvailable())
             st.show();
@@ -241,9 +266,7 @@ public class GridMainEventsFrag extends Fragment implements ClickListener {
             e.printStackTrace();
         }
     }
-    public ArrayList<JSONObject> getEventList(){
-        return eventData;
-    }
+
     public void setEventData(ArrayList<JSONObject> dataGrid){
        data = dataGrid;
     }
@@ -268,11 +291,10 @@ public class GridMainEventsFrag extends Fragment implements ClickListener {
                                 StyleableToast st = new StyleableToast(getContext(), "Removing...", Toast.LENGTH_SHORT);
 
                                 for (int position : ints) {
-                                    //eventData.remove(position);
                                     try {
                                         deleteEvent.put("user_id", mAdapter.getObject().get(position).getString("user_id"));
                                         deleteEvent.put("event_id", mAdapter.getObject().get(position).getString("event_id"));
-                                        //Custom stylable toast*
+
                                         st.setBackgroundColor(Color.RED);
                                         st.setTextColor(Color.WHITE);
                                         st.setIcon(R.drawable.ic_delete_black_24dp);
@@ -281,10 +303,6 @@ public class GridMainEventsFrag extends Fragment implements ClickListener {
                                         st.show();
                                         data.remove(position);
                                         mAdapter.notifyItemRemoved(position);
-
-                                        //if(data!=null)
-                                            //mAdapter.setEventData(data);
-
 
                                     } catch (JSONException e) {
                                         e.printStackTrace();
@@ -297,12 +315,10 @@ public class GridMainEventsFrag extends Fragment implements ClickListener {
                                 StyleableToast st = new StyleableToast(getContext(), "Saving...", Toast.LENGTH_SHORT);
 
                                 for (int position : ints) {
-                                    //eventData.remove(position);
                                     mAdapter.notifyItemRemoved(position);
                                     try {
                                         saveEvent.put("user_id", mAdapter.getObject().get(position).getString("user_id"));
                                         saveEvent.put("event_id", mAdapter.getObject().get(position).getString("event_id"));
-                                        //Custom stylable toast*
                                         st.setBackgroundColor(Color.parseColor("#ff9dfc"));
                                         st.setTextColor(Color.WHITE);
                                         st.setIcon(R.drawable.ic_save_black_24dp);
@@ -311,10 +327,6 @@ public class GridMainEventsFrag extends Fragment implements ClickListener {
                                         st.show();
                                         data.remove(position);
                                         mAdapter.notifyItemRemoved(position);
-
-                                        //if(data!=null)
-                                            //mAdapter.setEventData(data);
-                                        //Toast.makeText(getContext(), mAdapter.getObject().get(position).getString("event_id"), Toast.LENGTH_SHORT).show();
 
                                     } catch (JSONException e) {
                                         e.printStackTrace();

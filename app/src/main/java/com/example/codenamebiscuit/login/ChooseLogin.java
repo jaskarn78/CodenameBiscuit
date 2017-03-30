@@ -5,12 +5,18 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.percent.PercentLayoutHelper;
+import android.support.percent.PercentRelativeLayout;
 import android.support.v4.app.FragmentActivity;
 import android.support.v7.preference.PreferenceManager;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.Button;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.example.codenamebiscuit.MainActivity;
 import com.example.codenamebiscuit.R;
@@ -59,6 +65,13 @@ public class ChooseLogin extends FragmentActivity implements GoogleApiClient.OnC
     private static final int RC_SIGN_IN = 9001;
     private SharedPreferences pref;
     private DatabaseHelper db;
+    private boolean isFacebookScreen = true;
+    private TextView tvSignupInvoker;
+    private LinearLayout llSignup;
+    private TextView tvSigninInvoker;
+    private LinearLayout llSignin;
+    private SignInButton signInButton;
+
 
     public ChooseLogin(){
 
@@ -77,12 +90,8 @@ public class ChooseLogin extends FragmentActivity implements GoogleApiClient.OnC
         this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
         setContentView(R.layout.activity_login);
-        mLoginButton = (LoginButton) findViewById(R.id.facebook_login_button);
-        mGoogleApiClient = App.getGoogleApiHelper().getApiClient();
-        db = new DatabaseHelper(this);
-
         // Set the dimensions of the sign-in button.
-        SignInButton signInButton = (SignInButton) findViewById(R.id.sign_in_button);
+        signInButton = (SignInButton) findViewById(R.id.btnGoogleSignin);
         signInButton.setSize(SignInButton.SIZE_STANDARD);
         signInButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -90,14 +99,87 @@ public class ChooseLogin extends FragmentActivity implements GoogleApiClient.OnC
                 setupViaGoogle();
             }
         });
+        mLoginButton = (LoginButton) findViewById(R.id.btnFacebookSignup);
 
         mLoginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 setupViaFB();
 
-        }
+            }
         });
+        mGoogleApiClient = App.getGoogleApiHelper().getApiClient();
+        db = new DatabaseHelper(this);
+        llSignup = (LinearLayout)findViewById(R.id.llSignup);
+        llSignin = (LinearLayout)findViewById(R.id.llSignin);
+        tvSignupInvoker = (TextView) findViewById(R.id.tvSignupInvoker);
+        tvSigninInvoker = (TextView) findViewById(R.id.tvSigninInvoker);
+        tvSignupInvoker.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                isFacebookScreen = false;
+                showSignupForm();
+            }
+        });
+
+        tvSigninInvoker.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                isFacebookScreen = true;
+                showSigninForm();
+            }
+        });
+        showSigninForm();
+
+        /*LottieAnimationView animationView = (LottieAnimationView) findViewById(R.id.animation_view);
+        animationView.loop(true);
+        animationView.playAnimation();
+        LottieAnimationView animationView2 = (LottieAnimationView) findViewById(R.id.animation_view2);
+        animationView2.loop(true);
+        animationView2.playAnimation();*/
+
+
+    }
+    private void showSignupForm() {
+        PercentRelativeLayout.LayoutParams paramsLogin = (PercentRelativeLayout.LayoutParams) llSignin.getLayoutParams();
+        PercentLayoutHelper.PercentLayoutInfo infoLogin = paramsLogin.getPercentLayoutInfo();
+        infoLogin.widthPercent = 0.15f;
+        llSignin.requestLayout();
+
+
+        PercentRelativeLayout.LayoutParams paramsSignup = (PercentRelativeLayout.LayoutParams) llSignup.getLayoutParams();
+        PercentLayoutHelper.PercentLayoutInfo infoSignup = paramsSignup.getPercentLayoutInfo();
+        infoSignup.widthPercent = 0.85f;
+        llSignup.requestLayout();
+
+        tvSignupInvoker.setVisibility(View.GONE);
+        tvSigninInvoker.setVisibility(View.VISIBLE);
+        Animation translate= AnimationUtils.loadAnimation(getApplicationContext(),R.anim.translate_right_to_left);
+        llSignup.startAnimation(translate);
+
+        Animation clockwise= AnimationUtils.loadAnimation(getApplicationContext(),R.anim.rotate_right_to_left);
+        mLoginButton.startAnimation(clockwise);
+
+    }
+    private void showSigninForm() {
+        PercentRelativeLayout.LayoutParams paramsLogin = (PercentRelativeLayout.LayoutParams) llSignin.getLayoutParams();
+        PercentLayoutHelper.PercentLayoutInfo infoLogin = paramsLogin.getPercentLayoutInfo();
+        infoLogin.widthPercent = 0.85f;
+        llSignin.requestLayout();
+
+
+        PercentRelativeLayout.LayoutParams paramsSignup = (PercentRelativeLayout.LayoutParams) llSignup.getLayoutParams();
+        PercentLayoutHelper.PercentLayoutInfo infoSignup = paramsSignup.getPercentLayoutInfo();
+        infoSignup.widthPercent = 0.15f;
+        llSignup.requestLayout();
+
+        Animation translate= AnimationUtils.loadAnimation(getApplicationContext(),R.anim.translate_left_to_right);
+        llSignin.startAnimation(translate);
+
+        tvSignupInvoker.setVisibility(View.VISIBLE);
+        tvSigninInvoker.setVisibility(View.GONE);
+        Animation clockwise= AnimationUtils.loadAnimation(getApplicationContext(),R.anim.rotate_left_to_right);
+        signInButton.startAnimation(clockwise);
     }
 
     private  void setupViaGoogle(){
@@ -168,7 +250,7 @@ public class ChooseLogin extends FragmentActivity implements GoogleApiClient.OnC
         initializeTokens();
 
         // Initialize Facebook LoginButton
-        LoginButton mLoginButton = (LoginButton) findViewById(R.id.facebook_login_button);
+        LoginButton mLoginButton = (LoginButton) findViewById(R.id.btnFacebookSignup);
 
         // Set permissions and register the callback
 

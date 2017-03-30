@@ -12,5 +12,10 @@
         android:orderInCategory="200"
         sothree:showAsAction="never"
         android:title="Anchor Preferences"/>
+    <item
+        android:id="@+id/flip_action"
+        android:icon="@drawable/ic_autorenew_white_24dp"
+        sothree:showAsAction="always"
+        android:visible="false"/>
 
 </menu>

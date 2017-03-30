@@ -39,6 +39,8 @@ repositories {
     flatDir {
         dirs 'libs'
     }
+    jcenter()
+
 
 }
 
@@ -89,6 +91,12 @@ dependencies {
     compile 'com.github.ksoichiro:android-observablescrollview:1.5.0'
     compile 'com.github.bumptech.glide:glide:3.7.0'
     compile 'com.github.jd-alexander:LikeButton:0.2.0'
+    compile 'com.geniusforapp.fancydialog:FancyDialog:0.0.7'
+    compile 'com.android.support:percent:25.3.0'
+    compile 'com.rohit.recycleritemclicksupport:recycleritemclicksupport:1.0.1'
+
+
+
 
 
 }

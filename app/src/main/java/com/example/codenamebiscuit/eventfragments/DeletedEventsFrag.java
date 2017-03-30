@@ -8,6 +8,7 @@ import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.preference.PreferenceManager;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -29,6 +30,8 @@ import com.example.codenamebiscuit.rv.ClickListener;
 import com.example.codenamebiscuit.rv.EventAdapter;
 import com.github.brnunes.swipeablerecyclerview.SwipeableRecyclerViewTouchListener;
 import com.muddzdev.styleabletoastlibrary.StyleableToast;
+import com.rohit.recycleritemclicksupport.RecyclerItemClickSupport;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -50,6 +53,7 @@ public class DeletedEventsFrag extends Fragment implements ClickListener{
     private RecyclerView mRecyclerView;
     private JSONObject restoreEvent;
     private ArrayList<JSONObject> data;
+    private Bundle bundle;
     GetDeletedEventsInterface sGetDeletedEventsInterface;
 
     public interface GetDeletedEventsInterface {
@@ -73,13 +77,13 @@ public class DeletedEventsFrag extends Fragment implements ClickListener{
         super.onCreate(savedInstanceState);
         pref = PreferenceManager.getDefaultSharedPreferences(getContext());
         restoreEvent = new JSONObject();
-
         String user_id = pref.getString("user_id", null);
         try {
             currentUserId.put("user_id", user_id); }
         catch (JSONException e) {
             e.printStackTrace(); }
         eventData = new ArrayList<JSONObject>();
+
         mAdapter = new EventAdapter(getActivity().getApplicationContext(), 1, "deleted", getFragmentManager(), getActivity());
         try {
             data = new QueryEventList(getString(R.string.DATABASE_DELETED_EVENTS_PULLER)).execute(currentUserId).get();
@@ -99,7 +103,6 @@ public class DeletedEventsFrag extends Fragment implements ClickListener{
         setupSwipeDownRefresh();
         mRecyclerView = (RecyclerView) rootView.findViewById(R.id.recyclerview_events);
         mAdapter.setEventData(data);
-
         mRecyclerView.setAdapter(mAdapter);
 
         return rootView; }
@@ -116,8 +119,22 @@ public class DeletedEventsFrag extends Fragment implements ClickListener{
         LinearLayoutManager layoutManager
                 = new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false);
         mRecyclerView.setLayoutManager(layoutManager);
+        RecyclerItemClickSupport.addTo(mRecyclerView).setOnItemClickListener(new RecyclerItemClickSupport.OnItemClickListener() {
+            @Override
+            public void onItemClicked(RecyclerView recyclerView, int i, View view) {
+                DisplayEvent displayEvent = DisplayEvent.newInstance();
+                displayEvent.setArguments(bundle);
+                FragmentTransaction ft = getFragmentManager().beginTransaction();
+                ft.replace(R.id.fragment_container, displayEvent);
+                ft.addToBackStack(null);
+                ft.commit();
+            }
+        });
+        mRecyclerView.setHasFixedSize(false);
+        mRecyclerView.setItemViewCacheSize(100);
+        mRecyclerView.setDrawingCacheEnabled(true);
+        mRecyclerView.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_HIGH);
 
-        //mRecyclerView.setItemAnimator(new DefaultItemAnimator());
         TextView tv = (TextView)getActivity().findViewById(R.id.toolbar_title);
         tv.setText("Removed");
     }
@@ -171,24 +188,6 @@ public class DeletedEventsFrag extends Fragment implements ClickListener{
                 android.R.color.holo_red_light);
     }
 
-
-    /**********************************************************************************************
-     * HTTP request to run php script which contains sql command
-     * to retrieve all event data filtered by user id
-     **********************************************************************************************/
-    /*private void loadEventData() {
-        QueryEventList list = (QueryEventList)
-                new QueryEventList(getString(R.string.DATABASE_DELETED_EVENTS_PULLER),
-                        getContext()).execute(currentUserId);
-        try {
-            eventData=list.get();
-            mAdapter.setEventData(eventData);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (ExecutionException e) {
-            e.printStackTrace();
-        }
-    }*/
     /**********************************************************************************************
      * Handles the drop down functionality in the list view of the event data
      * When image button is clicked, additional event information is revealed

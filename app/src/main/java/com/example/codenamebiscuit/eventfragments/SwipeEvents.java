@@ -10,14 +10,19 @@ import android.support.v7.preference.PreferenceManager;
 import android.support.v7.widget.CardView;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.Toolbar;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
@@ -55,7 +60,10 @@ public class SwipeEvents extends android.support.v4.app.Fragment{
     private String event_description;
     private String lat, lng;
     private SharedPreferences pref;
+    private android.support.v7.widget.Toolbar toolbar;
+    private LinearLayout linearLayoutContainer;
     private JSONObject user;
+    private MenuItem item;
     private ArrayList<JSONObject> data;
     private int lastPosition = -1;
     private FloatingActionButton floatingActionButton;
@@ -101,6 +109,7 @@ public class SwipeEvents extends android.support.v4.app.Fragment{
 
         View rootView = inflater.inflate(R.layout.activity_swipe_events, container, false);
         cardStack = (SwipeDeck) rootView.findViewById(R.id.swipe_deck);
+        setHasOptionsMenu(true);
 
         //alter toolbar title
         TextView textView = (TextView)getActivity().findViewById(R.id.toolbar_title);
@@ -148,6 +157,8 @@ public class SwipeEvents extends android.support.v4.app.Fragment{
 
         adapter = new SwipeDeckAdapter(data, getActivity().getApplicationContext(), savedInstanceState);
         cardStack.setAdapter(adapter);
+        toolbar = (android.support.v7.widget.Toolbar) getActivity().findViewById(R.id.toolbar);
+
 
         cardStack.setCallback(new SwipeDeck.SwipeDeckCallback() {
             @Override
@@ -223,6 +234,14 @@ public class SwipeEvents extends android.support.v4.app.Fragment{
         super.onLowMemory();
     }
 
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.sliding_panel, menu);
+        item =menu.findItem(R.id.flip_action);
+        item.setVisible(true);
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
 
 
 
@@ -292,14 +311,14 @@ public class SwipeEvents extends android.support.v4.app.Fragment{
 
 
             ImageView frontCardImage = (ImageView) v.findViewById(R.id.offer_image);
-            Picasso.with(context).load(image).placeholder(R.drawable.progress).into(frontCardImage);
-            //Glide.with(SwipeEvents.this).load(image).diskCacheStrategy(DiskCacheStrategy.ALL)
-             //       .placeholder(R.drawable.progress).into(frontCardImage);
+            //Picasso.with(context).load(image).into(frontCardImage);
+            Glide.with(SwipeEvents.this).load(image).diskCacheStrategy(DiskCacheStrategy.ALL)
+                    .placeholder(R.drawable.progress).into(frontCardImage);
 
             final ImageView flippedCardImage = (ImageView) v.findViewById(R.id.back_image);
-            Picasso.with(context).load(image).placeholder(R.drawable.progress).centerCrop().fit().into(flippedCardImage);
-            //Glide.with(SwipeEvents.this).load(image).centerCrop()
-            //        .placeholder(R.drawable.progress).into(flippedCardImage);
+            //Picasso.with(context).load(image).centerCrop().fit().into(flippedCardImage);
+            Glide.with(SwipeEvents.this).load(image).centerCrop()
+                    .placeholder(R.drawable.progress).into(flippedCardImage);
 
             TextView event_location_tv = (TextView) v.findViewById(R.id.display_event_location);
             event_location_tv.setText(event_location);

@@ -8,6 +8,7 @@ import android.graphics.Bitmap;
 import android.graphics.Typeface;
 
 import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.net.Uri;
@@ -19,6 +20,7 @@ import android.provider.CalendarContract;
 
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
@@ -33,6 +35,7 @@ import android.view.animation.AnimationUtils;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
@@ -75,7 +78,7 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
     private ImageView rowMenu;
     private Activity activity;
     private Bundle eventBundle;
-    private String currentLat, currentLng;
+    private Bundle bundle;
 
 
     public EventAdapter(Context context, int type, String message,
@@ -88,6 +91,7 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
         this.fragmentManager=fragmentManager;
         this.activity=activity;
         eventBundle = new Bundle();
+        bundle=new Bundle();
     }
 
 
@@ -182,41 +186,34 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
             mWebView = (WebView)view.findViewById(R.id.webView);
             mLinkImageButton = (ImageButton)view.findViewById(R.id.linkButton);
 
+            //itemView.setOnClickListener(this);
+            //itemView.setOnLongClickListener(this);
             view.setOnClickListener(this);
             view.setOnLongClickListener(this);
+            //this.layout.setOnClickListener(this);
+            //.cardView.setOnLongClickListener(this);
 
-            if(type==2) {
-                mEventNameBack.setTypeface(typeface);
-                view.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(final View v) {
-                        final CardView cv = (CardView) v.findViewById(R.id.cardview);
-                        final CardView cvBack = (CardView) v.findViewById(R.id.card_view_back);
-                        FlipAnimation flipAnimation = new FlipAnimation(cv, cvBack);
-                        if (cv.getVisibility() == View.GONE)
-                            flipAnimation.reverse();
-                        v.startAnimation(flipAnimation);
-                    }
-                });
-            }
         }
 
         @Override
-        public void onClick(final View v) {}
+        public void onClick(final View v) {
+
+        }
 
         @Override
         public boolean onLongClick(View v) {
-            return true;}}
+            return true;
+        }}
 
 
     @Override
     public void onBindViewHolder(final EventAdapterViewHolder eventAdapterViewHolder, final int position) {
-
         String eventLocation = null;    String eventPref = null;    String eventPath = null;
         String event = null;            String eventInfo = "";      String startDate=null;
         String startTime=null;          String eventid = null;      String userId=null;
         String eventHoster=null;        String cost=null;           Double lat=0.0;
         Double lng=0.0;                 final JSONObject restoreEvent = new JSONObject();
+
 
         try {
             eventLocation = mEventData.get(position).getString("event_location");
@@ -242,17 +239,25 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
         final String finalEvent = event;
         final String finalEventInfo1 = eventInfo;
         final String finalEventLocation = eventLocation;
-        final String finalEvent1 = event; final String finalEventPath = eventPath;
-        final String finalStartDate = startDate; final String finalStartTime = startTime;
-        final String finalEventLocation1 = eventLocation; final String finalEventPref = eventPref;
-        final String finalEventInfo = eventInfo; final String finalEventHoster = eventHoster;
-        final Double finalLat = lat; final Double finalLng = lng;
-        final String finalCost = cost; final String finalEventid = eventid;
+
+        final Bundle bundle = new Bundle();
+        bundle.putString("eventName", event);
+        bundle.putString("eventImage", eventPath);
+        bundle.putString("eventDate", startDate);
+        bundle.putString("eventTime", startTime);
+        bundle.putString("eventLocation", eventLocation);
+        bundle.putString("eventPreference", eventPref);
+        bundle.putString("eventDescription", eventInfo);
+        bundle.putString("eventHoster", eventHoster);
+        bundle.putString("eventDistance", getLocation(lat, lng)+" mi");
+        bundle.putString("eventCost", cost);
+        bundle.putString("eventId", eventid);
+        bundle.putDouble("eventLat", lat);
+        bundle.putDouble("eventLng", lng);
+        setBundle(bundle);
 
         if(type==1) {
             setAnimation(eventAdapterViewHolder.itemView, position);
-            final Double finalLat1 = lat;
-            final Double finalLng1 = lng;
             rowMenu.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -265,22 +270,7 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
                             switch (item.getItemId()){
                                 case R.id.info:
                                     DisplayEvent displayEvent = DisplayEvent.newInstance();
-                                    Bundle bundle = new Bundle();
-                                    bundle.putString("eventName", finalEvent1);
-                                    bundle.putString("eventImage", finalEventPath);
-                                    bundle.putString("eventDate", finalStartDate);
-                                    bundle.putString("eventTime", finalStartTime);
-                                    bundle.putString("eventLocation", finalEventLocation1);
-                                    bundle.putString("eventPreference", finalEventPref);
-                                    bundle.putString("eventDescription", finalEventInfo);
-                                    bundle.putString("eventHoster", finalEventHoster);
-                                    bundle.putString("eventDistance", getLocation(finalLat, finalLng)+" mi");
-                                    bundle.putString("eventCost", finalCost);
-                                    bundle.putString("eventId", finalEventid);
-                                    bundle.putDouble("eventLat", finalLat1);
-                                    bundle.putDouble("eventLng", finalLng1);
                                     displayEvent.setArguments(bundle);
-
                                     FragmentTransaction ft = fragmentManager.beginTransaction();
                                     ft.replace(R.id.fragment_container, displayEvent);
                                     ft.addToBackStack(null);
@@ -291,6 +281,7 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
                     });
                 }
             });
+
             /********************************************************************************
              * assigns distance from current location to event location
              *******************************************************************************/
@@ -362,7 +353,6 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
                 }
             });
 
-
             eventAdapterViewHolder.mEventHoster.setText("Presented By: " + eventHoster);
             eventAdapterViewHolder.mEventCost.setText("Entry Fee: $" + cost);
             eventAdapterViewHolder.mWebView.getSettings().setJavaScriptEnabled(true);
@@ -382,6 +372,8 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
                 public void onPageFinished(WebView view, final String url) {
                 }
             });
+
+
 
 
             /*****************************************************************************************
@@ -406,6 +398,8 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
             });
 
 
+
+
             /*****************************************************************************************
              * Clicking on the cardview item will expand the card to
              * revieal additional information as well as additional buttons
@@ -414,14 +408,20 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
             eventAdapterViewHolder.cardView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if (eventAdapterViewHolder.layout.getVisibility() == View.GONE) {
-                        eventAdapterViewHolder.layout.setVisibility(View.VISIBLE);
-                    } else {
-                        eventAdapterViewHolder.layout.setVisibility(View.GONE);
-                    }
+                    DisplayEvent displayEvent = DisplayEvent.newInstance();
+                    displayEvent.setArguments(bundle);
+
+                    FragmentTransaction ft = fragmentManager.beginTransaction();
+                    ft.replace(R.id.fragment_container, displayEvent);
+                    ft.addToBackStack(null);
+                    ft.commit();
                 }
             });
         }
+
+
+
+
         /*****************************************************************************************
          * Type 2 represents the grid layout and its corresponding views are set
          * ****************************************************************************************/
@@ -447,21 +447,6 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
                 public void onClick(View v) {
                     Toast.makeText(context, "info icon clicked at position "+finalEvent, Toast.LENGTH_SHORT).show();
                     DisplayEvent displayEvent = DisplayEvent.newInstance();
-                    Bundle bundle = new Bundle();
-                    bundle.putString("eventName", finalEvent1);
-                    bundle.putString("eventImage", finalEventPath);
-                    bundle.putString("eventDate", finalStartDate);
-                    bundle.putString("eventTime", finalStartTime);
-                    bundle.putString("eventLocation", finalEventLocation1);
-                    bundle.putString("eventPreference", finalEventPref);
-                    bundle.putString("eventDescription", finalEventInfo);
-                    bundle.putString("eventHoster", finalEventHoster);
-                    bundle.putString("eventDistance", getLocation(finalLat, finalLng)+" mi");
-                    bundle.putString("eventCost", finalCost);
-                    bundle.putString("eventId", finalEventid);
-                    bundle.putDouble("eventLat", finalLat2);
-                    bundle.putDouble("eventLng", finalLng2);
-                    Log.i("adapter coords", finalLat+", "+finalLng);
                     displayEvent.setArguments(bundle);
 
                     FragmentTransaction ft = fragmentManager.beginTransaction();
@@ -483,8 +468,17 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
                     .networkPolicy(NetworkPolicy.OFFLINE)
                     .error( R.drawable.cast_album_art_placeholder)
                     .placeholder(R.drawable.progress)
-                    .into(eventAdapterViewHolder.mEventImageback);}
+                    .into(eventAdapterViewHolder.mEventImageback);
 
+        }
+
+
+    }
+    public void setBundle(Bundle bundle){
+        this.bundle=bundle;
+    }
+    public Bundle getBundle(){
+        return this.bundle;
     }
 
     /*****************************************************************************************
@@ -507,12 +501,6 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
         return (int)Math.round(distance*0.000621371192); }
 
 
-    private void setupEventBundle(Bundle bundle){
-        eventBundle=bundle;
-    }
-    private Bundle getEventBundle(){
-        return eventBundle;
-    }
 
     /*****************************************************************************************
      * This method simply returns the number of items to display. It is used behind the scenes
@@ -587,8 +575,5 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
     public ArrayList<JSONObject> getObject() {
         return mEventData;
     }
-
-
-
 
 }

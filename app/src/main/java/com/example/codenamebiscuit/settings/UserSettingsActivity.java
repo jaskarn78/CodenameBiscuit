@@ -90,9 +90,9 @@ public class UserSettingsActivity
         if (fbprofile != null)
             initializeFBProfileInfo(fbprofile);
 
-        initializeLogoutButton();
         try {
             setupSharedPreferences();
+            initializeLogoutButton();
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -131,7 +131,7 @@ public class UserSettingsActivity
         logout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                prefs.edit().putString("user_id", null).apply();
+                prefs.edit().clear().apply();
                 Intent login = new Intent(UserSettingsActivity.this, ChooseLogin.class);
                 startActivity(login);
                 finish();

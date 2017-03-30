@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/transparentPink"
+    android:gravity="center"
+    android:orientation="vertical"
+    android:padding="48dp">
+
+    <!--<com.airbnb.lottie.LottieAnimationView
+       xmlns:android="http://schemas.android.com/apk/res/android"
+       xmlns:app="http://schemas.android.com/apk/res-auto"
+       android:id="@+id/animation_view"
+       android:layout_width="match_parent"
+       android:layout_height="200dp"
+       android:background="@color/transparentFB"
+       app:lottie_fileName="loading.json"/>-->
+
+
+        <ImageView
+            android:layout_width="130dp"
+            android:layout_height="130dp"
+            android:layout_marginTop="40dp"
+            android:src="@drawable/komalslogo" />
+
+
+    <com.google.android.gms.common.SignInButton
+        android:id="@+id/btnGoogleSignin"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="100dp"
+        android:background="@null"
+        android:text="Signin"
+        android:textColor="#FFF"
+        android:textSize="25sp" />
+
+</LinearLayout>

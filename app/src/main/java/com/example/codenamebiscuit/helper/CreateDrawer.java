@@ -3,6 +3,7 @@ package com.example.codenamebiscuit.helper;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.location.Address;
@@ -12,6 +13,7 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v7.preference.PreferenceManager;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
@@ -26,6 +28,7 @@ import com.example.codenamebiscuit.eventfragments.DeletedEventsFrag;
 import com.example.codenamebiscuit.eventfragments.GridMainEventsFrag;
 import com.example.codenamebiscuit.eventfragments.SavedEventsFrag;
 import com.example.codenamebiscuit.eventfragments.SwipeEvents;
+import com.example.codenamebiscuit.login.ChooseLogin;
 import com.example.codenamebiscuit.settings.UserSettingsActivity;
 import com.google.android.gms.maps.model.LatLng;
 import com.mikepenz.fontawesome_typeface_library.FontAwesome;
@@ -75,6 +78,8 @@ public class CreateDrawer {
     private String currentLat, currentLng;
     GPSTracker gps;
     LatLng latLng;
+    SharedPreferences preferences;
+
 
     public CreateDrawer(String fName, String lName, String pic, String email, Bundle savedState,
                         Toolbar toolbar, Context context, Activity activity,
@@ -93,6 +98,7 @@ public class CreateDrawer {
         overlay=context.getColor(R.color.black_overlay);
         livinBlack=context.getColor(R.color.livinBlack);
         livinWhite=context.getColor(R.color.livinWhite);
+        preferences=PreferenceManager.getDefaultSharedPreferences(context);
 
     }
 
@@ -166,20 +172,12 @@ public class CreateDrawer {
 
                         new DividerDrawerItem(),
                         new PrimaryDrawerItem()
-                                .withName("Current coordinates").withIcon(GoogleMaterial.Icon.gmd_gps).withIdentifier(7)
+                                .withName("Log Out").withIcon(FontAwesome.Icon.faw_sign_out).withIdentifier(7)
                                 .withTextColor(livinWhite)
                                 .withIconColor(livinWhite)
                                 .withSelectedTextColor(livinPink)
                                 .withSelectedIconColor(livinPink)
-                                .withSelectable(false),
-                        new DividerDrawerItem(),
-                        new SwitchDrawerItem().withName("Day/Night").withIcon(FontAwesome.Icon.faw_sun_o).withIdentifier(8)
-                                .withChecked(true).withOnCheckedChangeListener(onCheckedChangeListener)
-                                .withTextColor(livinWhite)
-                                .withIconColor(livinWhite)
-                                .withSelectedTextColor(livinPink)
-                                .withSelectedIconColor(livinPink)
-                                .withSelectedColor(livinBlack) .withSetSelected(true)
+                                .withSelectable(false)
 
                 )
                 .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
@@ -203,8 +201,16 @@ public class CreateDrawer {
                                 intent = new Intent(activity, UserSettingsActivity.class);
                             else if (drawerItem.getIdentifier()==6) {}
                                 //fragment = new GridMainEventsFrag();
-                            else if(drawerItem.getIdentifier()==7)
-                                getLocation();
+                            else if(drawerItem.getIdentifier()==7) {
+                                preferences.edit().clear().apply();
+                                preferences.edit().putString("user_id", null).commit();
+                                preferences.edit().putString("user_image", null).commit();
+                                preferences.edit().putString("fName", null).commit();
+                                preferences.edit().putString("lName", null).apply();
+                                preferences.edit().putString("email", null).apply();
+                                intent = new Intent(activity, ChooseLogin.class);
+                            }
+
                             //result.closeDrawer();
 
                             if (intent != null) {

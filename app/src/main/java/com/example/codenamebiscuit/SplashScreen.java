@@ -40,8 +40,8 @@ public class SplashScreen extends Activity {
         //StyleableToast st = new StyleableToast(getApplicationContext(), "LOADING EVENTS...", Toast.LENGTH_SHORT);
         //setupWindowAnimations();
         Intent intent = new Intent(this, MainActivity.class);
+        //finish();
         startActivity(intent);
-        finish();
 
     }
 

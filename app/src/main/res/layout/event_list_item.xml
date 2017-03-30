@@ -10,7 +10,8 @@
     android:orientation="vertical"
     android:id="@+id/event_list"
     >
-    <com.daimajia.swipe.SwipeLayout xmlns:swipe="http://schemas.android.com/apk/res-auto"
+    <com.daimajia.swipe.SwipeLayout
+        xmlns:swipe="http://schemas.android.com/apk/res-auto"
         android:id="@+id/swipe"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -59,8 +60,11 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="1dp"
+        android:foreground="?android:attr/selectableItemBackground"
+        android:clickable="true"
         card_view:cardElevation="2dp"
         card_view:contentPadding="1dp"
+
        >
 
     <RelativeLayout
@@ -68,6 +72,8 @@
         android:layout_height="match_parent"
         android:layout_margin="3dp"
         android:id="@+id/card_relative_layout"
+        android:foreground="?android:attr/selectableItemBackground"
+
         >
         <ImageView
             android:id="@+id/row_menu"
@@ -75,7 +81,8 @@
             android:layout_height="30dp"
             android:layout_alignParentEnd="true"
             android:layout_margin="5dp"
-            android:src="@drawable/ic_action_more_vert" />
+            android:clickable="true"
+            android:src="@drawable/ic_shortcut_more_vert" />
 
         <ImageView
             android:layout_width="95dp"

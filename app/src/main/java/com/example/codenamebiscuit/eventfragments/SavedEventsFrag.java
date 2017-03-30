@@ -11,8 +11,11 @@ import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.preference.PreferenceManager;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 
@@ -20,14 +23,18 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+
 import com.daimajia.androidanimations.library.fading_entrances.FadeInLeftAnimator;
 import com.example.codenamebiscuit.R;
+import com.example.codenamebiscuit.helper.FlipAnimation;
 import com.example.codenamebiscuit.helper.QueryEventList;
 import com.example.codenamebiscuit.helper.UpdateDbOnSwipe;
 import com.example.codenamebiscuit.rv.ClickListener;
@@ -35,6 +42,7 @@ import com.example.codenamebiscuit.rv.EventAdapter;
 import com.github.brnunes.swipeablerecyclerview.SwipeableRecyclerViewTouchListener;
 import com.mikepenz.itemanimators.AlphaInAnimator;
 import com.muddzdev.styleabletoastlibrary.StyleableToast;
+import com.rohit.recycleritemclicksupport.RecyclerItemClickSupport;
 
 
 import org.json.JSONException;
@@ -47,7 +55,7 @@ import java.util.concurrent.ExecutionException;
  * Created by jaskarnjagpal on 2/23/17.
  */
 
-public class SavedEventsFrag extends Fragment implements ClickListener {
+public class SavedEventsFrag extends Fragment implements ClickListener{
     private static final String TAG = "Saved Events Fragment";
 
     private RecyclerView mRecyclerView;
@@ -58,8 +66,13 @@ public class SavedEventsFrag extends Fragment implements ClickListener {
     private SwipeRefreshLayout swipeContainer;
     private JSONObject restoreEvent;
     private ArrayList<JSONObject> data;
-    private double currentLat, currentLng;
+
     GetSavedDataInterface sGetDataInterface;
+
+    @Override
+    public void itemClicked(View view, int position) {
+
+    }
 
     public interface GetSavedDataInterface {
         ArrayList<JSONObject> getSavedEventList();
@@ -76,11 +89,13 @@ public class SavedEventsFrag extends Fragment implements ClickListener {
     }
 
 
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         pref = PreferenceManager.getDefaultSharedPreferences(getContext());
         restoreEvent = new JSONObject();
+
         String user_id = pref.getString("user_id", null);
         try {
             currentUserId.put("user_id", user_id);
@@ -89,13 +104,12 @@ public class SavedEventsFrag extends Fragment implements ClickListener {
 
         eventData = new ArrayList<JSONObject>();
         mAdapter = new EventAdapter(getActivity().getApplicationContext(), 1, "saved", getFragmentManager(), getActivity());
+
         try {
             data = new QueryEventList(getString(R.string.DATABASE_SAVED_EVENTS_PULLER)).execute(currentUserId).get();
         } catch (InterruptedException | ExecutionException e) {
             e.printStackTrace();
         }
-
-
     }
 
     public static SavedEventsFrag newInstance() {
@@ -110,9 +124,7 @@ public class SavedEventsFrag extends Fragment implements ClickListener {
         swipeContainer = (SwipeRefreshLayout) rootView.findViewById(R.id.swipeContainer);
         setupSwipeDownRefresh();
         mRecyclerView = (RecyclerView) rootView.findViewById(R.id.recyclerview_events);
-
         return rootView;
-
     }
 
     /**********************************************************************************************
@@ -133,12 +145,10 @@ public class SavedEventsFrag extends Fragment implements ClickListener {
                 = new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false);
 
         mRecyclerView.setLayoutManager(layoutManager);
-        //mRecyclerView.setItemAnimator(new AlphaInAnimator());
-
-        //mRecyclerView.setHasFixedSize(false);
-        //mRecyclerView.setItemViewCacheSize(10);
-        //mRecyclerView.setDrawingCacheEnabled(true);
-        //mRecyclerView.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_LOW);
+        mRecyclerView.setHasFixedSize(false);
+        mRecyclerView.setItemViewCacheSize(100);
+        mRecyclerView.setDrawingCacheEnabled(true);
+        mRecyclerView.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_HIGH);
 
     }
 
@@ -151,14 +161,8 @@ public class SavedEventsFrag extends Fragment implements ClickListener {
     @Override
     public void onResume() {  // After a pause OR at startup
         super.onResume();
-        //try {
-            //data = new QueryEventList(getString(R.string.DATABASE_SAVED_EVENTS_PULLER)).execute(currentUserId).get();
             mAdapter.notifyDataSetChanged();
-        //}
-        /*catch (InterruptedException e) {
-            e.printStackTrace();}
-        catch (ExecutionException e) {
-            e.printStackTrace(); }*/
+
     }
 
 
@@ -218,20 +222,5 @@ public class SavedEventsFrag extends Fragment implements ClickListener {
         eventData = data;
     }
 
-
-    /**********************************************************************************************
-     * Handles the drop down functionality in the list view of the event data
-     * When image button is clicked, additional event information is revealed
-     * @param view
-     * @param position
-     **********************************************************************************************/
-
-    @Override
-    public void itemClicked(View view, int position) {
-        RelativeLayout layout = (RelativeLayout)view.findViewById(R.id.extend);
-        if (layout.getVisibility() == View.GONE)
-            layout.setVisibility(View.VISIBLE);
-        else
-            layout.setVisibility(View.GONE);}
 
 }

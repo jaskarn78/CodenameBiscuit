@@ -108,7 +108,7 @@ public class MainActivity extends AppCompatActivity
 
         TextView tv = (TextView) findViewById(R.id.toolbar_title);
         Typeface typeface = Typeface.createFromAsset(getApplicationContext().getAssets(), "fonts/Raleway-Black.ttf");
-        tv.setTypeface(typeface);
+        //tv.setTypeface(typeface);
         FacebookSdk.sdkInitialize(getApplicationContext());
         Log.i("activity started: ", "main activity");
 
@@ -146,7 +146,7 @@ public class MainActivity extends AppCompatActivity
     public void onBackPressed() {
         super.onBackPressed();
         if (getSupportFragmentManager().getBackStackEntryCount() > 0) {
-            getSupportFragmentManager().popBackStackImmediate();
+            //getSupportFragmentManager().popBackStackImmediate();
         }
     }
 

@@ -7,6 +7,11 @@
     <color name="gray_overlay">#99303030</color>
     <color name="black_overlay">#88000000</color>
     <color name="translivinPink">#55ff9dfc</color>
-    <color name="transparentPink">#99ff9dfc</color>
+    <color name="transparentPink">#30ff9dfc</color>
+    <color name="transparentFB">#30415dae</color>
+    <color name="grid_foreground_selected">#B3000000</color>
+    <color name="grid_label_text_normal">#FFF</color>
+    <color name="grid_label_text_selected">#B3FFFFFF</color>
+
 
 </resources>
