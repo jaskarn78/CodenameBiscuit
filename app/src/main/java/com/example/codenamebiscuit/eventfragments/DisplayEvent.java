@@ -20,6 +20,7 @@ import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.TextView;
 
+import com.devspark.progressfragment.ProgressFragment;
 import com.example.codenamebiscuit.R;
 import com.github.ksoichiro.android.observablescrollview.ObservableListView;
 import com.github.ksoichiro.android.observablescrollview.ObservableScrollViewCallbacks;
@@ -52,7 +53,7 @@ import java.util.logging.LogRecord;
  * Use the {@link DisplayEvent#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class DisplayEvent extends Fragment{
+public class DisplayEvent extends ProgressFragment{
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
 
     private ImageView displayEventImage;
@@ -63,6 +64,7 @@ public class DisplayEvent extends Fragment{
     private String eventName, eventImage, eventDate, eventCost;
     private String eventTime, eventDescription, eventLocation;
     private String eventPreferences, eventHoster, eventDistance;
+    private int mapImage;
     private LikeButton likeButton;
     private String eventId;
     private RatingBar ratingBar;
@@ -73,6 +75,15 @@ public class DisplayEvent extends Fragment{
     MapView mapView;
     private GoogleMap googleMap;
     Typeface typeface;
+    private View rootView;
+    private android.os.Handler mHandler;
+    private Runnable mShowContentRunnable = new Runnable() {
+        @Override
+        public void run() {
+            setContentShown(true);
+        }
+
+    };
 
 
 
@@ -99,7 +110,7 @@ public class DisplayEvent extends Fragment{
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_display_event, container, false);
+        rootView = inflater.inflate(R.layout.fragment_display_event, container, false);
 
         likeText = (TextView)rootView.findViewById(R.id.currentRating);
         likeButton = (LikeButton)rootView.findViewById(R.id.like);
@@ -142,32 +153,33 @@ public class DisplayEvent extends Fragment{
         eventId = bundle.getString("eventId");
         eventLat = bundle.getDouble("eventLat");
         eventLng = bundle.getDouble("eventLng");
+        mapImage = bundle.getInt("mapImage");
         Log.i("coords", eventLat+", "+eventLng);
 
 
-        return rootView;
+        return super.onCreateView(inflater, container, savedInstanceState);
     }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState){
         super.onActivityCreated(savedInstanceState);
+        setContentView(rootView);
+        setContentShown(false);
+        mHandler = new android.os.Handler();
+        mHandler.postDelayed(mShowContentRunnable, 500);
 
-        new android.os.Handler().postDelayed(new Runnable() {
+        mapView.getMapAsync(new OnMapReadyCallback() {
             @Override
-            public void run() {
-                mapView.getMapAsync(new OnMapReadyCallback() {
-                    @Override
-                    public void onMapReady(GoogleMap gMap) {
-                        googleMap=gMap;
-                        // Add a marker in Sydney and move the camera
-                        LatLng eventCoords = new LatLng(eventLat, eventLng);
-                        googleMap.addMarker(new MarkerOptions().position(eventCoords).title(eventName));
-                        CameraUpdate update = CameraUpdateFactory.newLatLngZoom(eventCoords, 10);
-                        googleMap.animateCamera(update);
-                    }
-                });
+            public void onMapReady(GoogleMap gMap) {
+                googleMap=gMap;
+                // Add a marker in Sydney and move the camera
+                LatLng eventCoords = new LatLng(eventLat, eventLng);
+                googleMap.addMarker(new MarkerOptions().position(eventCoords).title(eventName));
+                CameraUpdate update = CameraUpdateFactory.newLatLngZoom(eventCoords, 10);
+                googleMap.animateCamera(update);
             }
-        }, 1000);
+        });
+
 
         loadImage();
 
@@ -319,7 +331,11 @@ public class DisplayEvent extends Fragment{
     }
 
     public String getImageURL(String path) {
-        return "http://athena.ecs.csus.edu/~teamone/AndroidUploadImage/uploads/" + path; }
+        if(mapImage!=1)
+            return "http://athena.ecs.csus.edu/~teamone/events/" + path;
+        else
+            return path;
+    }
 
 
 

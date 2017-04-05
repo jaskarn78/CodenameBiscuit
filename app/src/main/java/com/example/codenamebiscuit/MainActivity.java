@@ -4,11 +4,15 @@ package com.example.codenamebiscuit;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
+import android.graphics.Color;
 import android.graphics.Typeface;
 import android.location.Location;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.AppCompatDelegate;
 import android.support.v7.preference.PreferenceManager;
@@ -34,6 +38,8 @@ import com.example.codenamebiscuit.helper.QueryEventList;
 import com.example.codenamebiscuit.login.ChooseLogin;
 import com.facebook.FacebookSdk;
 import com.google.android.gms.maps.MapsInitializer;
+import com.mikepenz.materialdrawer.Drawer;
+import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 import com.wunderlist.slidinglayer.SlidingLayer;
 import com.wunderlist.slidinglayer.transformer.AlphaTransformer;
@@ -45,12 +51,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
+import devlight.io.library.ntb.NavigationTabBar;
 import mehdi.sakout.fancybuttons.FancyButton;
 import pub.devrel.easypermissions.EasyPermissions;
 
 public class MainActivity extends AppCompatActivity
         implements View.OnLongClickListener, MainEventsFrag.GetDataInterface, DeletedEventsFrag.GetDeletedEventsInterface,
-        GridMainEventsFrag.GetMainDataInterface, SavedEventsFrag.GetSavedDataInterface, SwipeEvents.GetMainSwipeDataInterface{
+        SavedEventsFrag.GetSavedDataInterface, SwipeEvents.GetMainSwipeDataInterface{
     private JSONObject currentUserId = new JSONObject();
     private SharedPreferences pref;
     private Toolbar toolbar;
@@ -64,6 +71,9 @@ public class MainActivity extends AppCompatActivity
     private FancyButton healthButton, outdoorButton, entertainmentButton;
     private FancyButton familyButton, retailButton, performingButton;
     private JSONObject preferences = new JSONObject();
+    CreateDrawer createDrawer;
+    private TextView toolbarTitle;
+    PrimaryDrawerItem mainEvents;
     private boolean isActive = false;
     List<JSONObject> prefList;
     GPSTracker gps = new GPSTracker(this);
@@ -106,7 +116,7 @@ public class MainActivity extends AppCompatActivity
         this.getSupportActionBar().setDisplayShowTitleEnabled(false);
 
 
-        TextView tv = (TextView) findViewById(R.id.toolbar_title);
+        toolbarTitle = (TextView) findViewById(R.id.toolbar_title);
         Typeface typeface = Typeface.createFromAsset(getApplicationContext().getAssets(), "fonts/Raleway-Black.ttf");
         //tv.setTypeface(typeface);
         FacebookSdk.sdkInitialize(getApplicationContext());
@@ -146,7 +156,7 @@ public class MainActivity extends AppCompatActivity
     public void onBackPressed() {
         super.onBackPressed();
         if (getSupportFragmentManager().getBackStackEntryCount() > 0) {
-            //getSupportFragmentManager().popBackStackImmediate();
+            //getSupportFragmentManager().popBackStack();
         }
     }
 
@@ -263,9 +273,6 @@ public class MainActivity extends AppCompatActivity
                 e.printStackTrace(); }
             loadDrawer(savedstate);
             bindViews();
-
-
-
         }
     }
 
@@ -324,11 +331,12 @@ public class MainActivity extends AppCompatActivity
         final String lName = pref.getString("lName", null);
         final String email = pref.getString("email", null);
         FragmentManager manager = getSupportFragmentManager();
-        CreateDrawer createDrawer = new CreateDrawer(fName, lName, pic, email, savedState, toolbar,
+        createDrawer = new CreateDrawer(fName, lName, pic, email, savedState, toolbar,
                 getApplicationContext(), this, manager, getLat(), getLng());
         createDrawer.loadDrawer();
 
     }
+
 
     private String getLat(){
         double currentLat=0.0;
@@ -408,5 +416,89 @@ public class MainActivity extends AppCompatActivity
             e.printStackTrace();
         }
         return savedData; }
+
+    private void initiUI(){
+        final ViewPager viewPager = (ViewPager)findViewById(R.id.vp_horizontal_ntb);
+        viewPager.setAdapter(new MyPagerAdapter(getSupportFragmentManager()));
+        final String[] colors = getResources().getStringArray(R.array.livColors);
+
+        final NavigationTabBar navigationTabBar = (NavigationTabBar)findViewById(R.id.ntb_horizontal);
+        final ArrayList<NavigationTabBar.Model> models = new ArrayList<>();
+        models.add(
+                new NavigationTabBar.Model.Builder(
+                        getResources().getDrawable(R.drawable.ic_save_black_48dp),
+                        Color.parseColor(colors[2]))
+                        .title("Saved")
+                        .build()
+        );
+        models.add(
+                new NavigationTabBar.Model.Builder(
+                        getResources().getDrawable(R.drawable.ic_delete_black_48dp),
+                        Color.parseColor(colors[2]))
+                        .title("Removed")
+                        .build()
+        );
+        navigationTabBar.setModels(models);
+        navigationTabBar.setViewPager(viewPager, 0);
+        navigationTabBar.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(final int position, final float positionOffset, final int positionOffsetPixels) {
+
+            }
+
+            @Override
+            public void onPageSelected(final int position) {
+                navigationTabBar.getModels().get(position).hideBadge();
+                if(position==0)
+                    toolbarTitle.setText("Upcoming Events");
+                else
+                    toolbarTitle.setText("Upcoming Events - Swipe");
+            }
+
+            @Override
+            public void onPageScrollStateChanged(final int state) {
+
+            }
+        });
+
+        navigationTabBar.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                for (int i = 0; i < navigationTabBar.getModels().size(); i++) {
+                    final NavigationTabBar.Model model = navigationTabBar.getModels().get(i);
+                    navigationTabBar.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            model.showBadge();
+                        }
+                    }, i * 100);
+                }
+            }
+        }, 500);
+    }
+    private class MyPagerAdapter extends FragmentPagerAdapter {
+
+        public MyPagerAdapter(FragmentManager fm) {
+            super(fm);
+        }
+
+        @Override
+        public Fragment getItem(int pos) {
+            switch(pos) {
+
+                case 0:
+                    return SavedEventsFrag.newInstance();
+                case 1:
+                    return DeletedEventsFrag.newInstance();
+                default:
+                    return SavedEventsFrag.newInstance();
+            }
+        }
+
+        @Override
+        public int getCount() {
+            return 2;
+        }
+    }
 
 }

@@ -1,5 +1,6 @@
 package com.example.codenamebiscuit.eventfragments;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -27,12 +28,16 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.os.Handler;
+
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 
 import com.daimajia.androidanimations.library.fading_entrances.FadeInLeftAnimator;
+import com.devspark.progressfragment.ProgressFragment;
+import com.example.codenamebiscuit.MainActivity;
 import com.example.codenamebiscuit.R;
 import com.example.codenamebiscuit.helper.FlipAnimation;
 import com.example.codenamebiscuit.helper.QueryEventList;
@@ -41,6 +46,8 @@ import com.example.codenamebiscuit.rv.ClickListener;
 import com.example.codenamebiscuit.rv.EventAdapter;
 import com.github.brnunes.swipeablerecyclerview.SwipeableRecyclerViewTouchListener;
 import com.mikepenz.itemanimators.AlphaInAnimator;
+import com.mikepenz.materialdrawer.Drawer;
+import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
 import com.muddzdev.styleabletoastlibrary.StyleableToast;
 import com.rohit.recycleritemclicksupport.RecyclerItemClickSupport;
 
@@ -55,7 +62,7 @@ import java.util.concurrent.ExecutionException;
  * Created by jaskarnjagpal on 2/23/17.
  */
 
-public class SavedEventsFrag extends Fragment implements ClickListener{
+public class SavedEventsFrag extends ProgressFragment implements ClickListener{
     private static final String TAG = "Saved Events Fragment";
 
     private RecyclerView mRecyclerView;
@@ -66,6 +73,16 @@ public class SavedEventsFrag extends Fragment implements ClickListener{
     private SwipeRefreshLayout swipeContainer;
     private JSONObject restoreEvent;
     private ArrayList<JSONObject> data;
+    private View mContentView;
+    private Handler mHandler;
+    private Runnable mShowContentRunnable = new Runnable() {
+
+        @Override
+        public void run() {
+            setContentShown(true);
+        }
+
+    };
 
     GetSavedDataInterface sGetDataInterface;
 
@@ -82,10 +99,6 @@ public class SavedEventsFrag extends Fragment implements ClickListener{
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        try {
-            sGetDataInterface = (GetSavedDataInterface) context;
-        } catch (ClassCastException e) {
-            throw new ClassCastException(context.toString() + "must implement GetDataInterface Interface"); }
     }
 
 
@@ -102,14 +115,6 @@ public class SavedEventsFrag extends Fragment implements ClickListener{
         } catch (JSONException e) {
             e.printStackTrace(); }
 
-        eventData = new ArrayList<JSONObject>();
-        mAdapter = new EventAdapter(getActivity().getApplicationContext(), 1, "saved", getFragmentManager(), getActivity());
-
-        try {
-            data = new QueryEventList(getString(R.string.DATABASE_SAVED_EVENTS_PULLER)).execute(currentUserId).get();
-        } catch (InterruptedException | ExecutionException e) {
-            e.printStackTrace();
-        }
     }
 
     public static SavedEventsFrag newInstance() {
@@ -120,11 +125,15 @@ public class SavedEventsFrag extends Fragment implements ClickListener{
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.activity_main, container, false);
-        swipeContainer = (SwipeRefreshLayout) rootView.findViewById(R.id.swipeContainer);
+        mContentView = inflater.inflate(R.layout.activity_main, container, false);
+        swipeContainer = (SwipeRefreshLayout) mContentView.findViewById(R.id.swipeContainer);
         setupSwipeDownRefresh();
-        mRecyclerView = (RecyclerView) rootView.findViewById(R.id.recyclerview_events);
-        return rootView;
+        mRecyclerView = (RecyclerView) mContentView.findViewById(R.id.recyclerview_events);
+        eventData = new ArrayList<JSONObject>();
+        mAdapter = new EventAdapter(getActivity().getApplicationContext(), 1, "saved", getFragmentManager(), getActivity());
+
+        return super.onCreateView(inflater, container, savedInstanceState);
+
     }
 
     /**********************************************************************************************
@@ -136,9 +145,10 @@ public class SavedEventsFrag extends Fragment implements ClickListener{
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-
-        TextView tv = (TextView) getActivity().findViewById(R.id.toolbar_title);
-        tv.setText("Attending");
+        setContentView(mContentView);
+        obtainData();
+        //TextView tv = (TextView) getActivity().findViewById(R.id.toolbar_title);
+       // tv.setText("Attending");
         mAdapter.setEventData(data);
         mRecyclerView.setAdapter(mAdapter);
         LinearLayoutManager layoutManager
@@ -150,6 +160,17 @@ public class SavedEventsFrag extends Fragment implements ClickListener{
         mRecyclerView.setDrawingCacheEnabled(true);
         mRecyclerView.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_HIGH);
 
+
+    }
+    private void obtainData(){
+        setContentShown(false);
+        mHandler = new Handler();
+        mHandler.postDelayed(mShowContentRunnable, 2000);
+        try {
+            data = new QueryEventList(getString(R.string.DATABASE_SAVED_EVENTS_PULLER)).execute(currentUserId).get();
+        } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
+        }
     }
 
     /**********************************************************************************************

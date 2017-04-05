@@ -87,7 +87,9 @@
     <string name="google_maps_key" templateMergeStrategy="preserve">AIzaSyDXcIGF3rFsw_ZcxCS6udrjz5cpVeaCK4I</string>
 
     <string name="DATABASE_MAIN_EVENTS_PULLER">http://athena.ecs.csus.edu/~teamone/php/android/pull_main_events_list.php</string>
-    <!--<<string name="IMAGE_URL_PATH">http://athena.ecs.csus.edu/~teamone/AndroidUploadImage/uploads/</string>-->
+    <!--string name="IMAGE_URL_PATH">http://athena.ecs.csus.edu/~teamone/AndroidUploadImage/uploads/</string-->
+    <string name="IMAGE_URL_PATH">http://athena.ecs.csus.edu/~teamone/events/</string>
+
     <string name="DATABASE_STORE_SAVED_EVENTS">http://athena.ecs.csus.edu/~teamone/php/android/store_saved_events.php</string>
     <string name="DATABASE_SAVED_EVENTS_PULLER">http://athena.ecs.csus.edu/~teamone/php/android/pull_saved_events_list.php</string>
     <string name="DATABASE_STORE_DELETED_EVENTS">http://athena.ecs.csus.edu/~teamone/php/android/store_deleted_events.php</string>
@@ -95,10 +97,12 @@
     <string name="DATABASE_RESTORE_SAVED_EVENTS">http://athena.ecs.csus.edu/~teamone/php/android/restore_saved_events.php</string>
     <string name="DATABASE_RESTORE_DELETED_EVENTS">http://athena.ecs.csus.edu/~teamone/php/android/restore_deleted_events.php</string>
     <string name="PULL_USER_PREFERENCES">http://athena.ecs.csus.edu/~teamone/php/android/pull_preferences.php</string>
-    <string name="IMAGE_URL_PATH">http://jagpal-development.com/AndroidUploadImage/uploads/</string>
+    <!--string name="IMAGE_URL_PATH">http://jagpal-development.com/AndroidUploadImage/uploads/</string-->
     <string name="PUSH_USER_PREFERENCES">"http://athena.ecs.csus.edu/~teamone/php/android/push_user_preferences.php"</string>
     <string name="PULL_EVENT_LIKES">"http://athena.ecs.csus.edu/~teamone/php/android/pull_event_likes.php"</string>
-
+    <string name="title_activity_map">MapActivity</string>
+    <string name="lorem_ipsum">Lorem ipsum dolor sit amet, consequat eu sem, interdum nam a vel. Diam urna in fermentum, vivamus fusce adipiscing mi. Urna libero amet euismod vulputate porttitor, malesuada tortor metus interdum, blandit tincidunt amet sollicitudin dui imperdiet, dolor in, pellentesque hendrerit. Aliquam quam et pariatur rerum, ipsum consequat, quis in.</string>
+    <string name="title_activity_archived_events">ArchivedEvents</string>
 
 
 </resources>

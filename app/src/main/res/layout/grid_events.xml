@@ -158,11 +158,12 @@
             android:layout_marginTop="5dp"
             android:layout_marginLeft="2dp"
             android:id="@+id/event_info_back"
+            android:visibility="gone"
             android:textSize="15sp"/>
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/event_info_back"
+            android:layout_below="@+id/event_cost_back"
             android:layout_marginTop="5dp"
             android:layout_marginLeft="2dp"
             android:id="@+id/event_distance_back"

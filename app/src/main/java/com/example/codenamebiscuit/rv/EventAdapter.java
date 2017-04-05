@@ -1,6 +1,7 @@
 package com.example.codenamebiscuit.rv;
 
 import android.app.Activity;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 
@@ -51,12 +52,14 @@ import com.example.codenamebiscuit.eventfragments.DisplayEvent;
 import com.example.codenamebiscuit.helper.FlipAnimation;
 import com.example.codenamebiscuit.helper.GPSTracker;
 import com.example.codenamebiscuit.helper.UpdateDbOnSwipe;
+import com.geniusforapp.fancydialog.FancyAlertDialog;
 import com.mikepenz.iconics.view.IconicsImageView;
 import com.muddzdev.styleabletoastlibrary.StyleableToast;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
+import com.thebrownarrow.model.MyLocation;
 
 import net.colindodd.toggleimagebutton.ToggleImageButton;
 
@@ -79,6 +82,21 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
     private Activity activity;
     private Bundle eventBundle;
     private Bundle bundle;
+    private static ArrayList<String> latsArrayList = new ArrayList<>();
+    private static ArrayList<String> lngsArrayList = new ArrayList<>();
+    private static ArrayList<String> eventNameList = new ArrayList<>();
+    private static ArrayList<String> eventImageList = new ArrayList<>();
+    private static ArrayList<String> eventDescList = new ArrayList<>();
+
+    private static ArrayList<String> hosterArrayList = new ArrayList<>();
+    private static ArrayList<String> costArrayList = new ArrayList<>();
+    private static ArrayList<String> eventStartList = new ArrayList<>();
+    private static ArrayList<String> eventTimeList = new ArrayList<>();
+    private static ArrayList<String> eventPrefList = new ArrayList<>();
+    private static ArrayList<String> eventLocationList = new ArrayList<>();
+
+    private static ArrayList<Integer> eventDistanceList = new ArrayList<>();
+
 
 
     public EventAdapter(Context context, int type, String message,
@@ -229,8 +247,24 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
             lat = mEventData.get(position).getDouble("lat");
             lng=mEventData.get(position).getDouble("lng");
             eventInfo = mEventData.get(position).getString("event_description");
+
+            eventNameList.add(event);
+            eventImageList.add(getImageURL(eventPath));
+            eventDescList.add(eventInfo);
+            latsArrayList.add(lat+"");
+            lngsArrayList.add(lng+"");
+            eventDistanceList.add(getLocation(lat,lng));
+
+            hosterArrayList.add(eventHoster);
+            costArrayList.add(cost);
+            eventStartList.add(startDate);
+            eventTimeList.add(startTime);
+            eventPrefList.add(eventPref);
+            eventLocationList.add(eventLocation);
+
         } catch (JSONException e) {
             e.printStackTrace(); }
+
 
         eventAdapterViewHolder.mEventPreferenceTV.setText(eventPref);
         eventAdapterViewHolder.mEventLocationTV.setText(eventLocation);
@@ -343,13 +377,37 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
-                    mEventData.remove(position);
-                    notifyItemRemoved(position);
-                    notifyItemRangeChanged(position, mEventData.size());
-                    if (message.equals("saved"))
-                        new UpdateDbOnSwipe(context.getString(R.string.DATABASE_RESTORE_SAVED_EVENTS)).execute(restoreEvent);
-                    else
-                        new UpdateDbOnSwipe(context.getString(R.string.DATABASE_RESTORE_DELETED_EVENTS)).execute(restoreEvent);
+                    FancyAlertDialog.Builder alert = new FancyAlertDialog.Builder(activity)
+                            .setTextTitle(eventAdapterViewHolder.mEventName.getText()+"")
+                            .setImageDrawable(eventAdapterViewHolder.mEventImage.getDrawable().getCurrent())
+                            .setTextSubTitle("Restore Event")
+                            .setBody("Restore this event back to main events list")
+                            .setPositiveButtonText("Continue")
+                            .setPositiveColor(R.color.livinPink)
+                            .setOnPositiveClicked(new FancyAlertDialog.OnPositiveClicked() {
+                                @Override
+                                public void OnClick(View view, Dialog dialog) {
+                                    mEventData.remove(position);
+                                    notifyItemRemoved(position);
+                                    notifyItemRangeChanged(position, mEventData.size());
+                                    if (message.equals("saved"))
+                                        new UpdateDbOnSwipe(context.getString(R.string.DATABASE_RESTORE_SAVED_EVENTS)).execute(restoreEvent);
+                                    else
+                                        new UpdateDbOnSwipe(context.getString(R.string.DATABASE_RESTORE_DELETED_EVENTS)).execute(restoreEvent);
+                                    dialog.dismiss();
+                                }
+                            })
+                            .setNegativeButtonText("Cancel")
+                            .setOnNegativeClicked(new FancyAlertDialog.OnNegativeClicked() {
+                                @Override
+                                public void OnClick(View view, Dialog dialog) {
+                                    dialog.dismiss();
+                                }
+                            })
+                            .build();
+                    alert.show();
+
+
                 }
             });
 
@@ -457,17 +515,18 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
             });
 
 
+            Log.i("Image", getImageURL(eventPath));
             Picasso.with(context.getApplicationContext())
                     .load(getImageURL(eventPath))
-                    .error( R.drawable.cast_album_art_placeholder)
-                    .placeholder(R.drawable.progress)
+                    //.error(R.drawable.cast_album_art_placeholder)
+                    .error(R.drawable.placeholder)
                     .into(eventAdapterViewHolder.mEventImage);
 
             Picasso.with(context.getApplicationContext())
                     .load(getImageURL(eventPath))
                     .networkPolicy(NetworkPolicy.OFFLINE)
-                    .error( R.drawable.cast_album_art_placeholder)
-                    .placeholder(R.drawable.progress)
+                    //.error( R.drawable.cast_album_art_placeholder)
+                    .error(R.drawable.placeholder)
                     .into(eventAdapterViewHolder.mEventImageback);
 
         }
@@ -528,23 +587,17 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
     }
 
     public String getImageURL(String path) {
-        return "http://athena.ecs.csus.edu/~teamone/AndroidUploadImage/uploads/" + path; }
+        return context.getString(R.string.IMAGE_URL_PATH) + path; }
 
     public void loadImage(final ImageView imageView, final String URL) {
-        final Handler mainThreadHandler = new Handler();
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                mainThreadHandler.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        Picasso.with(imageView.getContext())
-                                .load(URL)
-                                .placeholder(R.drawable.progress)
-                                .error(R.drawable.cast_album_art_placeholder)
-                                .into(imageView); }
-            }, 300);}}).start();
-    }
+
+        Log.i("Image", URL);
+
+        Picasso.with(imageView.getContext())
+                .load(URL)
+                .placeholder(R.drawable.progress)
+                //.error(R.drawable.cast_album_art_placeholder)
+                .into(imageView); }
 
 
     public void clear() {
@@ -571,9 +624,46 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
             lastPosition=position;
         }
     }
+    public ArrayList<String> getLatsArrayList(){
+        return latsArrayList;
+    }
+    public ArrayList<String> getLngsArrayList(){
+        return lngsArrayList;
+    }
 
     public ArrayList<JSONObject> getObject() {
         return mEventData;
+    }
+
+    public ArrayList<String> getEventNameList(){
+        return eventNameList;
+    }
+    public ArrayList<String> getEventDescList(){
+        return eventDescList;
+    }
+    public ArrayList<String> getEventImageList(){
+        return eventImageList;
+    }
+    public ArrayList<String> getCostArrayList(){
+        return costArrayList;
+    }
+    public ArrayList<String> getEventLocationList(){
+        return eventLocationList;
+    }
+    public ArrayList<String> getHosterArrayList(){
+        return hosterArrayList;
+    }
+    public ArrayList<String> getEventStartList(){
+        return eventStartList;
+    }
+    public ArrayList<String> getEventPrefList(){
+        return eventPrefList;
+    }
+    public ArrayList<String> getEventTimeList(){
+        return eventTimeList;
+    }
+    public ArrayList<Integer> getEventDistanceList(){
+        return eventDistanceList;
     }
 
 }

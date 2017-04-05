@@ -13,9 +13,9 @@
         sothree:showAsAction="never"
         android:title="Anchor Preferences"/>
     <item
-        android:id="@+id/flip_action"
-        android:icon="@drawable/ic_autorenew_white_24dp"
+        android:id="@+id/map_action"
+        android:icon="@drawable/ic_map_white_48dp"
         sothree:showAsAction="always"
-        android:visible="false"/>
+        />
 
 </menu>

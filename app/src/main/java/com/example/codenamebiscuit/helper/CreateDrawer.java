@@ -22,6 +22,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.codenamebiscuit.ArchivedEvents;
 import com.example.codenamebiscuit.EmbeddedFragment;
 import com.example.codenamebiscuit.R;
 import com.example.codenamebiscuit.eventfragments.DeletedEventsFrag;
@@ -52,10 +53,14 @@ import com.mikepenz.materialize.Materialize;
 import com.muddzdev.styleabletoastlibrary.StyleableToast;
 import com.squareup.picasso.Picasso;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.ExecutionException;
 
 
 /**
@@ -69,13 +74,13 @@ public class CreateDrawer {
     private Context context;
     private Activity activity;
     Drawer result=null;
-    private Drawer resultAppended = null;
     AccountHeader headerResult=null;
     private FragmentManager fragmentManager;
-    private MiniDrawer miniResult = null;
     private int livinPink, overlay;
     private int livinBlack, livinWhite;
+    private int numOfSavedEvents, numOfDeletedEvents, totalNumEvents;
     private String currentLat, currentLng;
+    private PrimaryDrawerItem gridEvents, fullScreen,archivedEvents,account,logOut;
     GPSTracker gps;
     LatLng latLng;
     SharedPreferences preferences;
@@ -99,6 +104,12 @@ public class CreateDrawer {
         livinBlack=context.getColor(R.color.livinBlack);
         livinWhite=context.getColor(R.color.livinWhite);
         preferences=PreferenceManager.getDefaultSharedPreferences(context);
+        gridEvents = new PrimaryDrawerItem();
+        fullScreen = new PrimaryDrawerItem();
+        archivedEvents = new PrimaryDrawerItem();
+        account = new PrimaryDrawerItem();
+        logOut = new PrimaryDrawerItem();
+        //getNumberOfEvents();
 
     }
 
@@ -124,46 +135,44 @@ public class CreateDrawer {
                 .withActivity(activity)
                 .withToolbar(toolbar)
                 .withSliderBackgroundColor(context.getColor(R.color.black_overlay))
-                .withDelayDrawerClickEvent(40)
+                .withDelayDrawerClickEvent(150)
                 //.withDelayOnDrawerClose(300)
                 .withAccountHeader(headerResult)
                 .addDrawerItems(
-                        new PrimaryDrawerItem()
-                                .withName("Grid Events").withIcon(GoogleMaterial.Icon.gmd_home)
+                        gridEvents
+                                .withName("Grid Events")
+                                .withIcon(R.drawable.ic_home_white_48dp)
                                 .withIdentifier(1)
                                 .withTextColor(livinWhite)
                                 .withIconColor(livinWhite)
                                 .withSelectedTextColor(livinPink)
                                 .withSelectedIconColor(livinPink)
-                                .withSelectedColor(context.getColor(R.color.translivinPink)) .withSetSelected(true),
+                                .withSelectedColor(context.getColor(R.color.translivinPink))
+                                .withSetSelected(true),
                         new DividerDrawerItem(),
-                        new PrimaryDrawerItem()
-                                .withName("Full Screen").withIcon(GoogleMaterial.Icon.gmd_fullscreen).withIdentifier(2)
+                        fullScreen
+                                .withName("Full Screen")
+                                .withIcon(R.drawable.ic_fullscreen_white_48dp)
+                                .withIdentifier(2)
                                 .withTextColor(livinWhite)
                                 .withIconColor(livinWhite)
                                 .withSelectedTextColor(livinPink)
                                 .withSelectedIconColor(livinPink)
-                                .withSelectedColor(context.getColor(R.color.translivinPink)) .withSetSelected(true),
+                                .withSelectedColor(context.getColor(R.color.translivinPink)),
                         new DividerDrawerItem(),
 
-                        new PrimaryDrawerItem()
-                                .withName("Saved Events").withIcon(GoogleMaterial.Icon.gmd_save).withIdentifier(3)
+                        archivedEvents
+                                .withIdentifier(3)
+                                .withName("Archived Events")
+                                .withIcon(R.drawable.ic_archive_white_48dp)
                                 .withTextColor(livinWhite)
-                                .withIconColor(livinWhite)
-                                .withSelectedTextColor(livinPink)
-                                .withSelectedIconColor(livinPink)
-                                .withSelectedColor(context.getColor(R.color.translivinPink)) .withSetSelected(true),
+                                .withSelectable(false),
                         new DividerDrawerItem(),
-                        new PrimaryDrawerItem()
-                                .withName("Deleted Events").withIcon(GoogleMaterial.Icon.gmd_delete).withIdentifier(4)
-                                .withTextColor(livinWhite)
-                                .withIconColor(livinWhite)
-                                .withSelectedTextColor(livinPink)
-                                .withSelectedIconColor(livinPink)
-                                .withSelectedColor(context.getColor(R.color.translivinPink)) .withSetSelected(true),
-                        new DividerDrawerItem(),
-                        new PrimaryDrawerItem()
-                                .withName("Preferences").withIcon(GoogleMaterial.Icon.gmd_settings).withIdentifier(5)
+
+                        account
+                                .withName("Account")
+                                .withIcon(R.drawable.ic_account_circle_white_48dp)
+                                .withIdentifier(4)
                                 .withTextColor(livinWhite)
                                 .withIconColor(livinWhite)
                                 .withSelectedTextColor(livinPink)
@@ -171,8 +180,8 @@ public class CreateDrawer {
                                 .withSelectable(false),
 
                         new DividerDrawerItem(),
-                        new PrimaryDrawerItem()
-                                .withName("Log Out").withIcon(FontAwesome.Icon.faw_sign_out).withIdentifier(7)
+                        logOut
+                                .withName("Log Out").withIcon(FontAwesome.Icon.faw_sign_out).withIdentifier(5)
                                 .withTextColor(livinWhite)
                                 .withIconColor(livinWhite)
                                 .withSelectedTextColor(livinPink)
@@ -193,25 +202,20 @@ public class CreateDrawer {
                                 fragment = new GridMainEventsFrag().newInstance();
                             else if (drawerItem.getIdentifier()==2)
                                 fragment = new SwipeEvents().newInstance();
-                            else if (drawerItem.getIdentifier()==3)
-                                fragment = new SavedEventsFrag().newInstance();
+                            else if(drawerItem.getIdentifier()==3)
+                                intent = new Intent(activity, ArchivedEvents.class);
                             else if (drawerItem.getIdentifier()==4)
-                                fragment = new DeletedEventsFrag().newInstance();
-                            else if (drawerItem.getIdentifier()==5)
                                 intent = new Intent(activity, UserSettingsActivity.class);
-                            else if (drawerItem.getIdentifier()==6) {}
-                                //fragment = new GridMainEventsFrag();
-                            else if(drawerItem.getIdentifier()==7) {
+                            else if(drawerItem.getIdentifier()==5) {
                                 preferences.edit().clear().apply();
-                                preferences.edit().putString("user_id", null).commit();
-                                preferences.edit().putString("user_image", null).commit();
-                                preferences.edit().putString("fName", null).commit();
+                                preferences.edit().putString("user_id", null).apply();
+                                preferences.edit().putString("user_image", null).apply();
+                                preferences.edit().putString("fName", null).apply();
                                 preferences.edit().putString("lName", null).apply();
                                 preferences.edit().putString("email", null).apply();
                                 intent = new Intent(activity, ChooseLogin.class);
                             }
 
-                            //result.closeDrawer();
 
                             if (intent != null) {
                                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -288,6 +292,7 @@ public class CreateDrawer {
         }
 
     }
+
     public Drawer getResult(){
         return result;
     }

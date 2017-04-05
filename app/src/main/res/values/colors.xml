@@ -12,6 +12,11 @@
     <color name="grid_foreground_selected">#B3000000</color>
     <color name="grid_label_text_normal">#FFF</color>
     <color name="grid_label_text_selected">#B3FFFFFF</color>
+    <string-array name="livColors">
+        <item>#ff9dfc</item>
+        <item>#000000</item>
+        <item>#55ff9dfc</item>
+    </string-array>
 
 
 </resources>

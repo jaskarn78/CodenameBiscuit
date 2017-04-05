@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.preference.PreferenceManager;
@@ -26,6 +27,7 @@ import android.widget.Toolbar;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.devspark.progressfragment.ProgressFragment;
 import com.example.codenamebiscuit.R;
 import com.example.codenamebiscuit.helper.FlipAnimation;
 import com.example.codenamebiscuit.helper.QueryEventList;
@@ -47,7 +49,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
-public class SwipeEvents extends android.support.v4.app.Fragment{
+public class SwipeEvents extends ProgressFragment{
 
     private SwipeDeck cardStack;
     private SwipeDeckAdapter adapter;
@@ -66,15 +68,22 @@ public class SwipeEvents extends android.support.v4.app.Fragment{
     private MenuItem item;
     private ArrayList<JSONObject> data;
     private int lastPosition = -1;
-    private FloatingActionButton floatingActionButton;
     MapView mapView;
     private GoogleMap googleMap;
+    private View mContentView;
     GetMainSwipeDataInterface sGetDataInterface;
+    private Handler mHandler;
+    private Runnable mShowContentRunnable = new Runnable() {
+
+        @Override
+        public void run() {
+            setContentShown(true);
+        }
+    };
 
     public interface GetMainSwipeDataInterface {
         ArrayList<JSONObject> getMainEventList();
         ArrayList<JSONObject> getUpdatedEventList();
-
     }
     @Override
     public void onAttach(Context context) {
@@ -107,21 +116,33 @@ public class SwipeEvents extends android.support.v4.app.Fragment{
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState){
 
-        View rootView = inflater.inflate(R.layout.activity_swipe_events, container, false);
-        cardStack = (SwipeDeck) rootView.findViewById(R.id.swipe_deck);
+        mContentView = inflater.inflate(R.layout.activity_swipe_events, container, false);
+        cardStack = (SwipeDeck) mContentView.findViewById(R.id.swipe_deck);
         setHasOptionsMenu(true);
 
         //alter toolbar title
         TextView textView = (TextView)getActivity().findViewById(R.id.toolbar_title);
         textView.setText("LIV IT");
-
-        return rootView;
+        return super.onCreateView(inflater, container, savedInstanceState);
 
     }
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+        setContentView(mContentView);
+        obtainData();
         setupOnCreate(savedInstanceState);
+    }
+
+    private void obtainData(){
+        setContentShown(false);
+        mHandler = new Handler();
+        mHandler.postDelayed(mShowContentRunnable, 1000);
+        try {
+            data = new QueryEventList(getString(R.string.DATABASE_MAIN_EVENTS_PULLER)).execute(user).get();
+        } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -131,15 +152,7 @@ public class SwipeEvents extends android.support.v4.app.Fragment{
     @Override
     public void onResume() {
         super.onResume();
-        try {
-            data = new QueryEventList(getString(R.string.DATABASE_MAIN_EVENTS_PULLER)).execute(user).get();
-            adapter.setData(data);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (ExecutionException e) {
-            e.printStackTrace();
-        }
-
+        //adapter.notifyDataSetChanged();
     }
     @Override
     public void onStart(){
@@ -210,7 +223,7 @@ public class SwipeEvents extends android.support.v4.app.Fragment{
      * @return URL of image located on server
      */
     public String getImageURL(String path) {
-        return getString(R.string.IMAGE_URL_PATH) + path;
+        return "http://athena.ecs.csus.edu/~teamone/events/ + path";
     }
 
 
@@ -234,13 +247,6 @@ public class SwipeEvents extends android.support.v4.app.Fragment{
         super.onLowMemory();
     }
 
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.sliding_panel, menu);
-        item =menu.findItem(R.id.flip_action);
-        item.setVisible(true);
-        super.onCreateOptionsMenu(menu, inflater);
-    }
 
 
 
@@ -290,7 +296,7 @@ public class SwipeEvents extends android.support.v4.app.Fragment{
                 LayoutInflater inflater = getActivity().getLayoutInflater();
                 v = inflater.inflate(R.layout.cards, parent, false);
             try {
-                image = getImageURL(data.get(position).getString("img_path"));
+                image = data.get(position).getString("img_path");
                 event_id = data.get(position).getString("event_id");
                 String user_id = data.get(position).getString("user_id");
                 event_location = data.get(position).getString("event_location");
@@ -312,12 +318,13 @@ public class SwipeEvents extends android.support.v4.app.Fragment{
 
             ImageView frontCardImage = (ImageView) v.findViewById(R.id.offer_image);
             //Picasso.with(context).load(image).into(frontCardImage);
-            Glide.with(SwipeEvents.this).load(image).diskCacheStrategy(DiskCacheStrategy.ALL)
+            Glide.with(SwipeEvents.this).load(getImageURL(image)).diskCacheStrategy(DiskCacheStrategy.ALL)
                     .placeholder(R.drawable.progress).into(frontCardImage);
+            Log.i("Image path", getImageURL(image));
 
             final ImageView flippedCardImage = (ImageView) v.findViewById(R.id.back_image);
             //Picasso.with(context).load(image).centerCrop().fit().into(flippedCardImage);
-            Glide.with(SwipeEvents.this).load(image).centerCrop()
+            Glide.with(SwipeEvents.this).load(getImageURL(image)).centerCrop()
                     .placeholder(R.drawable.progress).into(flippedCardImage);
 
             TextView event_location_tv = (TextView) v.findViewById(R.id.display_event_location);
@@ -363,6 +370,8 @@ public class SwipeEvents extends android.support.v4.app.Fragment{
             });
             return v;
         }
+        public String getImageURL(String path) {
+            return context.getString(R.string.IMAGE_URL_PATH) + path; }
         private double getLat(){
             return Double.parseDouble(lat);
         }

@@ -5,12 +5,15 @@ package com.example.codenamebiscuit.eventfragments;
  */
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.preference.PreferenceManager;
 import android.support.v7.widget.CardView;
@@ -21,12 +24,15 @@ import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.devspark.progressfragment.ProgressFragment;
+import com.example.codenamebiscuit.MapActivity;
 import com.example.codenamebiscuit.R;
 import com.example.codenamebiscuit.helper.FlipAnimation;
 import com.example.codenamebiscuit.helper.QueryEventList;
@@ -49,7 +55,7 @@ import java.util.concurrent.ExecutionException;
  * Created by jaskarnjagpal on 2/23/17.
  */
 
-public class GridMainEventsFrag extends Fragment implements ClickListener {
+public class GridMainEventsFrag extends ProgressFragment implements ClickListener {
 
     private RecyclerView mRecyclerView;
     private EventAdapter mAdapter;
@@ -60,28 +66,27 @@ public class GridMainEventsFrag extends Fragment implements ClickListener {
     private SwipeRefreshLayout swipeContainer;
     private JSONObject saveEvent, deleteEvent;
     private ArrayList<JSONObject> data;
-    GetMainDataInterface sGetDataInterface;
+    private View mContentView;
+    private Handler mHandler;
+    private Runnable mShowContentRunnable = new Runnable() {
 
-    public interface GetMainDataInterface {
-        ArrayList<JSONObject> getMainEventList();
-        ArrayList<JSONObject> getUpdatedEventList();
-    }
+        @Override
+        public void run() {
+            setContentShown(true);
+        }
+
+    };
 
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        try {
-            sGetDataInterface = (GetMainDataInterface) context;
-
-        } catch (ClassCastException e) {
-            throw new ClassCastException(context.toString() + "must implement GetDataInterface Interface");
-        }
     }
 
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         pref = PreferenceManager.getDefaultSharedPreferences(getContext());
         saveEvent = new JSONObject();
         deleteEvent=new JSONObject();
@@ -92,17 +97,10 @@ public class GridMainEventsFrag extends Fragment implements ClickListener {
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        eventData = new ArrayList<JSONObject>();
+        setHasOptionsMenu(true);
 
+        eventData = new ArrayList<JSONObject>();
         mAdapter = new EventAdapter(getContext().getApplicationContext(), 2, "", getFragmentManager(), getActivity());
-        try {
-            data = new QueryEventList(getString(R.string.DATABASE_MAIN_EVENTS_PULLER)).execute(currentUserId).get();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (ExecutionException e) {
-            e.printStackTrace();
-        }
-        if (savedInstanceState == null) {}
 
     }
 
@@ -110,18 +108,22 @@ public class GridMainEventsFrag extends Fragment implements ClickListener {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState){
 
-        View rootView = inflater.inflate(R.layout.activity_main, container, false);
-        //initialize event dataset
-        swipeContainer = (SwipeRefreshLayout) rootView.findViewById(R.id.swipeContainer);
-        setupSwipeDownRefresh();
-        mRecyclerView = (RecyclerView)rootView.findViewById(R.id.recyclerview_events);
-        mRecyclerView.setHasFixedSize(false);
-        mRecyclerView.setItemViewCacheSize(100);
-        mRecyclerView.setDrawingCacheEnabled(true);
-        mRecyclerView.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_HIGH);
+        mContentView = inflater.inflate(R.layout.activity_main, container, false);
 
-        return rootView;
+        return super.onCreateView(inflater, container, savedInstanceState);
 
+    }
+
+    private void obtainData(){
+        mHandler = new Handler();
+        mHandler.postDelayed(mShowContentRunnable, 100);
+        try {
+            data = new QueryEventList(getString(R.string.DATABASE_MAIN_EVENTS_PULLER)).execute(currentUserId).get();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        }
     }
     public static GridMainEventsFrag newInstance() {
         GridMainEventsFrag myFragment = new GridMainEventsFrag();
@@ -134,9 +136,35 @@ public class GridMainEventsFrag extends Fragment implements ClickListener {
         return activeNetworkInfo != null && activeNetworkInfo.isConnected();
     }
     @Override
-    public void onPrepareOptionsMenu(Menu menu) {
-        menu.findItem(R.id.flip_action).setVisible(false);
+    public void onPrepareOptionsMenu(final Menu menu) {
+        menu.findItem(R.id.map_action).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                Bundle bundle = new Bundle();
+                bundle.putStringArrayList("latList", mAdapter.getLatsArrayList());
+                bundle.putStringArrayList("lngList", mAdapter.getLngsArrayList());
+                bundle.putStringArrayList("nameList", mAdapter.getEventNameList());
+                bundle.putStringArrayList("imageList", mAdapter.getEventImageList());
+                bundle.putStringArrayList("descList", mAdapter.getEventDescList());
+                bundle.putStringArrayList("hosterList", mAdapter.getHosterArrayList());
+                bundle.putStringArrayList("costList", mAdapter.getCostArrayList());
+                bundle.putStringArrayList("startList", mAdapter.getEventStartList());
+                bundle.putStringArrayList("timeList", mAdapter.getEventTimeList());
+                bundle.putStringArrayList("prefList", mAdapter.getEventPrefList());
+                bundle.putStringArrayList("locationList", mAdapter.getEventLocationList());
+                bundle.putIntegerArrayList("distanceList", mAdapter.getEventDistanceList());
 
+                Fragment fragment = new MapActivity();
+                fragment.setArguments(bundle);
+                FragmentTransaction ft = getFragmentManager().beginTransaction();
+                ft.setCustomAnimations(R.anim.enter, R.anim.exit);
+                ft.replace(R.id.fragment_container, fragment);
+                ft.addToBackStack(null);
+                ft.commit();
+                getFragmentManager().executePendingTransactions();
+                return false;
+            }
+        });
     }
 
 
@@ -145,10 +173,17 @@ public class GridMainEventsFrag extends Fragment implements ClickListener {
      * assigns mEventAdapter which contains all event information retrieved from MySQL request
      * recycler view is assigned a linear layout
      **********************************************************************************************/
-
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+        setContentView(mContentView);
+        //initialize event dataset
+        obtainData();
+        setContentShown(false);
+
+        swipeContainer = (SwipeRefreshLayout) mContentView.findViewById(R.id.swipeContainer);
+        setupSwipeDownRefresh();
+        mRecyclerView = (RecyclerView)mContentView.findViewById(R.id.recyclerview_events);
 
         mAdapter.setEventData(data);
         mRecyclerView.setAdapter(mAdapter);
@@ -156,6 +191,12 @@ public class GridMainEventsFrag extends Fragment implements ClickListener {
 
         StaggeredGridLayoutManager staggeredGridLayoutManager = new StaggeredGridLayoutManager(2, 1);
         mRecyclerView.setLayoutManager(staggeredGridLayoutManager);
+
+        mRecyclerView.setHasFixedSize(false);
+        mRecyclerView.setItemViewCacheSize(200);
+        mRecyclerView.setDrawingCacheEnabled(true);
+        mRecyclerView.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_AUTO);
+
         TextView textView = (TextView)getActivity().findViewById(R.id.toolbar_title);
         textView.setText("LIV IT");
         StyleableToast st = new StyleableToast(getContext(), "Network not detected!", Toast.LENGTH_LONG);
@@ -220,32 +261,26 @@ public class GridMainEventsFrag extends Fragment implements ClickListener {
                     e.printStackTrace();
                 }
                 mAdapter.setEventData(data);
-                swipeContainer.setRefreshing(false);
-            }
-
+                swipeContainer.setRefreshing(false); }
         });
         swipeContainer.setColorSchemeResources(android.R.color.holo_blue_bright,
                 android.R.color.holo_green_light,
                 android.R.color.holo_orange_light,
-                android.R.color.holo_red_light);
+                android.R.color.holo_red_light); }
 
-    }
     /**********************************************************************************************
      * Handles the drop down functionality in the list view of the event data
      * When image button is clicked, additional event information is revealed
      * @param view
      * @param position
      **********************************************************************************************/
-
     @Override
     public void itemClicked(View view, int position) {
         RelativeLayout layout = (RelativeLayout)view.findViewById(R.id.extend);
         if (layout.getVisibility() == View.GONE)
             layout.setVisibility(View.VISIBLE);
         else
-            layout.setVisibility(View.GONE);
-    }
-
+            layout.setVisibility(View.GONE); }
 
     /**********************************************************************************************
      * HTTP request to run python script which contains sql command
@@ -263,8 +298,7 @@ public class GridMainEventsFrag extends Fragment implements ClickListener {
         } catch (InterruptedException e) {
             e.printStackTrace();
         } catch (ExecutionException e) {
-            e.printStackTrace();
-        }
+            e.printStackTrace(); }
     }
 
     public void setEventData(ArrayList<JSONObject> dataGrid){
