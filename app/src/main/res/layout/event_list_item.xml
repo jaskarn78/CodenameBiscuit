@@ -75,40 +75,46 @@
         android:foreground="?android:attr/selectableItemBackground"
 
         >
+
         <ImageView
             android:id="@+id/row_menu"
             android:layout_width="30dp"
             android:layout_height="30dp"
             android:layout_alignParentEnd="true"
             android:layout_margin="5dp"
+            android:layout_below="@+id/tv_event_name"
             android:clickable="true"
+            android:background="@android:color/transparent"
             android:src="@drawable/ic_shortcut_more_vert" />
+
 
         <ImageView
             android:layout_width="95dp"
             android:layout_height="95dp"
             android:scaleType="fitXY"
             android:id="@+id/iv_event_image"
-            android:layout_alignParentLeft="true"
-            android:layout_marginRight="16dp"
+            android:layout_alignParentStart="true"
+            android:background="@drawable/rounded_rectangle_blue_border"
+            android:layout_marginEnd="16dp"
+            />
+        <ProgressBar
+            android:layout_width="95dp"
+            android:layout_height="95dp"
+            android:id="@+id/progress_bar"
+            android:layout_alignParentStart="true"
+            android:background="@drawable/rounded_rectangle_blue_border"
+            android:layout_marginEnd="16dp"
             />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/tv_event_name"
-            android:layout_toRightOf="@+id/iv_event_image"
+            android:layout_toEndOf="@+id/iv_event_image"
             android:layout_alignParentTop="true"
-            android:textSize="20sp"
+            android:textSize="16sp"
             />
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/tv_event_hoster"
-            android:layout_toRightOf="@+id/iv_event_image"
-            android:layout_below="@+id/tv_event_preference"
-            android:textSize="10sp"
-            />
+
 
         <TextView
             android:layout_width="wrap_content"
@@ -116,14 +122,36 @@
             android:id="@+id/tv_event_location"
             android:layout_toRightOf="@+id/iv_event_image"
             android:layout_below="@+id/tv_event_hoster"
+            android:text="Sacramento, CA"
             />
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/tv_event_preference"
             android:textSize="12sp"
-            android:layout_toEndOf="@+id/tv_event_name"
-            android:layout_marginTop="7dp"
+            android:layout_below="@+id/tv_event_name"
+            android:layout_toRightOf="@+id/iv_event_image"
+            android:text="Music"
+            />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/tv_event_preference2"
+            android:textSize="12sp"
+            android:layout_below="@+id/tv_event_name"
+            android:layout_marginStart="5dp"
+            android:layout_toRightOf="@+id/tv_event_preference"
+            android:text="Sports"
+            />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/tv_event_preference3"
+            android:textSize="12sp"
+            android:layout_below="@+id/tv_event_name"
+            android:layout_marginStart="5dp"
+            android:layout_toRightOf="@+id/tv_event_preference2"
+            android:text="Outdoor"
             />
 
         <TextView
@@ -148,7 +176,17 @@
             android:id="@+id/event_distance"
             android:gravity="center_horizontal"
             android:layout_toRightOf="@+id/iv_event_image"
+            android:visibility="gone"
             android:layout_below="@+id/cost" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/tv_event_hoster"
+            android:layout_toEndOf="@+id/iv_event_image"
+            android:layout_below="@+id/tv_event_preference"
+            android:text="Presented By"
+            android:textSize="10sp"
+            />
 
         <TextView
             android:layout_width="wrap_content"

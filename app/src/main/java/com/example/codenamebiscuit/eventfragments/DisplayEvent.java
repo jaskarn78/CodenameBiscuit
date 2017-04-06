@@ -1,39 +1,31 @@
 package com.example.codenamebiscuit.eventfragments;
 
-import android.content.Context;
 import android.content.Intent;
+import android.graphics.PorterDuff;
 import android.graphics.Typeface;
-import android.icu.text.DateFormat;
+import android.graphics.drawable.Drawable;
 import android.icu.text.SimpleDateFormat;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.TextView;
 
-import com.devspark.progressfragment.ProgressFragment;
 import com.example.codenamebiscuit.R;
-import com.github.ksoichiro.android.observablescrollview.ObservableListView;
-import com.github.ksoichiro.android.observablescrollview.ObservableScrollViewCallbacks;
-import com.github.ksoichiro.android.observablescrollview.ScrollState;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.MapView;
-import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.like.LikeButton;
@@ -42,8 +34,6 @@ import com.squareup.picasso.Picasso;
 
 import java.text.ParseException;
 import java.util.Date;
-import java.util.logging.Handler;
-import java.util.logging.LogRecord;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -53,8 +43,7 @@ import java.util.logging.LogRecord;
  * Use the {@link DisplayEvent#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class DisplayEvent extends ProgressFragment{
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
+public class DisplayEvent extends AppCompatActivity{
 
     private ImageView displayEventImage;
     private TextView displayEventName, displayEventStartDate, displayEventStartTIme;
@@ -72,25 +61,15 @@ public class DisplayEvent extends ProgressFragment{
     private IconicsImageView webSite, navigate;
     private IconicsImageView phone;
     private WebView webView;
+    private Toolbar toolbar;
+    private TextView toolbarTitle;
     MapView mapView;
     private GoogleMap googleMap;
     Typeface typeface;
-    private View rootView;
-    private android.os.Handler mHandler;
-    private Runnable mShowContentRunnable = new Runnable() {
-        @Override
-        public void run() {
-            setContentShown(true);
-        }
-
-    };
 
 
-
-    private OnFragmentInteractionListener mListener;
 
     public DisplayEvent() {
-        // Required empty public constructor
     }
 
 
@@ -103,43 +82,73 @@ public class DisplayEvent extends ProgressFragment{
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        typeface= Typeface.createFromAsset(getContext().getAssets(), "fonts/Raleway-Black.ttf");
+
+        this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+
+        setContentView(R.layout.activity_display_event);
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbarTitle = (TextView)findViewById(R.id.toolbar_title);
+        setSupportActionBar(toolbar);
+        this.getSupportActionBar().setDisplayShowTitleEnabled(false);
+        final Drawable upArrow = getResources().getDrawable(R.drawable.ic_arrow_back_black_18dp);
+        upArrow.setColorFilter(getResources().getColor(R.color.livinPink), PorterDuff.Mode.SRC_ATOP);
+        this.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        this.getSupportActionBar().setHomeAsUpIndicator(upArrow);
+
+        typeface= Typeface.createFromAsset(this.getAssets(), "fonts/Raleway-Black.ttf");
+        bindViews(savedInstanceState);
+
+        setupMap(savedInstanceState);
 
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        rootView = inflater.inflate(R.layout.fragment_display_event, container, false);
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // handle arrow click here
+        if (item.getItemId() == android.R.id.home) {
+            finish();
+        }
 
-        likeText = (TextView)rootView.findViewById(R.id.currentRating);
-        likeButton = (LikeButton)rootView.findViewById(R.id.like);
+        return super.onOptionsItemSelected(item);
+    }
 
-        phone = (IconicsImageView)rootView.findViewById(R.id.event_call);
-        webSite = (IconicsImageView)rootView.findViewById(R.id.event_website);
-        navigate = (IconicsImageView)rootView.findViewById(R.id.event_directions);
-        displayEventImage = (ImageView)rootView.findViewById(R.id.display_event_image);
+    @Override
+    public boolean onSupportNavigateUp(){
+        onBackPressed();
+        return true;
+    }
 
-        ratingBar = (RatingBar)rootView.findViewById(R.id.ratingBar);
-        webView = (WebView)rootView.findViewById(R.id.webView);
+    public void bindViews(Bundle savedInstanceState) {
+
+        likeText = (TextView)findViewById(R.id.currentRating);
+        likeButton = (LikeButton)findViewById(R.id.like);
+
+        phone = (IconicsImageView)findViewById(R.id.event_call);
+        webSite = (IconicsImageView)findViewById(R.id.event_website);
+        navigate = (IconicsImageView)findViewById(R.id.event_directions);
+        displayEventImage = (ImageView)findViewById(R.id.display_event_image);
+
+        ratingBar = (RatingBar)findViewById(R.id.ratingBar);
+        webView = (WebView)findViewById(R.id.webView);
 
 
-        displayEventName = (TextView)rootView.findViewById(R.id.display_event_name);
-        displayEventHoster = (TextView)rootView.findViewById(R.id.event_hoster);
-        displayEventDistance = (TextView)rootView.findViewById(R.id.display_event_distance);
-        displayEventPref = (TextView)rootView.findViewById(R.id.display_event_preference);
-        displayEventDesc = (TextView)rootView.findViewById(R.id.display_event_description);
-        displayEventLocation = (TextView)rootView.findViewById(R.id.display_event_location);
-        displayEventStartDate = (TextView)rootView.findViewById(R.id.display_event_date);
-        displayEventCost = (TextView)rootView.findViewById(R.id.display_event_cost);
-        displayEventStartTIme = (TextView)rootView.findViewById(R.id.display_event_time);
-        mapView = (MapView)rootView.findViewById(R.id.mapView);
+        displayEventName = (TextView)findViewById(R.id.display_event_name);
+        displayEventHoster = (TextView)findViewById(R.id.event_hoster);
+        displayEventDistance = (TextView)findViewById(R.id.display_event_distance);
+        displayEventPref = (TextView)findViewById(R.id.display_event_preference);
+        displayEventDesc = (TextView)findViewById(R.id.display_event_description);
+        displayEventLocation = (TextView)findViewById(R.id.display_event_location);
+        displayEventStartDate = (TextView)findViewById(R.id.display_event_date);
+        displayEventCost = (TextView)findViewById(R.id.display_event_cost);
+        displayEventStartTIme = (TextView)findViewById(R.id.display_event_time);
+        mapView = (MapView)findViewById(R.id.mapView);
         mapView.onCreate(savedInstanceState);
         mapView.onResume();
 
-
-        Bundle bundle = this.getArguments();
+        Bundle bundle = getIntent().getExtras();
         eventName=bundle.getString("eventName");
+        toolbarTitle.setText(eventName);
+
         eventImage = bundle.getString("eventImage");
         eventDate = bundle.getString("eventDate");
         eventHoster = bundle.getString("eventHoster");
@@ -156,23 +165,13 @@ public class DisplayEvent extends ProgressFragment{
         mapImage = bundle.getInt("mapImage");
         Log.i("coords", eventLat+", "+eventLng);
 
-
-        return super.onCreateView(inflater, container, savedInstanceState);
     }
 
-    @Override
-    public void onActivityCreated(Bundle savedInstanceState){
-        super.onActivityCreated(savedInstanceState);
-        setContentView(rootView);
-        setContentShown(false);
-        mHandler = new android.os.Handler();
-        mHandler.postDelayed(mShowContentRunnable, 500);
-
+    public void setupMap(Bundle savedInstanceState){
         mapView.getMapAsync(new OnMapReadyCallback() {
             @Override
             public void onMapReady(GoogleMap gMap) {
                 googleMap=gMap;
-                // Add a marker in Sydney and move the camera
                 LatLng eventCoords = new LatLng(eventLat, eventLng);
                 googleMap.addMarker(new MarkerOptions().position(eventCoords).title(eventName));
                 CameraUpdate update = CameraUpdateFactory.newLatLngZoom(eventCoords, 10);
@@ -180,13 +179,12 @@ public class DisplayEvent extends ProgressFragment{
             }
         });
 
-
         loadImage();
 
         displayEventName.setText(eventName);
-        displayEventHoster.setText("By: "+eventHoster);
+        displayEventHoster.setText("Presented By: "+eventHoster);
         displayEventDistance.setText(eventDistance);
-        displayEventPref.setText(eventPreferences);
+        displayEventPref.setText(eventPreferences+" | Sports | Music");
         displayEventLocation.setText("1234 Example Way "+eventLocation+" 95826");
         displayEventStartDate.setText("Start Date: "+parseDate(eventDate));
         displayEventStartTIme.setText("Start Time: "+parseTime(eventTime));
@@ -209,12 +207,10 @@ public class DisplayEvent extends ProgressFragment{
     public void onResume() {
         super.onResume();
         mapView.onResume();
-        ((AppCompatActivity)getActivity()).getSupportActionBar().hide();
     }
     @Override
     public void onStop() {
         super.onStop();
-        ((AppCompatActivity)getActivity()).getSupportActionBar().show();
     }
     @Override
     public void onPause() {
@@ -234,12 +230,6 @@ public class DisplayEvent extends ProgressFragment{
         mapView.onLowMemory();
     }
 
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        mListener = null;
-    }
 
 
     private void setupWebsiteBtn(){
@@ -326,13 +316,19 @@ public class DisplayEvent extends ProgressFragment{
     }
 
     private void loadImage(){
-        Picasso.with(getContext().getApplicationContext()).load(getImageURL(eventImage))
+        Picasso.with(this).load(getImageURL(eventImage))
                 .centerCrop().fit().into(displayEventImage);
+    }
+
+    @Override
+    public void onBackPressed()
+    {
+        super.onBackPressed();
     }
 
     public String getImageURL(String path) {
         if(mapImage!=1)
-            return "http://athena.ecs.csus.edu/~teamone/events/" + path;
+            return getResources().getString(R.string.IMAGE_URL_PATH) + path;
         else
             return path;
     }

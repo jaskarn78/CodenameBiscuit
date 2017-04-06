@@ -5,17 +5,18 @@
         android:id="@+id/action_toggle"
         android:orderInCategory="100"
         sothree:showAsAction="never"
-        android:title="Toggle Preferences"/>
+        android:title="@string/togglepref"/>
 
     <item
         android:id="@+id/action_anchor"
         android:orderInCategory="200"
         sothree:showAsAction="never"
-        android:title="Anchor Preferences"/>
+        android:title="@string/anchorpref"/>
     <item
         android:id="@+id/map_action"
         android:icon="@drawable/ic_map_white_48dp"
-        sothree:showAsAction="always"
+        sothree:showAsAction="ifRoom"
+        android:title="@string/faw_map"
         />
 
 </menu>

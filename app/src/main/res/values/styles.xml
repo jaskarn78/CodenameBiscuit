@@ -3,13 +3,12 @@
     <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.AppCompat.DayNight">
         <!-- Customize your theme here. -->
-        <item name="colorPrimary">@color/livinPink</item>
-        <item name="colorPrimaryDark">@color/black_overlay</item>
-        <item name="colorAccent">@color/colorAccent</item>
+        <item name="colorPrimary">@color/gray_overlay</item>
+        <item name="colorPrimaryDark">@color/livinBlack</item>
+        <item name="colorAccent">@color/livinPink</item>
         <item name="preferenceTheme">@style/PreferenceThemeOverlay</item>
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
-
 
     </style>
 
@@ -75,6 +74,14 @@
     <style name="Rating" parent="Theme.AppCompat.DayNight">
         <item name="colorControlNormal">@color/gray_overlay</item>
         <item name="colorControlActivated">@color/livinPink</item>
+    </style>
+
+    <style name="MyActionBar" parent="@android:style/Widget.Holo.Light.ActionBar">
+        <item name="android:background">#50000000</item>
+    </style>
+
+    <style name="MyTheme" parent="@android:style/Theme.Holo.Light">
+        <item name="android:actionBarStyle">@style/MyActionBar</item>
     </style>
 
 

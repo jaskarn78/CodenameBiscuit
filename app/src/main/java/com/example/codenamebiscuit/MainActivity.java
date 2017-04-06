@@ -4,15 +4,10 @@ package com.example.codenamebiscuit;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
-import android.graphics.Color;
 import android.graphics.Typeface;
-import android.location.Location;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.AppCompatDelegate;
 import android.support.v7.preference.PreferenceManager;
@@ -25,10 +20,8 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.TextView;
 
-import com.example.codenamebiscuit.eventfragments.DeletedEventsFrag;
 import com.example.codenamebiscuit.eventfragments.GridMainEventsFrag;
 import com.example.codenamebiscuit.eventfragments.MainEventsFrag;
-import com.example.codenamebiscuit.eventfragments.SavedEventsFrag;
 import com.example.codenamebiscuit.eventfragments.SwipeEvents;
 
 import com.example.codenamebiscuit.helper.ChangePreferences;
@@ -38,7 +31,6 @@ import com.example.codenamebiscuit.helper.QueryEventList;
 import com.example.codenamebiscuit.login.ChooseLogin;
 import com.facebook.FacebookSdk;
 import com.google.android.gms.maps.MapsInitializer;
-import com.mikepenz.materialdrawer.Drawer;
 import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 import com.wunderlist.slidinglayer.SlidingLayer;
@@ -51,19 +43,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
-import devlight.io.library.ntb.NavigationTabBar;
 import mehdi.sakout.fancybuttons.FancyButton;
 import pub.devrel.easypermissions.EasyPermissions;
 
 public class MainActivity extends AppCompatActivity
-        implements View.OnLongClickListener, MainEventsFrag.GetDataInterface, DeletedEventsFrag.GetDeletedEventsInterface,
-        SavedEventsFrag.GetSavedDataInterface, SwipeEvents.GetMainSwipeDataInterface{
+        implements View.OnLongClickListener, MainEventsFrag.GetDataInterface, SwipeEvents.GetMainSwipeDataInterface{
     private JSONObject currentUserId = new JSONObject();
     private SharedPreferences pref;
     private Toolbar toolbar;
-    private ArrayList<JSONObject> data, deletedData, savedData;
+    private ArrayList<JSONObject> data;
     private static final int RC_LOCATION_SERVICE=123;
-    private static final int RC_STORAGE_SERVICE=124;
     private SlidingLayer mSlidingLayer;
     private TextView swipeText;
     private SlidingUpPanelLayout mLayout;
@@ -76,7 +65,7 @@ public class MainActivity extends AppCompatActivity
     PrimaryDrawerItem mainEvents;
     private boolean isActive = false;
     List<JSONObject> prefList;
-    GPSTracker gps = new GPSTracker(this);
+    GPSTracker gps;
     static {
         AppCompatDelegate.setDefaultNightMode(
                 AppCompatDelegate.MODE_NIGHT_YES);
@@ -95,6 +84,7 @@ public class MainActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         //Remove notification bar
+        gps = new GPSTracker(this);
         this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
         setContentView(R.layout.launch_layout);
@@ -118,7 +108,6 @@ public class MainActivity extends AppCompatActivity
 
         toolbarTitle = (TextView) findViewById(R.id.toolbar_title);
         Typeface typeface = Typeface.createFromAsset(getApplicationContext().getAssets(), "fonts/Raleway-Black.ttf");
-        //tv.setTypeface(typeface);
         FacebookSdk.sdkInitialize(getApplicationContext());
         Log.i("activity started: ", "main activity");
 
@@ -126,22 +115,19 @@ public class MainActivity extends AppCompatActivity
         //if not looged in, redirect to chooseLogin activity*/
         checkIfFbOrGoogleLogin(savedInstanceState);
         bindViews();
+        GridMainEventsFrag eventsFrag = new GridMainEventsFrag();
+
+        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        ft.setCustomAnimations(R.anim.swing_up_left, R.anim.exit);
+        ft.replace(R.id.fragment_container, eventsFrag, "mainFrag");
+        ft.addToBackStack("mainFrag");
+        ft.commit();
 
         swipeText.setTypeface(typeface);
-
-        GridMainEventsFrag eventsFrag = new GridMainEventsFrag();
-        // Normal app init code..
-        if (savedInstanceState == null) {
-            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-            ft.setCustomAnimations(R.anim.swing_up_left, R.anim.exit);
-            ft.add(R.id.fragment_container, eventsFrag, "mainFrag");
-            ft.commit();
-        }
 
         if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
             return;}
     }
-
 
     @Override
     protected void onResume() {
@@ -156,7 +142,6 @@ public class MainActivity extends AppCompatActivity
     public void onBackPressed() {
         super.onBackPressed();
         if (getSupportFragmentManager().getBackStackEntryCount() > 0) {
-            //getSupportFragmentManager().popBackStack();
         }
     }
 
@@ -221,8 +206,6 @@ public class MainActivity extends AppCompatActivity
                         btnList.get(finalI).setSelected(false);
                         try {
                             preferences.put("pref_id"+(finalI+1), 0);
-                            //Log.i("pref_id"+(finalI), preferences.getString("pref_id"+(finalI+1)));
-
                         } catch (JSONException e) {
                             e.printStackTrace();
                         } }
@@ -281,7 +264,6 @@ public class MainActivity extends AppCompatActivity
      **********************************************************************************************/
    @Override
    public boolean onCreateOptionsMenu(Menu menu) {
-       // Inflate the menu; this adds items to the action bar if it is present.
        getMenuInflater().inflate(R.menu.sliding_panel, menu);
        MenuItem item = menu.findItem(R.id.action_toggle);
        if (mLayout != null) {
@@ -325,6 +307,7 @@ public class MainActivity extends AppCompatActivity
         return true;
     }
 
+
     private void loadDrawer(Bundle savedState) {
         final String pic = pref.getString("user_image", null);
         final String fName = pref.getString("fName", null);
@@ -334,7 +317,6 @@ public class MainActivity extends AppCompatActivity
         createDrawer = new CreateDrawer(fName, lName, pic, email, savedState, toolbar,
                 getApplicationContext(), this, manager, getLat(), getLng());
         createDrawer.loadDrawer();
-
     }
 
 
@@ -353,39 +335,13 @@ public class MainActivity extends AppCompatActivity
         }
         return currentLng+"";
     }
+
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         // Forward results to EasyPermissions
         EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, this);}
 
-    public void loadData(){
-        try {
-            data = new QueryEventList(getString(R.string.DATABASE_MAIN_EVENTS_PULLER), this).execute(currentUserId).get();
-            savedData = new QueryEventList(getString(R.string.DATABASE_SAVED_EVENTS_PULLER), this).execute(currentUserId).get();
-            deletedData = new QueryEventList(getString(R.string.DATABASE_DELETED_EVENTS_PULLER), this).execute(currentUserId).get();
-
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (ExecutionException e) {
-            e.printStackTrace();
-        }
-    }
-
-
-    @Override
-    public ArrayList<JSONObject> getDeletedEventList() {
-        return deletedData; }
-
-    @Override
-    public ArrayList<JSONObject> getUpdatedDeletedEventList() {
-        try {
-            deletedData= new QueryEventList(getString(R.string.DATABASE_DELETED_EVENTS_PULLER), this).get();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (ExecutionException e) {
-            e.printStackTrace(); }
-        return deletedData; }
 
     @Override
     public ArrayList<JSONObject> getMainEventList() {
@@ -401,104 +357,5 @@ public class MainActivity extends AppCompatActivity
             e.printStackTrace();
         }
         return data; }
-
-    @Override
-    public ArrayList<JSONObject> getSavedEventList() {
-        return savedData; }
-
-    @Override
-    public ArrayList<JSONObject> getUpdatedSavedEventList() {
-        try {
-            savedData= new QueryEventList(getString(R.string.DATABASE_SAVED_EVENTS_PULLER), this).get();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (ExecutionException e) {
-            e.printStackTrace();
-        }
-        return savedData; }
-
-    private void initiUI(){
-        final ViewPager viewPager = (ViewPager)findViewById(R.id.vp_horizontal_ntb);
-        viewPager.setAdapter(new MyPagerAdapter(getSupportFragmentManager()));
-        final String[] colors = getResources().getStringArray(R.array.livColors);
-
-        final NavigationTabBar navigationTabBar = (NavigationTabBar)findViewById(R.id.ntb_horizontal);
-        final ArrayList<NavigationTabBar.Model> models = new ArrayList<>();
-        models.add(
-                new NavigationTabBar.Model.Builder(
-                        getResources().getDrawable(R.drawable.ic_save_black_48dp),
-                        Color.parseColor(colors[2]))
-                        .title("Saved")
-                        .build()
-        );
-        models.add(
-                new NavigationTabBar.Model.Builder(
-                        getResources().getDrawable(R.drawable.ic_delete_black_48dp),
-                        Color.parseColor(colors[2]))
-                        .title("Removed")
-                        .build()
-        );
-        navigationTabBar.setModels(models);
-        navigationTabBar.setViewPager(viewPager, 0);
-        navigationTabBar.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-            @Override
-            public void onPageScrolled(final int position, final float positionOffset, final int positionOffsetPixels) {
-
-            }
-
-            @Override
-            public void onPageSelected(final int position) {
-                navigationTabBar.getModels().get(position).hideBadge();
-                if(position==0)
-                    toolbarTitle.setText("Upcoming Events");
-                else
-                    toolbarTitle.setText("Upcoming Events - Swipe");
-            }
-
-            @Override
-            public void onPageScrollStateChanged(final int state) {
-
-            }
-        });
-
-        navigationTabBar.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                for (int i = 0; i < navigationTabBar.getModels().size(); i++) {
-                    final NavigationTabBar.Model model = navigationTabBar.getModels().get(i);
-                    navigationTabBar.postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            model.showBadge();
-                        }
-                    }, i * 100);
-                }
-            }
-        }, 500);
-    }
-    private class MyPagerAdapter extends FragmentPagerAdapter {
-
-        public MyPagerAdapter(FragmentManager fm) {
-            super(fm);
-        }
-
-        @Override
-        public Fragment getItem(int pos) {
-            switch(pos) {
-
-                case 0:
-                    return SavedEventsFrag.newInstance();
-                case 1:
-                    return DeletedEventsFrag.newInstance();
-                default:
-                    return SavedEventsFrag.newInstance();
-            }
-        }
-
-        @Override
-        public int getCount() {
-            return 2;
-        }
-    }
 
 }

@@ -55,7 +55,7 @@ import java.util.concurrent.ExecutionException;
  * Created by jaskarnjagpal on 2/23/17.
  */
 
-public class GridMainEventsFrag extends ProgressFragment implements ClickListener {
+public class GridMainEventsFrag extends Fragment implements ClickListener {
 
     private RecyclerView mRecyclerView;
     private EventAdapter mAdapter;
@@ -67,15 +67,7 @@ public class GridMainEventsFrag extends ProgressFragment implements ClickListene
     private JSONObject saveEvent, deleteEvent;
     private ArrayList<JSONObject> data;
     private View mContentView;
-    private Handler mHandler;
-    private Runnable mShowContentRunnable = new Runnable() {
 
-        @Override
-        public void run() {
-            setContentShown(true);
-        }
-
-    };
 
     @Override
     public void onAttach(Context context) {
@@ -89,7 +81,7 @@ public class GridMainEventsFrag extends ProgressFragment implements ClickListene
 
         pref = PreferenceManager.getDefaultSharedPreferences(getContext());
         saveEvent = new JSONObject();
-        deleteEvent=new JSONObject();
+        deleteEvent = new JSONObject();
 
         String user_id = pref.getString("user_id", null);
         try {
@@ -98,10 +90,6 @@ public class GridMainEventsFrag extends ProgressFragment implements ClickListene
             e.printStackTrace();
         }
         setHasOptionsMenu(true);
-
-        eventData = new ArrayList<JSONObject>();
-        mAdapter = new EventAdapter(getContext().getApplicationContext(), 2, "", getFragmentManager(), getActivity());
-
     }
 
     @Override
@@ -109,14 +97,11 @@ public class GridMainEventsFrag extends ProgressFragment implements ClickListene
                              Bundle savedInstanceState){
 
         mContentView = inflater.inflate(R.layout.activity_main, container, false);
-
-        return super.onCreateView(inflater, container, savedInstanceState);
+        return mContentView;
 
     }
 
     private void obtainData(){
-        mHandler = new Handler();
-        mHandler.postDelayed(mShowContentRunnable, 100);
         try {
             data = new QueryEventList(getString(R.string.DATABASE_MAIN_EVENTS_PULLER)).execute(currentUserId).get();
         } catch (InterruptedException e) {
@@ -176,10 +161,12 @@ public class GridMainEventsFrag extends ProgressFragment implements ClickListene
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        setContentView(mContentView);
         //initialize event dataset
+
+        eventData = new ArrayList<JSONObject>();
+        mAdapter = new EventAdapter(getContext().getApplicationContext(), 2, "", getFragmentManager(), getActivity());
+
         obtainData();
-        setContentShown(false);
 
         swipeContainer = (SwipeRefreshLayout) mContentView.findViewById(R.id.swipeContainer);
         setupSwipeDownRefresh();
@@ -193,7 +180,7 @@ public class GridMainEventsFrag extends ProgressFragment implements ClickListene
         mRecyclerView.setLayoutManager(staggeredGridLayoutManager);
 
         mRecyclerView.setHasFixedSize(false);
-        mRecyclerView.setItemViewCacheSize(200);
+        mRecyclerView.setItemViewCacheSize(data.size());
         mRecyclerView.setDrawingCacheEnabled(true);
         mRecyclerView.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_AUTO);
 
@@ -209,7 +196,6 @@ public class GridMainEventsFrag extends ProgressFragment implements ClickListene
                 new RecyclerItemClickSupport.OnItemClickListener() {
                     @Override
                     public void onItemClicked(RecyclerView recyclerView, int position, View view) {
-                        Toast.makeText(getActivity().getApplicationContext(), "CLick" + position, Toast.LENGTH_SHORT).show();
                         final CardView cv = (CardView) view.findViewById(R.id.cardview);
                         final CardView cvBack = (CardView) view.findViewById(R.id.card_view_back);
                         FlipAnimation flipAnimation = new FlipAnimation(cv, cvBack);
@@ -217,7 +203,6 @@ public class GridMainEventsFrag extends ProgressFragment implements ClickListene
                             flipAnimation.reverse();
                         view.startAnimation(flipAnimation); }
                 });
-
         if(!isNetworkAvailable())
             st.show();
 
@@ -234,7 +219,7 @@ public class GridMainEventsFrag extends ProgressFragment implements ClickListene
     @Override
     public void onResume() {  // After a pause OR at startup
         super.onResume();
-        mAdapter.notifyDataSetChanged();
+        //mAdapter.notifyDataSetChanged();
     }
 
     @Override
@@ -282,28 +267,6 @@ public class GridMainEventsFrag extends ProgressFragment implements ClickListene
         else
             layout.setVisibility(View.GONE); }
 
-    /**********************************************************************************************
-     * HTTP request to run python script which contains sql command
-     * to retrieve all event data filtered by user id
-     **********************************************************************************************/
-    private void loadEventData(){
-        QueryEventList list = (QueryEventList)
-                new QueryEventList(getString(R.string.DATABASE_MAIN_EVENTS_PULLER), getContext()).execute(currentUserId);
-        try {
-            Log.i("list size: ",list.get()+"");
-            setEventData(list.get());
-            eventData = list.get();
-            mAdapter.setEventData(eventData);
-
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (ExecutionException e) {
-            e.printStackTrace(); }
-    }
-
-    public void setEventData(ArrayList<JSONObject> dataGrid){
-       data = dataGrid;
-    }
 
 
     private void enableCardSwiping(){

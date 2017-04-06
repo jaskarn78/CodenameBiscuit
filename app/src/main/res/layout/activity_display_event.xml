@@ -1,16 +1,131 @@
 
-<RelativeLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/livinWhite"
-    android:id="@+id/back_layout"
-        >
+<android.support.design.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/main_content"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true">
 
-    <ScrollView
+
+        <android.support.design.widget.AppBarLayout
+            android:id="@+id/appbar"
+            android:layout_width="match_parent"
+            android:layout_height="330dp"
+            android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+            android:fitsSystemWindows="true">
+            <android.support.design.widget.CollapsingToolbarLayout
+                android:id="@+id/collapsing_toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                app:layout_scrollFlags="scroll|exitUntilCollapsed"
+                android:fitsSystemWindows="true"
+                app:contentScrim="@android:color/transparent"
+                app:expandedTitleMarginStart="48dp"
+                app:expandedTitleMarginEnd="64dp">
+
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:id="@+id/display_event_image"
+                    />
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@color/transLivinBlack"
+                    android:id="@+id/eventName_layout"
+                    android:isScrollContainer="false"
+                    android:layout_gravity="bottom"
+                    app:layout_collapseMode="pin"
+                    android:fitsSystemWindows="true"
+                    >
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Event Name"
+                        android:textSize="25sp"
+                        android:layout_marginStart="15dp"
+                        android:textColor="@color/livinWhite"
+                        android:id="@+id/display_event_name"
+                        />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Event Hoster"
+                        android:layout_below="@id/display_event_name"
+                        android:textSize="15sp"
+                        android:layout_marginStart="15dp"
+                        android:textColor="@color/livinWhite"
+                        android:id="@+id/event_hoster"
+                        />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="16sp"
+                        android:layout_marginStart="15dp"
+                        android:layout_toEndOf="@id/event_hoster"
+                        android:layout_alignBaseline="@id/event_hoster"
+                        android:textColor="@color/livinWhite"
+                        android:text="0.5 mi"
+                        android:id="@+id/display_event_distance"
+                        />
+                    <io.techery.properratingbar.ProperRatingBar
+                        android:id="@+id/upperRatingBar"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_toEndOf="@id/display_event_distance"
+                        android:layout_below="@+id/display_event_name"
+                        android:layout_marginStart="10dp"
+                        android:layout_marginBottom="20dp"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        app:prb_defaultRating="1"
+                        app:prb_symbolicTick="$$$"
+                        app:prb_symbolicTickNormalColor="@android:color/darker_gray"
+                        app:prb_symbolicTickSelectedColor="@android:color/holo_green_dark"
+                        app:prb_totalTicks="1"
+                        />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="15sp"
+                        android:layout_marginBottom="5dp"
+                        android:layout_marginStart="15dp"
+                        android:layout_below="@id/event_hoster"
+                        android:text="Family Friendly"
+                        android:textColor="@color/livinPink"
+                        android:id="@+id/display_event_preference"
+                        />
+
+                </RelativeLayout>
+                <android.support.v7.widget.Toolbar
+                    android:id="@+id/toolbar"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:background="@color/transparentBlack"
+                    android:layout_marginBottom="20dp"
+                    app:layout_collapseMode="parallax">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Archived Events"
+                        android:textColor="@color/livinWhite"
+                        android:textSize="25sp"
+                        android:id="@+id/toolbar_title" />
+                </android.support.v7.widget.Toolbar>
+
+            </android.support.design.widget.CollapsingToolbarLayout>
+
+        </android.support.design.widget.AppBarLayout>
+
+    <android.support.v4.widget.NestedScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -18,81 +133,8 @@
             android:orientation="vertical"
             >
 
-        <ImageView
-            android:layout_width="match_parent"
-            android:layout_height="200dp"
-            android:id="@+id/display_event_image" />
 
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@color/livinBlack"
-            android:id="@+id/eventName_layout"
-            android:isScrollContainer="false"
-            >
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Event Name"
-                android:textSize="25sp"
-                android:textColor="@color/livinWhite"
-                android:layout_marginStart="10dp"
-                android:id="@+id/display_event_name"
-                />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Event Hoster"
-                android:layout_toRightOf="@id/display_event_name"
-                android:layout_marginEnd="5dp"
-                android:textSize="15sp"
-                android:layout_alignBaseline="@id/display_event_name"
-                android:textColor="@color/livinWhite"
-                android:id="@+id/event_hoster"
-                />
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="16sp"
-                android:layout_marginStart="15dp"
-                android:layout_toRightOf="@id/event_hoster"
-                android:layout_alignBaseline="@id/display_event_name"
-                android:textColor="@color/livinWhite"
-                android:text="0.5 mi"
-                android:id="@+id/display_event_distance"
-                />
-            <io.techery.properratingbar.ProperRatingBar
-                android:id="@+id/upperRatingBar"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_toRightOf="@id/display_event_distance"
-                android:layout_above="@+id/display_event_preference"
-                android:layout_marginBottom="2dp"
-                android:layout_marginStart="10dp"
-                android:textSize="18sp"
-                android:textStyle="bold"
-                app:prb_defaultRating="1"
-                app:prb_symbolicTick="$"
-                app:prb_symbolicTickNormalColor="@android:color/darker_gray"
-                app:prb_symbolicTickSelectedColor="@android:color/holo_green_dark"
-                app:prb_totalTicks="1"
-                />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="15sp"
-                android:layout_marginStart="10dp"
-                android:layout_marginBottom="5dp"
-                android:layout_below="@id/display_event_name"
-                android:text="Family Friendly"
-                android:textColor="@color/livinPink"
-                android:id="@+id/display_event_preference"
-                />
-
-        </RelativeLayout>
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -458,5 +500,5 @@
         </RelativeLayout>
         </LinearLayout>
 
-    </ScrollView>
-</RelativeLayout>
+    </android.support.v4.widget.NestedScrollView>
+</android.support.design.widget.CoordinatorLayout>

@@ -19,6 +19,7 @@ import android.os.Handler;
 import android.os.HandlerThread;
 import android.provider.CalendarContract;
 
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
@@ -39,14 +40,20 @@ import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.load.resource.drawable.GlideDrawable;
+import com.bumptech.glide.request.RequestListener;
 import com.daimajia.androidanimations.library.Techniques;
 import com.daimajia.androidanimations.library.YoYo;
 import com.daimajia.swipe.SimpleSwipeListener;
 import com.daimajia.swipe.SwipeLayout;
+import com.devspark.progressfragment.ProgressFragment;
 import com.example.codenamebiscuit.R;
 import com.example.codenamebiscuit.eventfragments.DisplayEvent;
 import com.example.codenamebiscuit.helper.FlipAnimation;
@@ -77,11 +84,14 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
     private String message;
     private int type;
     private FragmentManager fragmentManager;
+    private FragmentManager childFragmentManager;
     private int lastPosition = -1;
     private ImageView rowMenu;
     private Activity activity;
     private Bundle eventBundle;
     private Bundle bundle;
+    private View rootView;
+
     private static ArrayList<String> latsArrayList = new ArrayList<>();
     private static ArrayList<String> lngsArrayList = new ArrayList<>();
     private static ArrayList<String> eventNameList = new ArrayList<>();
@@ -108,6 +118,7 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
         this.type=type;
         this.fragmentManager=fragmentManager;
         this.activity=activity;
+        this.childFragmentManager = childFragmentManager;
         eventBundle = new Bundle();
         bundle=new Bundle();
     }
@@ -158,6 +169,7 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
         public EventAdapterViewHolder(View view) {
             super(view);
 
+            rootView = view;
             rowMenu = (ImageView)view.findViewById(R.id.row_menu);
 
             moreInfo = (TextView) view.findViewById(R.id.more_info);
@@ -303,13 +315,10 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
                         public boolean onMenuItemClick(MenuItem item) {
                             switch (item.getItemId()){
                                 case R.id.info:
-                                    DisplayEvent displayEvent = DisplayEvent.newInstance();
-                                    displayEvent.setArguments(bundle);
-                                    FragmentTransaction ft = fragmentManager.beginTransaction();
-                                    ft.replace(R.id.fragment_container, displayEvent);
-                                    ft.addToBackStack(null);
-                                    ft.commit();
-                                    break;
+                                    Intent intent = new Intent(activity, DisplayEvent.class);
+                                    intent.putExtras(bundle);
+                                    intent.setFlags(Intent.FLAG_ACTIVITY_PREVIOUS_IS_TOP);
+                                    context.startActivity(intent);
                             }
                             return true; }
                     });
@@ -466,13 +475,10 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
             eventAdapterViewHolder.cardView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    DisplayEvent displayEvent = DisplayEvent.newInstance();
-                    displayEvent.setArguments(bundle);
-
-                    FragmentTransaction ft = fragmentManager.beginTransaction();
-                    ft.replace(R.id.fragment_container, displayEvent);
-                    ft.addToBackStack(null);
-                    ft.commit();
+                    Intent intent = new Intent(activity, DisplayEvent.class);
+                    intent.putExtras(bundle);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_PREVIOUS_IS_TOP);
+                    context.startActivity(intent);
                 }
             });
         }
@@ -503,30 +509,41 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
             eventAdapterViewHolder.moreInfo.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Toast.makeText(context, "info icon clicked at position "+finalEvent, Toast.LENGTH_SHORT).show();
-                    DisplayEvent displayEvent = DisplayEvent.newInstance();
-                    displayEvent.setArguments(bundle);
-
-                    FragmentTransaction ft = fragmentManager.beginTransaction();
-                    ft.replace(R.id.fragment_container, displayEvent);
-                    ft.addToBackStack(null);
-                    ft.commit();
+                    Intent intent = new Intent(activity, DisplayEvent.class);
+                    intent.putExtras(bundle);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_PREVIOUS_IS_TOP);
+                    context.startActivity(intent);
                 }
             });
 
+            final ProgressBar progressBar = (ProgressBar)rootView.findViewById(R.id.progress);
 
             Log.i("Image", getImageURL(eventPath));
-            Picasso.with(context.getApplicationContext())
+            Glide.with(context.getApplicationContext())
                     .load(getImageURL(eventPath))
-                    //.error(R.drawable.cast_album_art_placeholder)
+                    .placeholder(R.drawable.progress)
                     .error(R.drawable.placeholder)
+                    .diskCacheStrategy(DiskCacheStrategy.ALL)
+                    .listener(new RequestListener<String, GlideDrawable>() {
+                        @Override
+                        public boolean onException(Exception e, String model, com.bumptech.glide.request.target.Target<GlideDrawable> target, boolean isFirstResource) {
+                            progressBar.setVisibility(View.GONE);
+                            return false;
+                        }
+
+                        @Override
+                        public boolean onResourceReady(GlideDrawable resource, String model, com.bumptech.glide.request.target.Target<GlideDrawable> target, boolean isFromMemoryCache, boolean isFirstResource) {
+                            progressBar.setVisibility(View.GONE);
+                            return false;
+                        }
+                    })
                     .into(eventAdapterViewHolder.mEventImage);
 
-            Picasso.with(context.getApplicationContext())
+            Glide.with(context.getApplicationContext())
                     .load(getImageURL(eventPath))
-                    .networkPolicy(NetworkPolicy.OFFLINE)
-                    //.error( R.drawable.cast_album_art_placeholder)
+                    .placeholder(R.drawable.progress)
                     .error(R.drawable.placeholder)
+                    .diskCacheStrategy(DiskCacheStrategy.ALL)
                     .into(eventAdapterViewHolder.mEventImageback);
 
         }
@@ -590,14 +607,28 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
         return context.getString(R.string.IMAGE_URL_PATH) + path; }
 
     public void loadImage(final ImageView imageView, final String URL) {
-
         Log.i("Image", URL);
-
-        Picasso.with(imageView.getContext())
+        final ProgressBar progressBar = (ProgressBar) rootView.findViewById(R.id.progress_bar);
+        Glide.with(imageView.getContext())
                 .load(URL)
                 .placeholder(R.drawable.progress)
-                //.error(R.drawable.cast_album_art_placeholder)
-                .into(imageView); }
+                .diskCacheStrategy(DiskCacheStrategy.ALL)
+                .error(R.drawable.placeholder)
+                .listener(new RequestListener<String, GlideDrawable>() {
+                    @Override
+                    public boolean onException(Exception e, String model, com.bumptech.glide.request.target.Target<GlideDrawable> target, boolean isFirstResource) {
+                        progressBar.setVisibility(View.GONE);
+                        return false;
+                    }
+
+                    @Override
+                    public boolean onResourceReady(GlideDrawable resource, String model, com.bumptech.glide.request.target.Target<GlideDrawable> target, boolean isFromMemoryCache, boolean isFirstResource) {
+                        progressBar.setVisibility(View.GONE);
+                        return false;
+                    }
+                })
+                .into(imageView);
+    }
 
 
     public void clear() {
@@ -610,6 +641,7 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
         mEventData.addAll(list);
         notifyDataSetChanged();
     }
+
     private void setAnimation(View viewToAnimate, int position) {
         // If the bound view wasn't previously displayed on screen, it's animated
         if (position > lastPosition) {

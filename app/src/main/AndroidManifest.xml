@@ -60,6 +60,7 @@
         <activity
             android:name=".settings.UserSettingsActivity"
             android:label="Settings"
+            android:alwaysRetainTaskState="true"
             android:launchMode="singleTop">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
@@ -95,6 +96,11 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity>
+        <activity android:name=".eventfragments.DisplayEvent">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".ArchivedEvents"/>
         </activity>
         <activity
             android:name=".ArchivedEvents"

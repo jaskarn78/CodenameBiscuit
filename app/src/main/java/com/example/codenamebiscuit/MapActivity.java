@@ -2,6 +2,7 @@ package com.example.codenamebiscuit;
 
 import android.*;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
@@ -412,7 +413,6 @@ public class MapActivity extends ProgressFragment {
             tv_image.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Fragment fragment = new DisplayEvent();
                     Bundle bundle = new Bundle();
                     bundle.putString("eventName", nameList.get(position));
                     bundle.putString("eventImage", imageList.get(position));
@@ -428,13 +428,9 @@ public class MapActivity extends ProgressFragment {
                     bundle.putDouble("eventLng", Double.parseDouble(lngsArrayList.get(position)));
                     bundle.putString("eventDistance", distanceList.get(position)+"");
                     bundle.putInt("mapImage", 1);
-                    fragment.setArguments(bundle);
-                    FragmentTransaction ft = getFragmentManager().beginTransaction();
-                    ft.setCustomAnimations(R.anim.enter, R.anim.exit);
-                    ft.replace(R.id.fragment_container, fragment);
-                    ft.addToBackStack(null);
-                    ft.commit();
-                    //getFragmentManager().executePendingTransactions();
+                    Intent intent = new Intent(getActivity(), DisplayEvent.class);
+                    intent.putExtras(bundle);
+                    getContext().startActivity(intent);
                 }
             });
             final MyLocation myLocation = arr_LocationList.get(position);

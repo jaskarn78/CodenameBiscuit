@@ -1,67 +1,71 @@
 package com.example.codenamebiscuit;
 
-import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
-import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.preference.PreferenceManager;
 import android.support.v7.widget.Toolbar;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.example.codenamebiscuit.eventfragments.DeletedEventsFrag;
 import com.example.codenamebiscuit.eventfragments.SavedEventsFrag;
-import com.example.codenamebiscuit.helper.QueryEventList;
-import com.example.codenamebiscuit.rv.EventAdapter;
-import com.mikepenz.materialdrawer.Drawer;
 
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.concurrent.ExecutionException;
 
 import devlight.io.library.ntb.NavigationTabBar;
 
 public class ArchivedEvents extends AppCompatActivity {
     private Toolbar toolbar;
     private TextView toolbarTitle;
-    private Drawer result;
-    private int numOfSavedEvents, numOfDeletedEvents;
+    private int page;
+    private Bundle bundle;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
-
         setContentView(R.layout.activity_archived_events);
+
+        if(savedInstanceState!=null)
+            page=savedInstanceState.getInt("page");
+
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         toolbarTitle = (TextView)findViewById(R.id.toolbar_title);
         toolbarTitle.setText("Saved Events");
+        bundle = new Bundle();
+
 
         setSupportActionBar(toolbar);
         this.getSupportActionBar().setDisplayShowTitleEnabled(false);
         final Drawable upArrow = getResources().getDrawable(R.drawable.ic_arrow_back_black_18dp);
-        upArrow.setColorFilter(getResources().getColor(R.color.livinPink), PorterDuff.Mode.SRC_ATOP);
+        upArrow.setColorFilter(getResources().getColor(R.color.livinWhite), PorterDuff.Mode.SRC_ATOP);
         this.getSupportActionBar().setHomeAsUpIndicator(upArrow);
         this.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
         initiUI();
     }
+
+
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+        super.onSaveInstanceState(savedInstanceState);
+        savedInstanceState.putInt("page", page);
+    }
+
+    @Override
+    public void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        page = savedInstanceState.getInt("page");
+    }
+
 
     private void initiUI(){
         final ViewPager viewPager = (ViewPager)findViewById(R.id.vp_horizontal_ntb);
@@ -84,8 +88,10 @@ public class ArchivedEvents extends AppCompatActivity {
                         .title("Removed")
                         .build()
         );
+
         navigationTabBar.setModels(models);
-        navigationTabBar.setViewPager(viewPager, 0);
+        navigationTabBar.setBehaviorEnabled(true);
+        navigationTabBar.setViewPager(viewPager, page);
         navigationTabBar.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(final int position, final float positionOffset, final int positionOffsetPixels) {
@@ -95,6 +101,7 @@ public class ArchivedEvents extends AppCompatActivity {
             @Override
             public void onPageSelected(final int position) {
                 navigationTabBar.getModels().get(position).hideBadge();
+                page=position;
                 if(position==0)
                     toolbarTitle.setText("Saved Events");
                 else
@@ -105,22 +112,9 @@ public class ArchivedEvents extends AppCompatActivity {
             public void onPageScrollStateChanged(final int state) {
 
             }
+
         });
 
-        navigationTabBar.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                for (int i = 0; i < navigationTabBar.getModels().size(); i++) {
-                    final NavigationTabBar.Model model = navigationTabBar.getModels().get(i);
-                    navigationTabBar.postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            model.showBadge();
-                        }
-                    }, i * 100);
-                }
-            }
-        }, 500);
     }
     private class MyPagerAdapter extends FragmentPagerAdapter {
 

@@ -53,10 +53,9 @@ public class DeletedEventsFrag extends ProgressFragment implements ClickListener
     private JSONObject currentUserId = new JSONObject();
     private SwipeRefreshLayout swipeContainer;
     private RecyclerView mRecyclerView;
-    private JSONObject restoreEvent;
     private ArrayList<JSONObject> data;
     private View mContentView;
-    private Bundle bundle;
+    Bundle bundle;
     private Handler mHandler;
     private Runnable mShowContentRunnable = new Runnable() {
 
@@ -66,13 +65,6 @@ public class DeletedEventsFrag extends ProgressFragment implements ClickListener
         }
 
     };
-    GetDeletedEventsInterface sGetDeletedEventsInterface;
-
-    public interface GetDeletedEventsInterface {
-        ArrayList<JSONObject> getDeletedEventList();
-        ArrayList<JSONObject> getUpdatedDeletedEventList();
-
-    }
 
     @Override
     public void onAttach(Context context) {
@@ -84,8 +76,8 @@ public class DeletedEventsFrag extends ProgressFragment implements ClickListener
     @Override
     public void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
+        bundle = new Bundle();
         pref = PreferenceManager.getDefaultSharedPreferences(getContext());
-        restoreEvent = new JSONObject();
         String user_id = pref.getString("user_id", null);
         try {
             currentUserId.put("user_id", user_id); }
@@ -93,6 +85,10 @@ public class DeletedEventsFrag extends ProgressFragment implements ClickListener
             e.printStackTrace(); }
 
 
+    }
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+        super.onSaveInstanceState(savedInstanceState);
     }
 
     @Override
@@ -102,7 +98,7 @@ public class DeletedEventsFrag extends ProgressFragment implements ClickListener
         swipeContainer = (SwipeRefreshLayout) mContentView.findViewById(R.id.swipeContainer);
         setupSwipeDownRefresh();
         mRecyclerView = (RecyclerView) mContentView.findViewById(R.id.recyclerview_events);
-        eventData = new ArrayList<JSONObject>();
+        eventData = new ArrayList<>();
 
         mAdapter = new EventAdapter(getActivity().getApplicationContext(), 1, "deleted", getFragmentManager(), getActivity());
         return super.onCreateView(inflater, container, savedInstanceState);
@@ -118,7 +114,8 @@ public class DeletedEventsFrag extends ProgressFragment implements ClickListener
     public void onActivityCreated(Bundle savedInstanceState){
         super.onActivityCreated(savedInstanceState);
         setContentView(mContentView);
-
+        setAllowEnterTransitionOverlap(true);
+        setAllowReturnTransitionOverlap(true);
         obtainData();
         mAdapter.setEventData(data);
         mRecyclerView.setAdapter(mAdapter);
@@ -128,27 +125,22 @@ public class DeletedEventsFrag extends ProgressFragment implements ClickListener
         RecyclerItemClickSupport.addTo(mRecyclerView).setOnItemClickListener(new RecyclerItemClickSupport.OnItemClickListener() {
             @Override
             public void onItemClicked(RecyclerView recyclerView, int i, View view) {
-                DisplayEvent displayEvent = DisplayEvent.newInstance();
-                displayEvent.setArguments(bundle);
-                FragmentTransaction ft = getFragmentManager().beginTransaction();
-                ft.replace(R.id.fragment_container, displayEvent);
-                ft.addToBackStack(null);
-                ft.commit();
+                Intent intent = new Intent(getActivity(), DisplayEvent.class);
+                intent.putExtras(bundle);
+                getContext().startActivity(intent);
             }
         });
         mRecyclerView.setHasFixedSize(false);
         mRecyclerView.setItemViewCacheSize(100);
         mRecyclerView.setDrawingCacheEnabled(true);
-        mRecyclerView.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_HIGH);
+        mRecyclerView.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_AUTO);
 
-        //TextView tv = (TextView)getActivity().findViewById(R.id.toolbar_title);
-        //tv.setText("Removed");
     }
     private void obtainData(){
         setContentShown(false);
 
         mHandler = new Handler();
-        mHandler.postDelayed(mShowContentRunnable, 2000);
+        mHandler.postDelayed(mShowContentRunnable, 1000);
         try {
             data = new QueryEventList(getString(R.string.DATABASE_DELETED_EVENTS_PULLER)).execute(currentUserId).get();
         } catch (InterruptedException e) {
@@ -160,7 +152,8 @@ public class DeletedEventsFrag extends ProgressFragment implements ClickListener
 
     public static DeletedEventsFrag newInstance() {
         DeletedEventsFrag myFragment = new DeletedEventsFrag();
-        return myFragment; }
+        return myFragment;
+    }
 
     /**********************************************************************************************
      * When activity resumes after a pause, check to see if any new events have been added

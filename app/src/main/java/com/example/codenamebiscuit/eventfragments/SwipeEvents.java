@@ -223,7 +223,7 @@ public class SwipeEvents extends ProgressFragment{
      * @return URL of image located on server
      */
     public String getImageURL(String path) {
-        return "http://athena.ecs.csus.edu/~teamone/events/ + path";
+        return getResources().getString(R.string.IMAGE_URL_PATH)+path;
     }
 
 

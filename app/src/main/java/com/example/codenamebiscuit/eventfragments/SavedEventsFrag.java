@@ -1,56 +1,25 @@
 package com.example.codenamebiscuit.eventfragments;
 
-import android.app.Activity;
-import android.app.AlertDialog;
+
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.SharedPreferences;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
-import android.graphics.drawable.ColorDrawable;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.preference.PreferenceManager;
-import android.support.v7.widget.CardView;
-import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.helper.ItemTouchHelper;
-import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.os.Handler;
 
-import android.widget.RelativeLayout;
-import android.widget.TextView;
-import android.widget.Toast;
-
-
-import com.daimajia.androidanimations.library.fading_entrances.FadeInLeftAnimator;
 import com.devspark.progressfragment.ProgressFragment;
-import com.example.codenamebiscuit.MainActivity;
 import com.example.codenamebiscuit.R;
-import com.example.codenamebiscuit.helper.FlipAnimation;
 import com.example.codenamebiscuit.helper.QueryEventList;
-import com.example.codenamebiscuit.helper.UpdateDbOnSwipe;
 import com.example.codenamebiscuit.rv.ClickListener;
 import com.example.codenamebiscuit.rv.EventAdapter;
-import com.github.brnunes.swipeablerecyclerview.SwipeableRecyclerViewTouchListener;
-import com.mikepenz.itemanimators.AlphaInAnimator;
-import com.mikepenz.materialdrawer.Drawer;
-import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
-import com.muddzdev.styleabletoastlibrary.StyleableToast;
-import com.rohit.recycleritemclicksupport.RecyclerItemClickSupport;
-
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -71,10 +40,10 @@ public class SavedEventsFrag extends ProgressFragment implements ClickListener{
     private SharedPreferences pref;
     private JSONObject currentUserId = new JSONObject();
     private SwipeRefreshLayout swipeContainer;
-    private JSONObject restoreEvent;
     private ArrayList<JSONObject> data;
     private View mContentView;
     private Handler mHandler;
+    private boolean saved;
     private Runnable mShowContentRunnable = new Runnable() {
 
         @Override
@@ -84,16 +53,10 @@ public class SavedEventsFrag extends ProgressFragment implements ClickListener{
 
     };
 
-    GetSavedDataInterface sGetDataInterface;
 
     @Override
     public void itemClicked(View view, int position) {
 
-    }
-
-    public interface GetSavedDataInterface {
-        ArrayList<JSONObject> getSavedEventList();
-        ArrayList<JSONObject> getUpdatedSavedEventList();
     }
 
     @Override
@@ -107,20 +70,25 @@ public class SavedEventsFrag extends ProgressFragment implements ClickListener{
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         pref = PreferenceManager.getDefaultSharedPreferences(getContext());
-        restoreEvent = new JSONObject();
 
         String user_id = pref.getString("user_id", null);
         try {
             currentUserId.put("user_id", user_id);
         } catch (JSONException e) {
             e.printStackTrace(); }
-
+        mAdapter = new EventAdapter(getActivity().getApplicationContext(), 1, "saved", getChildFragmentManager(), getActivity());
     }
 
     public static SavedEventsFrag newInstance() {
-        SavedEventsFrag myFragment = new SavedEventsFrag();
-        return myFragment;
+        SavedEventsFrag frag = new SavedEventsFrag();
+        return frag;
     }
+
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+        super.onSaveInstanceState(savedInstanceState);
+    }
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -130,7 +98,6 @@ public class SavedEventsFrag extends ProgressFragment implements ClickListener{
         setupSwipeDownRefresh();
         mRecyclerView = (RecyclerView) mContentView.findViewById(R.id.recyclerview_events);
         eventData = new ArrayList<JSONObject>();
-        mAdapter = new EventAdapter(getActivity().getApplicationContext(), 1, "saved", getFragmentManager(), getActivity());
 
         return super.onCreateView(inflater, container, savedInstanceState);
 
@@ -145,10 +112,10 @@ public class SavedEventsFrag extends ProgressFragment implements ClickListener{
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+
         setContentView(mContentView);
         obtainData();
-        //TextView tv = (TextView) getActivity().findViewById(R.id.toolbar_title);
-       // tv.setText("Attending");
+
         mAdapter.setEventData(data);
         mRecyclerView.setAdapter(mAdapter);
         LinearLayoutManager layoutManager
@@ -158,14 +125,14 @@ public class SavedEventsFrag extends ProgressFragment implements ClickListener{
         mRecyclerView.setHasFixedSize(false);
         mRecyclerView.setItemViewCacheSize(100);
         mRecyclerView.setDrawingCacheEnabled(true);
-        mRecyclerView.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_HIGH);
+        mRecyclerView.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_AUTO);
 
 
     }
     private void obtainData(){
         setContentShown(false);
         mHandler = new Handler();
-        mHandler.postDelayed(mShowContentRunnable, 2000);
+        mHandler.postDelayed(mShowContentRunnable, 1500);
         try {
             data = new QueryEventList(getString(R.string.DATABASE_SAVED_EVENTS_PULLER)).execute(currentUserId).get();
         } catch (InterruptedException | ExecutionException e) {
@@ -180,11 +147,32 @@ public class SavedEventsFrag extends ProgressFragment implements ClickListener{
      * set swipecontainer.setRefreshing to false
      **********************************************************************************************/
     @Override
-    public void onResume() {  // After a pause OR at startup
+    public void onResume() {
         super.onResume();
-            mAdapter.notifyDataSetChanged();
-
+        mAdapter.notifyDataSetChanged();
     }
+
+    @Override
+    public void onPause(){
+        super.onPause();
+        FragmentTransaction ft = getFragmentManager().beginTransaction();
+        ft.addToBackStack("saved").commit();
+    }
+
+    @Override
+    public void onStop(){
+        super.onStop();
+    }
+
+    @Override
+    public void onDestroyView(){
+        super.onDestroyView();
+    }
+    @Override
+    public void onDetach(){
+        super.onDetach();
+    }
+
 
 
     @Override
@@ -223,25 +211,5 @@ public class SavedEventsFrag extends ProgressFragment implements ClickListener{
                 android.R.color.holo_green_light,
                 android.R.color.holo_orange_light,
                 android.R.color.holo_red_light); }
-
-
-    /**********************************************************************************************
-     * HTTP request to run php script which contains sql command
-     * to retrieve all event data filtered by user id
-     **********************************************************************************************/
-    private void loadEventData() {
-        try {
-            data =new QueryEventList(getString(R.string.DATABASE_SAVED_EVENTS_PULLER),
-                    getContext()).execute(currentUserId).get();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (ExecutionException e) {
-            e.printStackTrace();
-        }
-    }
-    public void setEventData(ArrayList<JSONObject> data){
-        eventData = data;
-    }
-
 
 }

@@ -19,7 +19,7 @@ import java.util.ArrayList;
  */
 
 public class ChangePreferences extends AsyncTask<JSONObject, Void, Void> {
-    private static final String DATABASE_MAIN_EVENTS_PULLER = "http://athena.ecs.csus.edu/~teamone/php/android/push_user_preferences.php";
+    private static final String DATABASE_MAIN_EVENTS_PULLER = "http://jagpal-development.com/php/push_user_preferences.php";
     ;
 
     private static ArrayList<JSONObject> mEventList;
