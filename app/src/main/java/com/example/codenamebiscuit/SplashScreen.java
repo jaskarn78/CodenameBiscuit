@@ -11,6 +11,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.transition.Fade;
@@ -27,21 +28,11 @@ import com.muddzdev.styleabletoastlibrary.StyleableToast;
 
 
 public class SplashScreen extends Activity {
-    //Splash screen timer
-    private static int SPLASH_TIME_OUT;
-    private ProgressBar progress;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //progress = (ProgressBar) findViewById(R.id.progressBar1);
-       //progress.getIndeterminateDrawable().setColorFilter(Color.rgb(255, 157, 252), PorterDuff.Mode.MULTIPLY);
-
-        //StyleableToast st = new StyleableToast(getApplicationContext(), "LOADING EVENTS...", Toast.LENGTH_SHORT);
-        //setupWindowAnimations();
         Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);
-        finish();
     }
 
 

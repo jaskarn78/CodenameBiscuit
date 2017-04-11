@@ -1,0 +1,243 @@
+<com.wunderlist.slidinglayer.SlidingLayer
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:fancy="http://schemas.android.com/apk/res-auto"
+    xmlns:slidingLayer="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="370dp"
+    android:id="@+id/slidingLayer1"
+    android:elevation="2dip"
+    slidingLayer:shadowDrawable="@drawable/sidebar_shadow"
+    slidingLayer:shadowSize="@dimen/shadow_size"
+    slidingLayer:offsetDistance="@dimen/offset_distance"
+    slidingLayer:previewOffsetDistance="@dimen/preview_offset_distance"
+    slidingLayer:stickTo="top">
+
+    <RelativeLayout
+        xmlns:fancy="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/sliding_relative"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="center_horizontal"
+        android:background="@color/livinBlack"
+        >
+        <RelativeLayout
+            android:id="@+id/LinearLayouttxt"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/swipeText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:layout_marginStart="80dp"
+                android:text="Preferences Selected "
+                android:textColor="@color/livinPink"
+                android:textSize="20sp" />
+
+            <com.mikepenz.iconics.view.IconicsImageView
+                android:id="@+id/down_arrow"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_marginEnd="10dp"
+                android:layout_alignParentBottom="true"
+                android:layout_alignParentEnd="true"
+                android:tint="@color/livinPink" />
+        </RelativeLayout>
+
+
+        <LinearLayout
+            android:id="@+id/section_socialnetworks"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_alignParentTop="true"
+            android:layout_marginTop="10dp"
+            android:minHeight="200dp"
+            android:orientation="vertical">
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="15dp"
+                android:gravity="center">
+
+                <mehdi.sakout.fancybuttons.FancyButton
+                    android:id="@+id/btn_music"
+                    android:layout_width="90dp"
+                    android:layout_height="90dp"
+                    fancy:fb_defaultColor="@color/translivinPink"
+                    fancy:fb_focusColor="#313131"
+                    fancy:fb_fontIconSize="10dp"
+                    fancy:fb_iconPaddingLeft="00dp"
+                    fancy:fb_iconPaddingRight="00dp"
+                    fancy:fb_iconPosition="top"
+                    fancy:fb_iconResource="@drawable/musicnote"
+                    fancy:fb_radius="64dp"
+                    fancy:fb_text="Music"
+                    fancy:fb_textColor="@color/livinBlack" />
+
+                <mehdi.sakout.fancybuttons.FancyButton
+                    android:id="@+id/btn_food"
+                    android:layout_width="90dp"
+                    android:layout_height="90dp"
+                    android:layout_marginEnd="10dp"
+                    android:layout_marginStart="10dp"
+                    fancy:fb_defaultColor="@color/translivinPink"
+                    fancy:fb_focusColor="#313131"
+                    fancy:fb_iconPaddingLeft="0dp"
+                    fancy:fb_iconPaddingRight="0dp"
+                    fancy:fb_iconPosition="top"
+                    fancy:fb_iconResource="@drawable/hamburger"
+                    fancy:fb_radius="64dp"
+                    fancy:fb_text="Food"
+                    fancy:fb_textColor="@color/livinBlack">
+
+                </mehdi.sakout.fancybuttons.FancyButton>
+
+
+                <mehdi.sakout.fancybuttons.FancyButton
+                    android:id="@+id/btn_sports"
+                    android:layout_width="90dp"
+                    android:layout_height="90dp"
+                    fancy:fb_defaultColor="@color/translivinPink"
+                    fancy:fb_focusColor="#313131"
+                    fancy:fb_iconPaddingLeft="0dp"
+                    fancy:fb_iconPaddingRight="0dp"
+                    fancy:fb_iconPosition="top"
+                    fancy:fb_iconResource="@drawable/football"
+                    fancy:fb_radius="64dp"
+                    fancy:fb_text="Sports"
+                    fancy:fb_textColor="@color/livinBlack">
+
+                </mehdi.sakout.fancybuttons.FancyButton>
+
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/sn_pos2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="15dp"
+                android:gravity="center"
+                android:orientation="horizontal">
+
+                <mehdi.sakout.fancybuttons.FancyButton
+                    android:id="@+id/btn_outdoors"
+                    android:layout_width="90dp"
+                    android:layout_height="90dp"
+                    fancy:fb_defaultColor="@color/translivinPink"
+                    fancy:fb_focusColor="#313131"
+                    fancy:fb_iconPaddingLeft="0dp"
+                    fancy:fb_iconPaddingRight="0dp"
+                    fancy:fb_iconPosition="top"
+                    fancy:fb_iconResource="@drawable/basecamp"
+                    fancy:fb_radius="64dp"
+                    fancy:fb_text="Outdoor"
+                    fancy:fb_textColor="@color/livinBlack">
+
+                </mehdi.sakout.fancybuttons.FancyButton>
+
+                <mehdi.sakout.fancybuttons.FancyButton
+                    android:id="@+id/btn_health"
+                    android:layout_width="90dp"
+                    android:layout_height="90dp"
+                    android:layout_marginEnd="10dp"
+                    android:layout_marginStart="10dp"
+                    fancy:fb_defaultColor="@color/translivinPink"
+                    fancy:fb_focusColor="#313131"
+                    fancy:fb_iconPaddingLeft="0dp"
+                    fancy:fb_iconPaddingRight="0dp"
+                    fancy:fb_iconPosition="top"
+                    fancy:fb_iconResource="@drawable/bike"
+                    fancy:fb_radius="64dp"
+                    fancy:fb_text="Health"
+                    fancy:fb_textColor="@color/livinBlack">
+
+                </mehdi.sakout.fancybuttons.FancyButton>
+
+                <mehdi.sakout.fancybuttons.FancyButton
+                    android:id="@+id/btn_family"
+                    android:layout_width="90dp"
+                    android:layout_height="90dp"
+                    fancy:fb_defaultColor="@color/translivinPink"
+                    fancy:fb_focusColor="#313131"
+                    fancy:fb_iconPaddingLeft="0dp"
+                    fancy:fb_iconPaddingRight="0dp"
+                    fancy:fb_iconPosition="top"
+                    fancy:fb_iconResource="@drawable/ic_face_black_24dp"
+                    fancy:fb_radius="64dp"
+                    fancy:fb_text="Family"
+                    fancy:fb_textColor="@color/livinBlack">
+
+                </mehdi.sakout.fancybuttons.FancyButton>
+
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/LinearLayout1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:orientation="horizontal">
+
+                <mehdi.sakout.fancybuttons.FancyButton
+                    android:id="@+id/btn_retail"
+                    android:layout_width="90dp"
+                    android:layout_height="90dp"
+                    fancy:fb_defaultColor="@color/translivinPink"
+                    fancy:fb_focusColor="#313131"
+                    fancy:fb_iconPaddingLeft="0dp"
+                    fancy:fb_iconPaddingRight="0dp"
+                    fancy:fb_iconPosition="top"
+                    fancy:fb_iconResource="@drawable/cart"
+                    fancy:fb_radius="64dp"
+                    fancy:fb_text="Retail"
+                    fancy:fb_textColor="@color/livinBlack">
+
+                </mehdi.sakout.fancybuttons.FancyButton>
+
+                <mehdi.sakout.fancybuttons.FancyButton
+                    android:id="@+id/btn_performing"
+                    android:layout_width="90dp"
+                    android:layout_height="90dp"
+                    android:layout_marginEnd="10dp"
+                    android:layout_marginStart="10dp"
+                    fancy:fb_defaultColor="@color/translivinPink"
+                    fancy:fb_focusColor="#313131"
+                    fancy:fb_iconPaddingLeft="0dp"
+                    fancy:fb_iconPaddingRight="0dp"
+                    fancy:fb_iconPosition="top"
+                    fancy:fb_iconResource="@drawable/theater"
+                    fancy:fb_radius="64dp"
+                    fancy:fb_text="Entertainment"
+                    fancy:fb_textColor="@color/livinBlack"
+                    fancy:fb_textSize="11sp">
+
+                </mehdi.sakout.fancybuttons.FancyButton>
+
+                <mehdi.sakout.fancybuttons.FancyButton
+                    android:id="@+id/btn_entertainment"
+                    android:layout_width="90dp"
+                    android:layout_height="90dp"
+                    fancy:fb_defaultColor="@color/translivinPink"
+                    fancy:fb_focusColor="#313131"
+                    fancy:fb_iconPaddingLeft="0dp"
+                    fancy:fb_iconPaddingRight="0dp"
+                    fancy:fb_iconPosition="top"
+                    fancy:fb_iconResource="@drawable/movie"
+                    fancy:fb_radius="64dp"
+                    fancy:fb_text="Charity"
+                    fancy:fb_textColor="@color/livinBlack"
+                    fancy:fb_textSize="12sp">
+                </mehdi.sakout.fancybuttons.FancyButton>
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </RelativeLayout>
+</com.wunderlist.slidinglayer.SlidingLayer>

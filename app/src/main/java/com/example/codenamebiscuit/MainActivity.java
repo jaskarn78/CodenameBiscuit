@@ -1,11 +1,9 @@
 package com.example.codenamebiscuit;
 
-
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.res.Configuration;
-import android.graphics.Typeface;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
@@ -18,10 +16,10 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.example.codenamebiscuit.eventfragments.GridMainEventsFrag;
-import com.example.codenamebiscuit.eventfragments.MainEventsFrag;
 import com.example.codenamebiscuit.eventfragments.SwipeEvents;
 
 import com.example.codenamebiscuit.helper.ChangePreferences;
@@ -30,8 +28,7 @@ import com.example.codenamebiscuit.helper.GPSTracker;
 import com.example.codenamebiscuit.helper.QueryEventList;
 import com.example.codenamebiscuit.login.ChooseLogin;
 import com.facebook.FacebookSdk;
-import com.google.android.gms.maps.MapsInitializer;
-import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
+import com.mikepenz.iconics.view.IconicsImageView;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 import com.wunderlist.slidinglayer.SlidingLayer;
 import com.wunderlist.slidinglayer.transformer.AlphaTransformer;
@@ -44,26 +41,24 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 import mehdi.sakout.fancybuttons.FancyButton;
-import pub.devrel.easypermissions.EasyPermissions;
 
-public class MainActivity extends AppCompatActivity
-        implements View.OnLongClickListener, MainEventsFrag.GetDataInterface, SwipeEvents.GetMainSwipeDataInterface{
+public class MainActivity extends AppCompatActivity {
     private JSONObject currentUserId = new JSONObject();
     private SharedPreferences pref;
     private Toolbar toolbar;
-    private ArrayList<JSONObject> data;
-    private static final int RC_LOCATION_SERVICE=123;
     private SlidingLayer mSlidingLayer;
     private TextView swipeText;
     private SlidingUpPanelLayout mLayout;
     private FancyButton musicFancyButton, sportsButton, foodButton;
     private FancyButton healthButton, outdoorButton, entertainmentButton;
     private FancyButton familyButton, retailButton, performingButton;
-    private JSONObject preferences = new JSONObject();
+    private IconicsImageView downArrow;
+    private JSONObject preferences, removed;
+    private GridMainEventsFrag eventsFrag;
+    private SwipeEvents swipeEvents;
+    private boolean touched;
     CreateDrawer createDrawer;
-    private TextView toolbarTitle;
-    PrimaryDrawerItem mainEvents;
-    private boolean isActive = false;
+    private ProgressBar progressBar;
     List<JSONObject> prefList;
     GPSTracker gps;
     static {
@@ -83,71 +78,55 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         //Remove notification bar
-        gps = new GPSTracker(this);
         this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
         setContentView(R.layout.launch_layout);
+        progressBar = (ProgressBar)findViewById(R.id.progress_launch);
+        gps = new GPSTracker(this);
 
-
-        MapsInitializer.initialize(getApplicationContext());
 
         pref = PreferenceManager.getDefaultSharedPreferences(this);
-
-        if (!EasyPermissions.hasPermissions(this, Manifest.permission.ACCESS_FINE_LOCATION)) {
-            String perms[] = {Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION};
-            EasyPermissions.requestPermissions(MainActivity.this, "This app requires location services", RC_LOCATION_SERVICE, perms); }
-
+        preferences = new JSONObject(); removed = new JSONObject();
 
         // Handle Toolbar
         toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        setSupportActionBar(toolbar); getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         this.getSupportActionBar().setDisplayShowTitleEnabled(false);
 
-
-        toolbarTitle = (TextView) findViewById(R.id.toolbar_title);
-        Typeface typeface = Typeface.createFromAsset(getApplicationContext().getAssets(), "fonts/Raleway-Black.ttf");
         FacebookSdk.sdkInitialize(getApplicationContext());
-        Log.i("activity started: ", "main activity");
-
-        /**verify that user is logged in either through fb or google
-        //if not looged in, redirect to chooseLogin activity*/
         checkIfFbOrGoogleLogin(savedInstanceState);
-        bindViews();
-        GridMainEventsFrag eventsFrag = new GridMainEventsFrag();
 
-        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-        ft.setCustomAnimations(R.anim.swing_up_left, R.anim.exit);
-        ft.replace(R.id.fragment_container, eventsFrag, "mainFrag");
-        ft.addToBackStack("mainFrag");
-        ft.commit();
+        swipeEvents = new SwipeEvents();
+        eventsFrag = new GridMainEventsFrag();
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        transaction.setCustomAnimations(R.anim.swing_up_left, R.anim.exit);
+        transaction.replace(R.id.fragment_container, eventsFrag, "mainFrag");
+        transaction.commit();
 
-        swipeText.setTypeface(typeface);
-
-        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            return;}
     }
 
     @Override
     protected void onResume() {
-        super.onResume(); }
+        super.onResume();
+        progressBar.setVisibility(View.GONE);
+    }
 
     @Override
-    public void onPause(){
+    public void onPause() {
         super.onPause();
     }
 
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        if (getSupportFragmentManager().getBackStackEntryCount() > 0) {
-        }
+        System.exit(0);
     }
 
-    /**
+    /**********************************************************************************
      * View binding
-     */
+     **********************************************************************************/
     private void bindViews() {
         mSlidingLayer = (SlidingLayer) findViewById(R.id.slidingLayer1);
         swipeText = (TextView) findViewById(R.id.swipeText);
@@ -162,57 +141,24 @@ public class MainActivity extends AppCompatActivity
         performingButton=(FancyButton)findViewById(R.id.btn_performing);
         retailButton=(FancyButton)findViewById(R.id.btn_retail);
         familyButton=(FancyButton)findViewById(R.id.btn_family);
-        final List<FancyButton> btnList = new ArrayList();
+        downArrow = (IconicsImageView)findViewById(R.id.down_arrow);
+        downArrow.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(mSlidingLayer.isOpened())
+                    mSlidingLayer.closeLayer(true);
+                else
+                    mSlidingLayer.openLayer(true);
+            }
+        });
+        setupSlidingLayer();
+
+        List<FancyButton> btnList = new ArrayList();
         btnList.add(musicFancyButton);btnList.add(foodButton); btnList.add(sportsButton);
         btnList.add(outdoorButton); btnList.add(healthButton); btnList.add(familyButton);
         btnList.add(retailButton); btnList.add(performingButton); btnList.add(entertainmentButton);
-        try {
-            preferences.put("user_id", pref.getString("user_id", null));
-            prefList = new QueryEventList(getString(R.string.PULL_USER_PREFERENCES)).execute(currentUserId).get();
-            for(int i=0; i<prefList.size(); i++) {
-                Log.i("preferences" + i, prefList.get(i).getString("preference_id"));
-                if(Integer.parseInt(prefList.get(i).getString("preference_id"))>0) {
-                    btnList.get(i).setBackgroundColor(getColor(R.color.livinPink));
-                    btnList.get(i).setSelected(true);
-
-                }
-
-            }
-
-        } catch (JSONException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (ExecutionException e) {
-            e.printStackTrace();
-        }
-        for(int i=0; i<btnList.size(); i++){
-            final int finalI = i;
-            btnList.get(i).setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if (!btnList.get(finalI).isSelected()){
-                        btnList.get(finalI).setBackgroundColor(getColor(R.color.livinPink));
-                        btnList.get(finalI).setSelected(true);
-                        try {
-                            preferences.put("pref_id"+(finalI+1), 1);
-                           // Log.i("pref_id"+(finalI), preferences.getString("pref_id"+(finalI+1)));
-
-                        } catch (JSONException e) {
-                            e.printStackTrace(); }
-                    }
-                    else{
-                        btnList.get(finalI).setBackgroundColor(getColor(R.color.translivinPink));
-                        btnList.get(finalI).setSelected(false);
-                        try {
-                            preferences.put("pref_id"+(finalI+1), 0);
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        } }
-                    new ChangePreferences().execute(preferences); } });
-        }
+        setupPreferences(btnList);
         mSlidingLayer.animate().alpha(1.0f);
-
     }
 
 
@@ -222,9 +168,7 @@ public class MainActivity extends AppCompatActivity
             case KeyEvent.KEYCODE_BACK:
                 if (mSlidingLayer.isOpened()) {
                     mSlidingLayer.closeLayer(true);
-                    return true;
-                }
-
+                    return true; }
             default:
                 return super.onKeyDown(keyCode, event);
         }
@@ -259,53 +203,58 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-   /*********************************************************************************
+    /*********************************************************************************
      Create Menu
      **********************************************************************************************/
-   @Override
-   public boolean onCreateOptionsMenu(Menu menu) {
-       getMenuInflater().inflate(R.menu.sliding_panel, menu);
-       MenuItem item = menu.findItem(R.id.action_toggle);
-       if (mLayout != null) {
-           if (mLayout.getPanelState() == SlidingUpPanelLayout.PanelState.HIDDEN) {
-               item.setTitle("Toggle Preferences");
-           } else {
-               item.setTitle("Toggle Preferences");
-           }
-       }
-       return true;
-   }
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.sliding_panel, menu);
+        MenuItem item = menu.findItem(R.id.action_toggle);
+        if (mLayout != null) {
+            if (mLayout.getPanelState() == SlidingUpPanelLayout.PanelState.HIDDEN) {
+                item.setTitle("Toggle Preferences");
+            } else {
+                item.setTitle("Toggle Preferences"); }
+        }
+        return true; }
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
-        return super.onPrepareOptionsMenu(menu);
-    }
+        MenuItem item =menu.findItem(R.id.action_grid_to_full).setVisible(true);
+        if(eventsFrag.isVisible())
+            item.setIcon(R.drawable.ic_fullscreen_white_48dp);
+        else if(swipeEvents.isVisible())
+            item.setIcon(R.drawable.ic_grid_on_white_48dp);
+        return super.onPrepareOptionsMenu(menu); }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+
         switch (item.getItemId()) {
             case R.id.action_anchor:
                 mSlidingLayer.openLayer(true);
                 break;
             case R.id.action_toggle:
-               if(mSlidingLayer.getVisibility()==View.VISIBLE)
-                   mSlidingLayer.setVisibility(View.INVISIBLE);
+                if(mSlidingLayer.getVisibility()==View.VISIBLE)
+                    mSlidingLayer.setVisibility(View.INVISIBLE);
                 else
                     mSlidingLayer.setVisibility(View.VISIBLE);
+                break;
+             case R.id.action_grid_to_full:
+                if(eventsFrag.isAdded()){
+                    fragmentTransaction.replace(R.id.fragment_container, swipeEvents, "swipe");
+                    fragmentTransaction.setCustomAnimations(R.anim.swing_up_left, R.anim.slide_out_down);
+                    fragmentTransaction.commit();
+
+                }
+                else if(swipeEvents.isAdded()){
+                    fragmentTransaction.replace(R.id.fragment_container, eventsFrag, "eventsFrag");
+                    fragmentTransaction.setCustomAnimations(R.anim.slide_in_up, R.anim.slide_out_down);
+                    fragmentTransaction.commit();
+                }
         }
-        return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-    }
-
-    @Override
-    public boolean onLongClick(View v) {
-        Log.i("view long clicked", v.getHeight()+"");
-        return true;
-    }
+        return super.onOptionsItemSelected(item); }
 
 
     private void loadDrawer(Bundle savedState) {
@@ -316,8 +265,7 @@ public class MainActivity extends AppCompatActivity
         FragmentManager manager = getSupportFragmentManager();
         createDrawer = new CreateDrawer(fName, lName, pic, email, savedState, toolbar,
                 getApplicationContext(), this, manager, getLat(), getLng());
-        createDrawer.loadDrawer();
-    }
+        createDrawer.loadDrawer(); }
 
 
     private String getLat(){
@@ -325,37 +273,102 @@ public class MainActivity extends AppCompatActivity
         if(gps.canGetLocation()){
             currentLat=gps.getLatitude();
         }
-        return currentLat+"";
-    }
+        return currentLat+""; }
 
     private String getLng(){
         double currentLng=0.0;
         if(gps.canGetLocation()){
             currentLng=gps.getLongitude();
         }
-        return currentLng+"";
+        return currentLng+""; }
+
+    public void setupPreferences(final List<FancyButton> btnList) {
+        try {
+            preferences.put("user_id", pref.getString("user_id", null));
+            removed.put("user_id", pref.getString("user_id", null));
+            prefList = new QueryEventList(getString(R.string.PULL_USER_PREFERENCES)).execute(currentUserId).get();
+            if (prefList.size() == 0) {
+                mSlidingLayer.setVisibility(View.VISIBLE);
+                mSlidingLayer.openLayer(true);
+            }
+            for (int i = 0; i < prefList.size(); i++) {
+                if (Integer.parseInt(prefList.get(i).getString("preference_id")) > 0) {
+                    Log.i("preferences" + i, prefList.get(i).getString("preference_id"));
+                    btnList.get(Integer.parseInt(prefList.get(i).getString("preference_id")) - 1).setBackgroundColor(getColor(R.color.livinPink));
+                    btnList.get(Integer.parseInt(prefList.get(i).getString("preference_id")) - 1).setSelected(true);
+                    preferences.put("pref_id" + (Integer.parseInt(prefList.get(i).getString("preference_id"))), 1);
+                    Log.i("true/false: pref_id:" + (Integer.parseInt(prefList.get(i).getString("preference_id"))), "1"); }
+            }
+
+        } catch (JSONException | InterruptedException | ExecutionException e) {
+            e.printStackTrace(); }
+
+        for (int i = 0; i < btnList.size(); i++) {
+            final int finalI = i;
+            btnList.get(i).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    touched = true;
+                    if (!btnList.get(finalI).isSelected()) {
+                        btnList.get(finalI).setBackgroundColor(getColor(R.color.livinPink));
+                        btnList.get(finalI).setSelected(true);
+                        try {
+                            preferences.put("pref_id" + (finalI + 1), 1);
+                        } catch (JSONException e) {
+                            e.printStackTrace(); }
+                        new ChangePreferences().execute(preferences);
+                    } else {
+                        btnList.get(finalI).setBackgroundColor(getColor(R.color.translivinPink));
+                        btnList.get(finalI).setSelected(false);
+                        try {
+                            preferences.put("pref_id" + (finalI + 1), 0);
+                        } catch (JSONException e) {
+                            e.printStackTrace(); }
+                        new ChangePreferences().execute(preferences);} }
+            });
+        }
     }
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        // Forward results to EasyPermissions
-        EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, this);}
+    private void setupSlidingLayer(){
+        downArrow.setImageDrawable(getDrawable(R.drawable.ic_keyboard_arrow_down_white_48dp));
+        mSlidingLayer.setOnInteractListener(new SlidingLayer.OnInteractListener() {
+            @Override
+            public void onOpen() {
+                downArrow.setImageDrawable(getDrawable(R.drawable.ic_keyboard_arrow_up_white_48dp)); }
 
+            @Override
+            public void onShowPreview() { }
 
-    @Override
-    public ArrayList<JSONObject> getMainEventList() {
-        return data; }
+            @Override
+            public void onClose() {
+                downArrow.setImageDrawable(getDrawable(R.drawable.ic_keyboard_arrow_down_white_48dp)); }
 
-    @Override
-    public ArrayList<JSONObject> getUpdatedEventList() {
-        try {
-            data= new QueryEventList(getString(R.string.DATABASE_MAIN_EVENTS_PULLER), this).get();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (ExecutionException e) {
-            e.printStackTrace();
+            @Override
+            public void onOpened() {
+                downArrow.setImageDrawable(getDrawable(R.drawable.ic_keyboard_arrow_up_white_48dp)); }
+
+            @Override
+            public void onPreviewShowed() {
+                downArrow.setImageDrawable(getDrawable(R.drawable.ic_keyboard_arrow_down_white_48dp));
+                refresh(); }
+
+            @Override
+            public void onClosed() {
+                downArrow.setImageDrawable(getDrawable(R.drawable.ic_keyboard_arrow_down_white_48dp));
+                refresh(); }
+        });
+    }
+
+    private void refresh(){
+        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+        if(touched) {
+            if(eventsFrag.isAdded()) {
+                fragmentTransaction.detach(eventsFrag); fragmentTransaction.attach(eventsFrag);
+            }
+            else
+                fragmentTransaction.detach(swipeEvents); fragmentTransaction.attach(swipeEvents);
+            fragmentTransaction.commit();
         }
-        return data; }
+        touched=false; }
 
 }

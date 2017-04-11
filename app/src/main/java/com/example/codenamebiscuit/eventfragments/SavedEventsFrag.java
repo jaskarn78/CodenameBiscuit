@@ -4,6 +4,7 @@ package com.example.codenamebiscuit.eventfragments;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.preference.PreferenceManager;
@@ -11,11 +12,14 @@ import android.support.v7.widget.LinearLayoutManager;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.os.Handler;
 
 import com.devspark.progressfragment.ProgressFragment;
+import com.example.codenamebiscuit.MapActivity;
 import com.example.codenamebiscuit.R;
 import com.example.codenamebiscuit.helper.QueryEventList;
 import com.example.codenamebiscuit.rv.ClickListener;
@@ -48,7 +52,8 @@ public class SavedEventsFrag extends ProgressFragment implements ClickListener{
 
         @Override
         public void run() {
-            setContentShown(true);
+            if(isAdded())
+                setContentShown(true);
         }
 
     };
@@ -70,13 +75,13 @@ public class SavedEventsFrag extends ProgressFragment implements ClickListener{
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         pref = PreferenceManager.getDefaultSharedPreferences(getContext());
-
         String user_id = pref.getString("user_id", null);
         try {
             currentUserId.put("user_id", user_id);
         } catch (JSONException e) {
             e.printStackTrace(); }
-        mAdapter = new EventAdapter(getActivity().getApplicationContext(), 1, "saved", getChildFragmentManager(), getActivity());
+        setHasOptionsMenu(true);
+
     }
 
     public static SavedEventsFrag newInstance() {
@@ -94,8 +99,8 @@ public class SavedEventsFrag extends ProgressFragment implements ClickListener{
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         mContentView = inflater.inflate(R.layout.activity_main, container, false);
-        swipeContainer = (SwipeRefreshLayout) mContentView.findViewById(R.id.swipeContainer);
-        setupSwipeDownRefresh();
+        //swipeContainer = (SwipeRefreshLayout) mContentView.findViewById(R.id.swipeContainer);
+        //setupSwipeDownRefresh();
         mRecyclerView = (RecyclerView) mContentView.findViewById(R.id.recyclerview_events);
         eventData = new ArrayList<JSONObject>();
 
@@ -126,15 +131,33 @@ public class SavedEventsFrag extends ProgressFragment implements ClickListener{
         mRecyclerView.setItemViewCacheSize(100);
         mRecyclerView.setDrawingCacheEnabled(true);
         mRecyclerView.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_AUTO);
+    }
 
 
+    @Override
+    public void onPrepareOptionsMenu(final Menu menu) {
+        menu.findItem(R.id.refresh_saved).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                try {
+                    mAdapter.clear();
+                    data = new QueryEventList(getString(R.string.DATABASE_SAVED_EVENTS_PULLER)).execute(currentUserId).get();
+                    mAdapter.addAll(data);
+                    mAdapter.notifyDataSetChanged();
+                } catch (InterruptedException | ExecutionException e) {
+                    e.printStackTrace();
+                }
+                return false;
+            }
+        });
     }
     private void obtainData(){
         setContentShown(false);
         mHandler = new Handler();
-        mHandler.postDelayed(mShowContentRunnable, 1500);
+        mHandler.postDelayed(mShowContentRunnable, 2000);
         try {
             data = new QueryEventList(getString(R.string.DATABASE_SAVED_EVENTS_PULLER)).execute(currentUserId).get();
+            mAdapter = new EventAdapter(getActivity().getApplicationContext(), 1, "saved", getChildFragmentManager(), getActivity());
         } catch (InterruptedException | ExecutionException e) {
             e.printStackTrace();
         }

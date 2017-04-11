@@ -6,7 +6,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/livinBlack">
+    android:background="@color/cardview_dark_background">
 
     <com.example.codenamebiscuit.swipedeck.layouts.SwipeFrameLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
@@ -29,7 +29,6 @@
         swipedeck:layout_constraintLeft_toLeftOf="parent"
         swipedeck:layout_constraintTop_toTopOf="parent">
 
-
         <com.example.codenamebiscuit.swipedeck.SwipeDeck
             android:id="@+id/swipe_deck"
             android:layout_width="match_parent"
@@ -39,7 +38,6 @@
             swipedeck:card_spacing="6dp">
 
         </com.example.codenamebiscuit.swipedeck.SwipeDeck>
-
 
     </com.example.codenamebiscuit.swipedeck.layouts.SwipeFrameLayout>
 

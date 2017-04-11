@@ -24,6 +24,9 @@ import android.widget.Toast;
 
 import com.example.codenamebiscuit.ArchivedEvents;
 import com.example.codenamebiscuit.EmbeddedFragment;
+import com.example.codenamebiscuit.MainActivity;
+import com.example.codenamebiscuit.MainEvents;
+import com.example.codenamebiscuit.MapActivity;
 import com.example.codenamebiscuit.R;
 import com.example.codenamebiscuit.eventfragments.DeletedEventsFrag;
 import com.example.codenamebiscuit.eventfragments.GridMainEventsFrag;
@@ -73,6 +76,7 @@ public class CreateDrawer {
     private Toolbar toolbar;
     private Context context;
     private Activity activity;
+    private Bundle bundle;
     Drawer result=null;
     AccountHeader headerResult=null;
     private FragmentManager fragmentManager;
@@ -80,7 +84,7 @@ public class CreateDrawer {
     private int livinBlack, livinWhite;
     private int numOfSavedEvents, numOfDeletedEvents, totalNumEvents;
     private String currentLat, currentLng;
-    private PrimaryDrawerItem gridEvents, fullScreen,archivedEvents,account,logOut;
+    private PrimaryDrawerItem gridEvents, mapEvents,fullScreen,archivedEvents,account,logOut;
     GPSTracker gps;
     LatLng latLng;
     SharedPreferences preferences;
@@ -98,6 +102,7 @@ public class CreateDrawer {
         this.fragmentManager=fragmentManager;
         this.currentLat=currentLat;
         this.currentLng=currentLng;
+        this.bundle = new Bundle();
 
         livinPink=context.getColor(R.color.livinPink);
         overlay=context.getColor(R.color.black_overlay);
@@ -109,6 +114,7 @@ public class CreateDrawer {
         archivedEvents = new PrimaryDrawerItem();
         account = new PrimaryDrawerItem();
         logOut = new PrimaryDrawerItem();
+        mapEvents = new PrimaryDrawerItem();
         //getNumberOfEvents();
 
     }
@@ -150,21 +156,18 @@ public class CreateDrawer {
                                 .withSelectedColor(context.getColor(R.color.translivinPink))
                                 .withSetSelected(true),
                         new DividerDrawerItem(),
-                        fullScreen
-                                .withName("Full Screen")
-                                .withIcon(R.drawable.ic_fullscreen_white_48dp)
-                                .withIdentifier(2)
-                                .withTextColor(livinWhite)
-                                .withIconColor(livinWhite)
-                                .withSelectedTextColor(livinPink)
-                                .withSelectedIconColor(livinPink)
-                                .withSelectedColor(context.getColor(R.color.translivinPink)),
-                        new DividerDrawerItem(),
 
                         archivedEvents
-                                .withIdentifier(3)
+                                .withIdentifier(2)
                                 .withName("Archived Events")
                                 .withIcon(R.drawable.ic_archive_white_48dp)
+                                .withTextColor(livinWhite)
+                                .withSelectable(false),
+                        new DividerDrawerItem(),
+                        mapEvents
+                                .withIdentifier(3)
+                                .withName("Launch Map")
+                                .withIcon(R.drawable.ic_map_white_48dp)
                                 .withTextColor(livinWhite)
                                 .withSelectable(false),
                         new DividerDrawerItem(),
@@ -181,7 +184,9 @@ public class CreateDrawer {
 
                         new DividerDrawerItem(),
                         logOut
-                                .withName("Log Out").withIcon(FontAwesome.Icon.faw_sign_out).withIdentifier(5)
+                                .withName("Log Out")
+                                .withIcon(FontAwesome.Icon.faw_sign_out)
+                                .withIdentifier(5)
                                 .withTextColor(livinWhite)
                                 .withIconColor(livinWhite)
                                 .withSelectedTextColor(livinPink)
@@ -199,11 +204,12 @@ public class CreateDrawer {
                             Intent intent = null;
 
                             if (drawerItem.getIdentifier()==1)
-                                fragment = new GridMainEventsFrag().newInstance();
-                            else if (drawerItem.getIdentifier()==2)
-                                fragment = new SwipeEvents().newInstance();
-                            else if(drawerItem.getIdentifier()==3)
+                                intent = new Intent(activity, MainActivity.class);
+                            else if(drawerItem.getIdentifier()==2)
                                 intent = new Intent(activity, ArchivedEvents.class);
+                            else if(drawerItem.getIdentifier()==3) {
+                                fragment = new MapActivity().newInstance();
+                            }
                             else if (drawerItem.getIdentifier()==4)
                                 intent = new Intent(activity, UserSettingsActivity.class);
                             else if(drawerItem.getIdentifier()==5) {
@@ -216,7 +222,6 @@ public class CreateDrawer {
                                 intent = new Intent(activity, ChooseLogin.class);
                             }
 
-
                             if (intent != null) {
                                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                                 context.startActivity(intent); }
@@ -228,16 +233,14 @@ public class CreateDrawer {
                                 FragmentTransaction ft = fragmentManager.beginTransaction();
                                 ft.setCustomAnimations(R.anim.enter, R.anim.exit);
                                 ft.replace(R.id.fragment_container, fragment);
-                                ft.addToBackStack(null);
                                 ft.commit();
                                 fragmentManager.executePendingTransactions();
-
                                 return false;
                             } }
                         return false; }
                 })
                 .withSavedInstance(savedState)
-                .withShowDrawerOnFirstLaunch(true)
+                .withShowDrawerOnFirstLaunch(false)
                 .build();
 
 
@@ -292,12 +295,18 @@ public class CreateDrawer {
         }
 
     }
+    public void setBundle(Bundle bundle){
+        this.bundle=bundle;
+    }
 
     public Drawer getResult(){
         return result;
     }
     public AccountHeader getHeader(){
         return headerResult;
+    }
+    public PrimaryDrawerItem getMapEvents(){
+        return mapEvents;
     }
 
 }

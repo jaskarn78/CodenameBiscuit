@@ -35,14 +35,15 @@ public class QueryEventList extends AsyncTask<JSONObject, Void, ArrayList<JSONOb
 
     private ArrayList<JSONObject> eventList;
     private String main_events;
+    private EventAdapter adapter;
     private Context context;
+    private RecyclerView recyclerView;
     ProgressDialog dialog;
 
 
     public QueryEventList(String main_events, Context context){
         this.main_events=main_events;
         this.context=context;
-        //dialog = new ProgressDialog(context);
 
     }
     public QueryEventList(String main_events){
@@ -51,8 +52,10 @@ public class QueryEventList extends AsyncTask<JSONObject, Void, ArrayList<JSONOb
 
     @Override
     protected void onPreExecute(){
-       // dialog.setMessage("Loading Event Data...");
-        //dialog.show();
+        if(dialog!=null) {
+            dialog.setMessage("Loading Event Data...");
+            dialog.show();
+        }
     }
 
     @Override
@@ -126,6 +129,7 @@ public class QueryEventList extends AsyncTask<JSONObject, Void, ArrayList<JSONOb
             ArrayList<JSONObject> eventList = objs;
             setEventList(eventList);
         }
+
     }
     public ArrayList<JSONObject> getEventList(){
         Log.i("event list", eventList.toString());

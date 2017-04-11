@@ -43,7 +43,7 @@ import java.util.concurrent.ExecutionException;
  * Created by jaskarnjagpal on 2/23/17.
  */
 
-public class MainEventsFrag extends Fragment implements ClickListener {
+public class MainEventsFrag extends Fragment {
 
     private RecyclerView mRecyclerView, mRecyclerViewFeatured;
     private EventAdapter mAdapter;
@@ -101,8 +101,8 @@ public class MainEventsFrag extends Fragment implements ClickListener {
 
         View rootView = inflater.inflate(R.layout.activity_main, container, false);
 
-        swipeContainer = (SwipeRefreshLayout) rootView.findViewById(R.id.swipeContainer);
-        setupSwipeDownRefresh();
+        //swipeContainer = (SwipeRefreshLayout) rootView.findViewById(R.id.swipeContainer);
+        //setupSwipeDownRefresh();
 
         mRecyclerView = (RecyclerView)rootView.findViewById(R.id.recyclerview_events);
 
@@ -217,21 +217,7 @@ public class MainEventsFrag extends Fragment implements ClickListener {
                 android.R.color.holo_red_light);
 
     }
-    /**********************************************************************************************
-     * Handles the drop down functionality in the list view of the event data
-     * When image button is clicked, additional event information is revealed
-     * @param view
-     * @param position
-     **********************************************************************************************/
 
-    @Override
-    public void itemClicked(View view, int position) {
-        RelativeLayout layout = (RelativeLayout)view.findViewById(R.id.extend);
-        if (layout.getVisibility() == View.GONE)
-            layout.setVisibility(View.VISIBLE);
-        else
-            layout.setVisibility(View.GONE);
-    }
 
 
     /**********************************************************************************************
@@ -240,7 +226,7 @@ public class MainEventsFrag extends Fragment implements ClickListener {
      **********************************************************************************************/
     private void loadEventData(){
             QueryEventList list = (QueryEventList)
-                    new QueryEventList(getString(R.string.DATABASE_MAIN_EVENTS_PULLER), getContext()).execute(currentUserId);
+                    new QueryEventList(getString(R.string.DATABASE_MAIN_EVENTS_PULLER), getActivity()).execute(currentUserId);
         try {
             Log.i("list size: ",list.get()+"");
             setEventData(list.get());

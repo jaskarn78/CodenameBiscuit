@@ -6,6 +6,8 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.preference.PreferenceManager;
 import android.support.v7.widget.CardView;
@@ -21,17 +23,22 @@ import android.view.animation.AnimationUtils;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.Toolbar;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.load.resource.drawable.GlideDrawable;
+import com.bumptech.glide.request.RequestListener;
+import com.bumptech.glide.request.target.Target;
 import com.devspark.progressfragment.ProgressFragment;
 import com.example.codenamebiscuit.R;
 import com.example.codenamebiscuit.helper.FlipAnimation;
 import com.example.codenamebiscuit.helper.QueryEventList;
 import com.example.codenamebiscuit.helper.UpdateDbOnSwipe;
+import com.example.codenamebiscuit.rv.EventAdapter;
 import com.example.codenamebiscuit.swipedeck.SwipeDeck;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -40,16 +47,19 @@ import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.mikepenz.iconics.view.IconicsImageView;
 import com.muddzdev.styleabletoastlibrary.StyleableToast;
 import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
+import com.wunderlist.slidinglayer.SlidingLayer;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
-public class SwipeEvents extends ProgressFragment{
+public class SwipeEvents extends Fragment{
 
     private SwipeDeck cardStack;
     private SwipeDeckAdapter adapter;
@@ -61,6 +71,8 @@ public class SwipeEvents extends ProgressFragment{
     private String event_name;
     private String event_description;
     private String lat, lng;
+    private String eventWebsite;
+    private Bundle savedState;
     private SharedPreferences pref;
     private android.support.v7.widget.Toolbar toolbar;
     private LinearLayout linearLayoutContainer;
@@ -71,29 +83,11 @@ public class SwipeEvents extends ProgressFragment{
     MapView mapView;
     private GoogleMap googleMap;
     private View mContentView;
-    GetMainSwipeDataInterface sGetDataInterface;
     private Handler mHandler;
-    private Runnable mShowContentRunnable = new Runnable() {
+    private SlidingLayer mSlidingLayer;
+    private IconicsImageView downArrow;
 
-        @Override
-        public void run() {
-            setContentShown(true);
-        }
-    };
 
-    public interface GetMainSwipeDataInterface {
-        ArrayList<JSONObject> getMainEventList();
-        ArrayList<JSONObject> getUpdatedEventList();
-    }
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        try {
-            sGetDataInterface = (GetMainSwipeDataInterface) context;
-        } catch (ClassCastException e) {
-            throw new ClassCastException(context.toString() + "must implement GetDataInterface Interface");
-        }
-    }
     public static SwipeEvents newInstance() {
         SwipeEvents myFragment = new SwipeEvents();
         return myFragment;
@@ -119,31 +113,34 @@ public class SwipeEvents extends ProgressFragment{
         mContentView = inflater.inflate(R.layout.activity_swipe_events, container, false);
         cardStack = (SwipeDeck) mContentView.findViewById(R.id.swipe_deck);
         setHasOptionsMenu(true);
+        mSlidingLayer = (SlidingLayer) getActivity().findViewById(R.id.slidingLayer1);
+        downArrow = (IconicsImageView)getActivity().findViewById(R.id.down_arrow);
 
         //alter toolbar title
         TextView textView = (TextView)getActivity().findViewById(R.id.toolbar_title);
         textView.setText("LIV IT");
-        return super.onCreateView(inflater, container, savedInstanceState);
+        return mContentView;
 
     }
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        setContentView(mContentView);
         obtainData();
+        savedState = savedInstanceState;
         setupOnCreate(savedInstanceState);
+    }
+    @Override
+    public void onPrepareOptionsMenu(final Menu menu) {
     }
 
     private void obtainData(){
-        setContentShown(false);
-        mHandler = new Handler();
-        mHandler.postDelayed(mShowContentRunnable, 1000);
         try {
             data = new QueryEventList(getString(R.string.DATABASE_MAIN_EVENTS_PULLER)).execute(user).get();
         } catch (InterruptedException | ExecutionException e) {
             e.printStackTrace();
         }
     }
+
 
     /**
      * data is an arraylist passed through an interface from main activity
@@ -152,7 +149,6 @@ public class SwipeEvents extends ProgressFragment{
     @Override
     public void onResume() {
         super.onResume();
-        //adapter.notifyDataSetChanged();
     }
     @Override
     public void onStart(){
@@ -279,6 +275,10 @@ public class SwipeEvents extends ProgressFragment{
             return data.size();
         }
 
+        public void clear(){
+            data.clear();
+        }
+
         @Override
         public JSONObject getItem(int position) {
             return data.get(position);
@@ -303,6 +303,7 @@ public class SwipeEvents extends ProgressFragment{
                 event_name = data.get(position).getString("event_name");
                 event_preference = data.get(position).getString("preference_name");
                 event_description = data.get(position).getString("event_description");
+                eventWebsite = data.get(position).getString("event_website");
                 lat = data.get(position).getString("lat");
                 lng = data.get(position).getString("lng");
             } catch (JSONException e) {
@@ -315,17 +316,51 @@ public class SwipeEvents extends ProgressFragment{
              */
             mapView = (MapView)v.findViewById(R.id.mapView);
 
-
+            final ProgressBar progressBarFront = (ProgressBar)v.findViewById(R.id.front_progress);
+            final ProgressBar progressBarBack = (ProgressBar)v.findViewById(R.id.back_progress);
             ImageView frontCardImage = (ImageView) v.findViewById(R.id.offer_image);
             //Picasso.with(context).load(image).into(frontCardImage);
-            Glide.with(SwipeEvents.this).load(getImageURL(image)).diskCacheStrategy(DiskCacheStrategy.ALL)
-                    .placeholder(R.drawable.progress).into(frontCardImage);
+            Glide.with(SwipeEvents.this)
+                    .load(getImageURL(image))
+                    .diskCacheStrategy(DiskCacheStrategy.ALL)
+                    .placeholder(R.drawable.progress)
+                    .listener(new RequestListener<String, GlideDrawable>() {
+                        @Override
+                        public boolean onException(Exception e, String model, Target<GlideDrawable> target, boolean isFirstResource) {
+                            progressBarFront.setVisibility(View.GONE);
+                            return false;
+                        }
+
+                        @Override
+                        public boolean onResourceReady(GlideDrawable resource, String model, Target<GlideDrawable> target, boolean isFromMemoryCache, boolean isFirstResource) {
+                            progressBarFront.setVisibility(View.GONE);
+                            return false;
+                        }
+                    })
+                    .into(frontCardImage);
+
             Log.i("Image path", getImageURL(image));
 
             final ImageView flippedCardImage = (ImageView) v.findViewById(R.id.back_image);
             //Picasso.with(context).load(image).centerCrop().fit().into(flippedCardImage);
-            Glide.with(SwipeEvents.this).load(getImageURL(image)).centerCrop()
-                    .placeholder(R.drawable.progress).into(flippedCardImage);
+            Glide.with(SwipeEvents.this)
+                    .load(getImageURL(image))
+                    .centerCrop()
+                    .placeholder(R.drawable.progress)
+                    .listener(new RequestListener<String, GlideDrawable>() {
+                        @Override
+                        public boolean onException(Exception e, String model, Target<GlideDrawable> target, boolean isFirstResource) {
+                            progressBarBack.setVisibility(View.GONE);
+                            return false;
+                        }
+
+                        @Override
+                        public boolean onResourceReady(GlideDrawable resource, String model, Target<GlideDrawable> target, boolean isFromMemoryCache, boolean isFirstResource) {
+                            progressBarBack.setVisibility(View.GONE);
+                            return false;
+                        }
+                    })
+                    .into(flippedCardImage);
 
             TextView event_location_tv = (TextView) v.findViewById(R.id.display_event_location);
             event_location_tv.setText(event_location);

@@ -104,6 +104,7 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
     private static ArrayList<String> eventTimeList = new ArrayList<>();
     private static ArrayList<String> eventPrefList = new ArrayList<>();
     private static ArrayList<String> eventLocationList = new ArrayList<>();
+    private static ArrayList<String> eventWebsiteList = new ArrayList<>();
 
     private static ArrayList<Integer> eventDistanceList = new ArrayList<>();
 
@@ -118,7 +119,6 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
         this.type=type;
         this.fragmentManager=fragmentManager;
         this.activity=activity;
-        this.childFragmentManager = childFragmentManager;
         eventBundle = new Bundle();
         bundle=new Bundle();
     }
@@ -152,15 +152,15 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
         public final TextView mEventCost, mEventCostBack;
         public final ImageView mEventImage, mEventImageback;
         public final TextView mEventStartDate, mEventStartTime;
-        public final TextView mEventInfoBack, mEventInfo;
-        public final ImageButton mSaveImageButton, mLinkImageButton;
-        public final ImageButton mShareButton;
+        public final TextView mEventInfoBack;//, mEventInfo;
+        //public final ImageButton mSaveImageButton, mLinkImageButton;
+        //public final ImageButton mShareButton;
         public final TextView mEventHoster, mEventDistanceBack;
         public final TextView mEventDistance;
-        public final CardView cardView;
+        public final CardView cardView, cardViewBack;
         public IconicsImageView infoIcon;
         public TextView moreInfo;
-        public final RelativeLayout layout;
+        //public final RelativeLayout layout;
         public final WebView mWebView;
         SwipeLayout mSwipeLayout;
         Button buttonDelete;
@@ -178,7 +178,7 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
 
             mEventDistance = (TextView)view.findViewById(R.id.event_distance);
             mEventDistanceBack = (TextView)view.findViewById(R.id.event_distance_back);
-            mEventInfo = (TextView)view.findViewById(R.id.extra_info);
+           // mEventInfo = (TextView)view.findViewById(R.id.extra_info);
 
             mSwipeLayout = (SwipeLayout) itemView.findViewById(R.id.swipe);
             buttonDelete = (Button) itemView.findViewById(R.id.delete);
@@ -201,20 +201,21 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
             mEventStartDate = (TextView)view.findViewById(R.id.start_date);
             mEventStartTime = (TextView)view.findViewById(R.id.start_time);
 
-            mSaveImageButton = (ImageButton)view.findViewById(R.id.saveButton);
-            mShareButton = (ImageButton)view.findViewById(R.id.shareButton);
+            //mSaveImageButton = (ImageButton)view.findViewById(R.id.saveButton);
+            //mShareButton = (ImageButton)view.findViewById(R.id.shareButton);
 
             mEventInfoBack = (TextView)view.findViewById(R.id.event_info_back);
             mEventImageback = (ImageView)view.findViewById(R.id.iv_event_image_back);
 
             mEventHoster = (TextView)view.findViewById(R.id.tv_event_hoster);
-            layout = (RelativeLayout) view.findViewById(R.id.extend);
+            //layout = (RelativeLayout) view.findViewById(R.id.extend);
 
             mEventImage = (ImageView) view.findViewById(R.id.iv_event_image);
             cardView = (CardView) view.findViewById(R.id.cardview);
+            cardViewBack = (CardView)view.findViewById(R.id.card_view_back);
 
             mWebView = (WebView)view.findViewById(R.id.webView);
-            mLinkImageButton = (ImageButton)view.findViewById(R.id.linkButton);
+            //mLinkImageButton = (ImageButton)view.findViewById(R.id.linkButton);
 
             //itemView.setOnClickListener(this);
             //itemView.setOnLongClickListener(this);
@@ -242,6 +243,7 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
         String event = null;            String eventInfo = "";      String startDate=null;
         String startTime=null;          String eventid = null;      String userId=null;
         String eventHoster=null;        String cost=null;           Double lat=0.0;
+        String eventWebsite = null;
         Double lng=0.0;                 final JSONObject restoreEvent = new JSONObject();
 
 
@@ -259,8 +261,11 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
             lat = mEventData.get(position).getDouble("lat");
             lng=mEventData.get(position).getDouble("lng");
             eventInfo = mEventData.get(position).getString("event_description");
+            eventWebsite = mEventData.get(position).getString("event_website");
+            Log.i("website: ", eventWebsite);
 
             eventNameList.add(event);
+            eventWebsiteList.add(eventWebsite);
             eventImageList.add(getImageURL(eventPath));
             eventDescList.add(eventInfo);
             latsArrayList.add(lat+"");
@@ -282,9 +287,6 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
         eventAdapterViewHolder.mEventLocationTV.setText(eventLocation);
         eventAdapterViewHolder.mEventName.setText(event);
 
-        final String finalEvent = event;
-        final String finalEventInfo1 = eventInfo;
-        final String finalEventLocation = eventLocation;
 
         final Bundle bundle = new Bundle();
         bundle.putString("eventName", event);
@@ -300,10 +302,11 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
         bundle.putString("eventId", eventid);
         bundle.putDouble("eventLat", lat);
         bundle.putDouble("eventLng", lng);
+        bundle.putString("eventWebsite", eventWebsite);
         setBundle(bundle);
 
         if(type==1) {
-            setAnimation(eventAdapterViewHolder.itemView, position);
+            //setAnimation(eventAdapterViewHolder.itemView, position);
             rowMenu.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -336,13 +339,13 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
              ******************************************************************************/
 
             loadImage(eventAdapterViewHolder.mEventImage, getImageURL(eventPath));
-            eventAdapterViewHolder.mEventInfo.setText("Additional Event Information");
+            //eventAdapterViewHolder.mEventInfo.setText("Additional Event Information");
 
             /********************************************************************************
              * Implements add to calendar funcitonality, will add event to
              * internal mobile calendar with the event name, date, time, and
              * event description
-             *******************************************************************************/
+             *******************************************************************************
             eventAdapterViewHolder.mSaveImageButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -359,7 +362,7 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                     context.startActivity(intent);
                 }
-            });
+            });*/
 
             /***************************************************************************************
              * Handles the swipe to restore operation in saved events and deleted events
@@ -422,48 +425,6 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
 
             eventAdapterViewHolder.mEventHoster.setText("Presented By: " + eventHoster);
             eventAdapterViewHolder.mEventCost.setText("Entry Fee: $" + cost);
-            eventAdapterViewHolder.mWebView.getSettings().setJavaScriptEnabled(true);
-            eventAdapterViewHolder.mWebView.getSettings().setLoadWithOverviewMode(true);
-            eventAdapterViewHolder.mWebView.getSettings().setUseWideViewPort(true);
-            eventAdapterViewHolder.mWebView.setVerticalScrollBarEnabled(true);
-            eventAdapterViewHolder.mWebView.setHorizontalScrollBarEnabled(true);
-            eventAdapterViewHolder.mWebView.setWebViewClient(new WebViewClient() {
-
-                @Override
-                public boolean shouldOverrideUrlLoading(WebView view, String url) {
-                    view.loadUrl(url);
-                    return true;
-                }
-
-                @Override
-                public void onPageFinished(WebView view, final String url) {
-                }
-            });
-
-
-
-
-            /*****************************************************************************************
-             * Clicking on the link icon in the expanded cardview will
-             * open a webpage with the specified url. Event poster can post
-             * ticket sale link along with other event information
-             ****************************************************************************************/
-            eventAdapterViewHolder.mLinkImageButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    eventAdapterViewHolder.mWebView.loadUrl("https://www.google.com");
-                    if (eventAdapterViewHolder.mWebView.getVisibility() == View.GONE) {
-                        eventAdapterViewHolder.mWebView.setVisibility(View.VISIBLE);
-                        StyleableToast st = new StyleableToast(context.getApplicationContext(), "Loading Website...", Toast.LENGTH_SHORT);
-                        st.setBackgroundColor(context.getColor(R.color.livinPink));
-                        st.setTextColor(context.getColor(R.color.livinWhite));
-                        st.show();
-                    } else {
-                        eventAdapterViewHolder.mWebView.setVisibility(View.GONE);
-                    }
-                }
-            });
-
 
 
 
@@ -472,10 +433,12 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
              * revieal additional information as well as additional buttons
              * which will perform the share, webview, and add to calendar functions
              * ****************************************************************************************/
+            final String finalEventWebsite1 = eventWebsite;
             eventAdapterViewHolder.cardView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     Intent intent = new Intent(activity, DisplayEvent.class);
+                    bundle.putString("eventWebsite", finalEventWebsite1);
                     intent.putExtras(bundle);
                     intent.setFlags(Intent.FLAG_ACTIVITY_PREVIOUS_IS_TOP);
                     context.startActivity(intent);
@@ -504,8 +467,6 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
              *Sets up Bundle object to pass to DisplayEvent fragment
              * DisplayEvent fragment displays all event information
              ***************************************************************************/
-            final Double finalLat2 = lat;
-            final Double finalLng2 = lng;
             eventAdapterViewHolder.moreInfo.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -515,15 +476,13 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
                     context.startActivity(intent);
                 }
             });
-
-            final ProgressBar progressBar = (ProgressBar)rootView.findViewById(R.id.progress);
-
-            Log.i("Image", getImageURL(eventPath));
+            final ProgressBar progressBar = (ProgressBar)rootView.findViewById(R.id.grid_progress);
+            Log.i("images", getImageURL(eventPath));
             Glide.with(context.getApplicationContext())
                     .load(getImageURL(eventPath))
                     .placeholder(R.drawable.progress)
                     .error(R.drawable.placeholder)
-                    .diskCacheStrategy(DiskCacheStrategy.ALL)
+                    .diskCacheStrategy(DiskCacheStrategy.SOURCE)
                     .listener(new RequestListener<String, GlideDrawable>() {
                         @Override
                         public boolean onException(Exception e, String model, com.bumptech.glide.request.target.Target<GlideDrawable> target, boolean isFirstResource) {
@@ -543,8 +502,8 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
                     .load(getImageURL(eventPath))
                     .placeholder(R.drawable.progress)
                     .error(R.drawable.placeholder)
-                    .diskCacheStrategy(DiskCacheStrategy.ALL)
                     .into(eventAdapterViewHolder.mEventImageback);
+
 
         }
 
@@ -612,7 +571,6 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
         Glide.with(imageView.getContext())
                 .load(URL)
                 .placeholder(R.drawable.progress)
-                .diskCacheStrategy(DiskCacheStrategy.ALL)
                 .error(R.drawable.placeholder)
                 .listener(new RequestListener<String, GlideDrawable>() {
                     @Override
@@ -642,20 +600,8 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
         notifyDataSetChanged();
     }
 
-    private void setAnimation(View viewToAnimate, int position) {
-        // If the bound view wasn't previously displayed on screen, it's animated
-        if (position > lastPosition) {
-            Animation animation = AnimationUtils.loadAnimation(context, R.anim.enter);
-            viewToAnimate.startAnimation(animation);
-            lastPosition = position; }
-    }
-    private void setGridAnimation(View viewToAnimate, int position){
-        if(position>lastPosition){
-            Animation animation = AnimationUtils.loadAnimation(context, R.anim.swing_up_left);
-            viewToAnimate.startAnimation(animation);
-            lastPosition=position;
-        }
-    }
+
+
     public ArrayList<String> getLatsArrayList(){
         return latsArrayList;
     }
@@ -697,5 +643,6 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
     public ArrayList<Integer> getEventDistanceList(){
         return eventDistanceList;
     }
+    public ArrayList<String> getEventWebsiteList(){ return eventWebsiteList; }
 
 }

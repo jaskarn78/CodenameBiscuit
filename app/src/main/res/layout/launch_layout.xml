@@ -1,269 +1,47 @@
-<?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_height="match_parent"
-    android:layout_width="match_parent">
 <LinearLayout
-        android:layout_height="match_parent"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_height="match_parent"
+    android:layout_width="match_parent"
+    android:background="@color/black_overlay"
+    android:orientation="vertical"
+    >
+
+
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar"
         android:layout_width="match_parent"
-        android:orientation="vertical"
-        android:background="@color/black_overlay"
-        xmlns:app="http://schemas.android.com/apk/res-auto">
+        android:layout_height="50dp"
+        android:background="@color/livinBlack"
+        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+        app:popupTheme="@style/ThemeOverlay.AppCompat.Dark" >
 
-        <android.support.v7.widget.Toolbar
-            xmlns:android="http://schemas.android.com/apk/res/android"
-            android:id="@+id/toolbar"
+
+        <TextView
             android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:background="@color/livinBlack"
-            android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
-            app:popupTheme="@style/ThemeOverlay.AppCompat.Dark" >
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="20dp"
+            android:gravity="center_horizontal"
+            android:textSize="20sp"
+            android:text="Toolbar"
+            android:textColor="@color/livinPink"
+            android:id="@+id/toolbar_title" />
+
+    </android.support.v7.widget.Toolbar>
+    <ProgressBar
+        android:id="@+id/progress_launch"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
 
 
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="20dp"
-                android:gravity="center_horizontal"
-                android:textSize="20sp"
-                android:text="Toolbar"
-                android:textColor="@color/livinPink"
-                android:id="@+id/toolbar_title" />
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/fragment_container">
 
-        </android.support.v7.widget.Toolbar>
+        <include layout="@layout/update_pref"/>
+    </FrameLayout>
 
-        <FrameLayout
-            android:id="@+id/fragment_container"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            />
 
 </LinearLayout>
-
-    <!-- SLIDING LAYOUT -->
-
-
-    <com.wunderlist.slidinglayer.SlidingLayer
-        xmlns:fancy="http://schemas.android.com/apk/res-auto"
-        xmlns:slidingLayer="http://schemas.android.com/apk/res-auto"
-        android:id="@+id/slidingLayer1"
-        android:layout_width="wrap_content"
-        android:layout_height="370dp"
-        android:elevation="2dip"
-        slidingLayer:shadowDrawable="@drawable/sidebar_shadow"
-        slidingLayer:shadowSize="@dimen/shadow_size"
-        slidingLayer:offsetDistance="@dimen/offset_distance"
-        slidingLayer:previewOffsetDistance="@dimen/preview_offset_distance"
-        slidingLayer:stickTo="bottom"
-        slidingLayer:changeStateOnTap="true">
-
-        <RelativeLayout
-            android:id="@+id/sliding_relative"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_gravity="center_horizontal"
-            android:background="@color/black_overlay">
-
-            <TextView
-                android:id="@+id/swipeText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Preference List.."
-                android:layout_centerHorizontal="true"
-                android:textColor="@color/livinPink"
-                android:textSize="20sp"
-               />
-
-            <LinearLayout
-                android:id="@+id/section_socialnetworks"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/swipeText"
-                android:layout_marginTop="10dp"
-                android:minHeight="200dp"
-                android:orientation="vertical"
-                >
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_marginBottom="15dp"
-                    android:gravity="center" >
-
-                    <mehdi.sakout.fancybuttons.FancyButton
-                        android:id="@+id/btn_music"
-                        android:layout_width="85dp"
-                        android:layout_height="85dp"
-                        android:layout_marginRight="10dp"
-                        fancy:fb_defaultColor="@color/translivinPink"
-                        fancy:fb_focusColor="#313131"
-                        fancy:fb_iconResource="@drawable/musicnote"
-                        fancy:fb_iconPaddingLeft="0dp"
-                        fancy:fb_iconPaddingRight="0dp"
-                        fancy:fb_iconPosition="top"
-                        fancy:fb_radius="64dp"
-                        fancy:fb_text="Music"
-                        fancy:fb_textColor="@color/livinBlack" />
-
-                    <mehdi.sakout.fancybuttons.FancyButton
-                        android:id="@+id/btn_food"
-                        android:layout_width="85dp"
-                        android:layout_height="85dp"
-                        android:layout_marginRight="10dp"
-                        fancy:fb_defaultColor="@color/translivinPink"
-                        fancy:fb_iconPaddingLeft="0dp"
-                        fancy:fb_iconPaddingRight="0dp"
-                        fancy:fb_focusColor="#313131"
-                        fancy:fb_iconResource="@drawable/hamburger"
-                        fancy:fb_text="Food"
-                        fancy:fb_textColor="@color/livinBlack"
-                        fancy:fb_iconPosition="top"
-                        fancy:fb_radius="64dp">
-                    </mehdi.sakout.fancybuttons.FancyButton>
-
-
-                    <mehdi.sakout.fancybuttons.FancyButton
-                        android:id="@+id/btn_sports"
-                        android:layout_width="85dp"
-                        android:layout_height="85dp"
-                        android:layout_marginRight="10dp"
-                        fancy:fb_iconPaddingLeft="0dp"
-                        fancy:fb_defaultColor="@color/translivinPink"
-                        fancy:fb_iconPaddingRight="0dp"
-                        fancy:fb_iconPosition="top"
-                        fancy:fb_focusColor="#313131"
-                        fancy:fb_iconResource="@drawable/football"
-                        fancy:fb_text="Sports"
-                        fancy:fb_textColor="@color/livinBlack"
-                        fancy:fb_radius="64dp">
-                    </mehdi.sakout.fancybuttons.FancyButton>
-
-
-                </LinearLayout>
-
-                <LinearLayout
-                    android:id="@+id/sn_pos2"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_marginBottom="15dp"
-                    android:gravity="center"
-                    android:orientation="horizontal" >
-
-                    <mehdi.sakout.fancybuttons.FancyButton
-                        android:id="@+id/btn_outdoors"
-                        android:layout_width="85dp"
-                        android:layout_height="85dp"
-                        android:layout_marginRight="10dp"
-                        fancy:fb_defaultColor="@color/translivinPink"
-                        fancy:fb_iconPaddingLeft="0dp"
-                        fancy:fb_iconPaddingRight="0dp"
-                        fancy:fb_iconPosition="top"
-                        fancy:fb_focusColor="#313131"
-                        fancy:fb_iconResource="@drawable/basecamp"
-                        fancy:fb_text="Outdoor"
-                        fancy:fb_textColor="@color/livinBlack"
-                        fancy:fb_radius="64dp">
-                    </mehdi.sakout.fancybuttons.FancyButton>
-
-                    <mehdi.sakout.fancybuttons.FancyButton
-                        android:id="@+id/btn_health"
-                        android:layout_width="85dp"
-                        android:layout_height="85dp"
-                        android:layout_marginRight="10dp"
-                        fancy:fb_defaultColor="@color/translivinPink"
-                        fancy:fb_iconPaddingLeft="0dp"
-                        fancy:fb_iconPaddingRight="0dp"
-                        fancy:fb_focusColor="#313131"
-                        fancy:fb_iconPosition="top"
-                        fancy:fb_iconResource="@drawable/bike"
-                        fancy:fb_text="Health"
-                        fancy:fb_textColor="@color/livinBlack"
-                        fancy:fb_radius="64dp" >
-                    </mehdi.sakout.fancybuttons.FancyButton>
-
-                    <mehdi.sakout.fancybuttons.FancyButton
-                        android:id="@+id/btn_family"
-                        android:layout_width="85dp"
-                        android:layout_height="85dp"
-                        android:layout_marginRight="10dp"
-                        fancy:fb_defaultColor="@color/translivinPink"
-                        fancy:fb_iconPaddingLeft="0dp"
-                        fancy:fb_iconPaddingRight="0dp"
-                        fancy:fb_focusColor="#313131"
-                        fancy:fb_text="Family"
-                        fancy:fb_iconResource="@drawable/ic_face_black_24dp"
-                        fancy:fb_iconPosition="top"
-                        fancy:fb_textColor="@color/livinBlack"
-                        fancy:fb_radius="64dp">
-                    </mehdi.sakout.fancybuttons.FancyButton>
-
-
-
-
-                </LinearLayout>
-
-                <LinearLayout
-                    android:id="@+id/LinearLayout1"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:gravity="center"
-                    android:orientation="horizontal" >
-
-                    <mehdi.sakout.fancybuttons.FancyButton
-                        android:id="@+id/btn_retail"
-                        android:layout_width="85dp"
-                        android:layout_height="85dp"
-                        android:layout_marginRight="10dp"
-                        fancy:fb_defaultColor="@color/translivinPink"
-                        fancy:fb_iconPaddingLeft="0dp"
-                        fancy:fb_iconPaddingRight="0dp"
-                        fancy:fb_focusColor="#313131"
-                        fancy:fb_iconResource="@drawable/cart"
-                        fancy:fb_iconPosition="top"
-                        fancy:fb_text="Retail"
-                        fancy:fb_textColor="@color/livinBlack"
-                        fancy:fb_radius="64dp">
-                    </mehdi.sakout.fancybuttons.FancyButton>
-
-                    <mehdi.sakout.fancybuttons.FancyButton
-                        android:id="@+id/btn_performing"
-                        android:layout_width="85dp"
-                        android:layout_height="85dp"
-                        android:layout_marginRight="10dp"
-                        fancy:fb_defaultColor="@color/translivinPink"
-                        fancy:fb_iconPaddingLeft="0dp"
-                        fancy:fb_iconPaddingRight="0dp"
-                        fancy:fb_focusColor="#313131"
-                        fancy:fb_iconResource="@drawable/theater"
-                        fancy:fb_text="Entertainment"
-                        fancy:fb_textSize="12sp"
-                        fancy:fb_textColor="@color/livinBlack"
-                        fancy:fb_iconPosition="top"
-                        fancy:fb_radius="64dp">
-                    </mehdi.sakout.fancybuttons.FancyButton>
-
-                    <mehdi.sakout.fancybuttons.FancyButton
-                        android:id="@+id/btn_entertainment"
-                        android:layout_width="85dp"
-                        android:layout_height="85dp"
-                        android:layout_marginRight="10dp"
-                        fancy:fb_defaultColor="@color/translivinPink"
-                        fancy:fb_iconPaddingLeft="0dp"
-                        fancy:fb_iconPaddingRight="0dp"
-                        fancy:fb_focusColor="#313131"
-                        fancy:fb_iconResource="@drawable/movie"
-                        fancy:fb_text="Performing Arts"
-                        fancy:fb_textColor="@color/livinBlack"
-                        fancy:fb_iconPosition="top"
-                        fancy:fb_textSize="12sp"
-                        fancy:fb_radius="64dp" >
-                    </mehdi.sakout.fancybuttons.FancyButton>
-                </LinearLayout>
-            </LinearLayout>
-
-
-
-        </RelativeLayout>
-
-    </com.wunderlist.slidinglayer.SlidingLayer>
-</RelativeLayout>

@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
+
+
 <android.support.design.widget.CoordinatorLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:id="@+id/parent"
@@ -46,6 +49,7 @@
         </android.support.design.widget.CollapsingToolbarLayout>
     </android.support.design.widget.AppBarLayout>
 
+
     <android.support.v4.view.ViewPager
         android:id="@+id/vp_horizontal_ntb"
         android:layout_width="match_parent"
@@ -57,8 +61,9 @@
             android:layout_width="match_parent"
             android:layout_height="50dp"
             android:layout_gravity="bottom"
+            android:background="@drawable/border_black"
             app:ntb_badge_gravity="top"
-            app:ntb_bg_color="@color/cardview_dark_background"
+            app:ntb_bg_color="@color/black_overlay"
             app:ntb_active_color="@color/livinPink"
             app:ntb_inactive_color="@color/livinWhite"
             app:ntb_badge_position="right"
@@ -68,5 +73,4 @@
             app:ntb_title_mode="all"
             app:ntb_titled="true"
             />
-
 </android.support.design.widget.CoordinatorLayout>

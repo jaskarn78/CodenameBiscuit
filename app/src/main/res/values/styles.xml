@@ -1,9 +1,9 @@
 <resources>
 
     <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.AppCompat.DayNight">
+    <style name="AppTheme" parent="Theme.AppCompat.Light">
         <!-- Customize your theme here. -->
-        <item name="colorPrimary">@color/gray_overlay</item>
+        <item name="colorPrimary">#FF000000</item>
         <item name="colorPrimaryDark">@color/livinBlack</item>
         <item name="colorAccent">@color/livinPink</item>
         <item name="preferenceTheme">@style/PreferenceThemeOverlay</item>
@@ -82,6 +82,11 @@
 
     <style name="MyTheme" parent="@android:style/Theme.Holo.Light">
         <item name="android:actionBarStyle">@style/MyActionBar</item>
+    </style>
+
+    <style name="ToolbarTheme" parent="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
+        <item name="selectableItemBackground">?android:selectableItemBackground</item>
+        <item name="selectableItemBackgroundBorderless">?android:selectableItemBackground</item>
     </style>
 
 

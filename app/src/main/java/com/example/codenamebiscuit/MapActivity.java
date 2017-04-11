@@ -3,12 +3,14 @@ package com.example.codenamebiscuit;
 import android.*;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Point;
 import android.graphics.drawable.Drawable;
+import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
@@ -19,6 +21,7 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.preference.PreferenceManager;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -30,11 +33,19 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.drawable.GlideDrawable;
+import com.bumptech.glide.request.RequestListener;
 import com.devspark.progressfragment.ProgressFragment;
 import com.example.codenamebiscuit.eventfragments.DisplayEvent;
+import com.example.codenamebiscuit.eventfragments.GridMainEventsFrag;
+import com.example.codenamebiscuit.helper.GPSTracker;
+import com.example.codenamebiscuit.helper.QueryEventList;
 import com.example.codenamebiscuit.rv.EventAdapter;
+import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -47,12 +58,16 @@ import com.squareup.picasso.Target;
 import com.thebrownarrow.customstyledmap.CustomMap;
 import com.thebrownarrow.model.MyLocation;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
+import java.util.concurrent.ExecutionException;
 
 public class MapActivity extends ProgressFragment {
-    private ArrayList<String> latsArrayList;
-    private ArrayList<String> lngsArrayList;
-    private ArrayList<String> nameList;
+    private ArrayList<Double> latsArrayList;
+    private ArrayList <Double> lngsArrayList;
+    private ArrayList <String> nameList;
     private ArrayList<String> imageList;
     private ArrayList<String> descList;
     private ArrayList<String> hosterList;
@@ -62,6 +77,10 @@ public class MapActivity extends ProgressFragment {
     private ArrayList<String> prefList;
     private ArrayList<String> locationList;
     private ArrayList<Integer> distanceList;
+    private ArrayList<JSONObject> data;
+    private SharedPreferences sharedPreferences;
+    private JSONObject currentUser;
+    private Double currentLat, currentLng;
 
 
     private ArrayList<MyLocation> latLngsArrayList;
@@ -84,6 +103,13 @@ public class MapActivity extends ProgressFragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
+        currentUser = new JSONObject();
+        try {
+            currentUser.put("user_id", sharedPreferences.getString("user_id", null));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -96,18 +122,17 @@ public class MapActivity extends ProgressFragment {
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        setContentView(mContentView);
         setContents(mContentView);
 
 
     }
+    public MapActivity newInstance() {
+        MapActivity mapActivity = new MapActivity();
+        return mapActivity;
+    }
     public void onDestroyView()
     {
         super.onDestroyView();
-        Fragment fragment = this.getChildFragmentManager().findFragmentById(R.id.map);
-        FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
-        ft.remove(fragment);
-        ft.commit();
     }
     @Override
     public void onResume() {
@@ -120,65 +145,47 @@ public class MapActivity extends ProgressFragment {
         //((AppCompatActivity)getActivity()).getSupportActionBar().show();
     }
 
-    private void setContents(View rootView){
-        setContentShown(false);
-        mHandler = new Handler();
-        mHandler.postDelayed(mShowContentRunnable, 2000);
-        Bundle bundle = getArguments();
-        latsArrayList = new ArrayList<>();
-        latsArrayList.clear();
-        latsArrayList = bundle.getStringArrayList("latList");
-
-        lngsArrayList = new ArrayList<>();
-        lngsArrayList.clear();
-        lngsArrayList = bundle.getStringArrayList("lngList");
-
+    private void loadData(){
         latLngsArrayList = new ArrayList<>();
-        latLngsArrayList.clear();
-
-        nameList=new ArrayList<>();
-        nameList.clear();
-        nameList = bundle.getStringArrayList("nameList");
-
+        latsArrayList = new ArrayList<>();
+        lngsArrayList = new ArrayList<>();
+        nameList = new ArrayList<>();
         imageList = new ArrayList<>();
-        imageList.clear();
-        imageList = bundle.getStringArrayList("imageList");
-
         descList = new ArrayList<>();
-        descList.clear();
-        descList = bundle.getStringArrayList("descList");
-
         hosterList = new ArrayList<>();
-        hosterList.clear();
-        hosterList = bundle.getStringArrayList("hosterList");
-
         prefList = new ArrayList<>();
-        prefList.clear();
-        prefList = bundle.getStringArrayList("prefList");
-
         startList = new ArrayList<>();
-        startList.clear();
-        startList = bundle.getStringArrayList("startList");
-
         timeList = new ArrayList<>();
-        timeList.clear();
-        timeList = bundle.getStringArrayList("timeList");
-
         costList = new ArrayList<>();
-        costList.clear();
-        costList = bundle.getStringArrayList("costList");
-
         locationList = new ArrayList<>();
-        locationList.clear();
-        locationList = bundle.getStringArrayList("locationList");
-
         distanceList = new ArrayList<>();
-        distanceList.clear();
-        distanceList = bundle.getIntegerArrayList("distanceList");
+        try{
+            data = new QueryEventList(getString(R.string.DATABASE_MAIN_EVENTS_PULLER), getContext()).execute(currentUser).get();
+            for(int i=0; i<data.size(); i++){
+                latsArrayList.add(data.get(i).getDouble("lat"));
+                lngsArrayList.add(data.get(i).getDouble("lng"));
+                nameList.add(data.get(i).getString("event_name"));
+                imageList.add(getString(R.string.IMAGE_URL_PATH)+data.get(i).getString("img_path"));
+                descList.add(data.get(i).getString("event_description"));
+                hosterList.add(data.get(i).getString("event_sponsor"));
+                prefList.add(data.get(i).getString("preference_name"));
+                startList.add(data.get(i).getString("start_date"));
+                timeList.add(data.get(i).getString("start_time"));
+                costList.add(data.get(i).getString("event_cost"));
+                locationList.add(data.get(i).getString("event_location"));
+                distanceList.add(getLocation(data.get(i).getDouble("lat"), data.get(i).getDouble("lng")));
+            }
 
+        } catch (InterruptedException | ExecutionException | JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void setContents(View rootView){
+        loadData();
 
         for(int i=0; i<lngsArrayList.size(); i++){
-            latLngsArrayList.add(new MyLocation(Double.parseDouble(latsArrayList.get(i)), Double.parseDouble(lngsArrayList.get(i))));
+            latLngsArrayList.add(new MyLocation(latsArrayList.get(i), lngsArrayList.get(i)));
             Log.i("latlngs", latLngsArrayList.get(i).getLatitude()+", "+latLngsArrayList.get(i).getLongitude());
         }
 
@@ -188,15 +195,18 @@ public class MapActivity extends ProgressFragment {
 
         event_pager = (ViewPager)rootView.findViewById(R.id.event_pager);
 
-        //supportMapFragment = (SupportMapFragment)getActivity().getSupportFragmentManager().findFragmentById(R.id.map);
         supportMapFragment = (SupportMapFragment) this.getChildFragmentManager().findFragmentById(R.id.map);
-
         supportMapFragment.getMapAsync(new OnMapReadyCallback() {
             @Override
             public void onMapReady(GoogleMap googleMap) {
 
                 map = googleMap;
                 map.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+                MyLocation location = latLngsArrayList.get(0);
+                Point mappoint = map.getProjection().toScreenLocation(
+                        new LatLng(location.getLatitude(), location.getLongitude()));
+                mappoint.set(mappoint.x, mappoint.y - 30);
+                map.animateCamera(CameraUpdateFactory.newLatLng(map.getProjection().fromScreenLocation(mappoint)));
                 customMap = new CustomMap(map, latLngsArrayList, getContext().getApplicationContext());
 
                 try {
@@ -205,7 +215,7 @@ public class MapActivity extends ProgressFragment {
                 } catch (Resources.NotFoundException e) {
                     Log.e("Explore detail activity", "Can't find style. Error: " + e);
                 }
-
+                setContentView(mContentView);
                 handleMap();
                 event_pager.setAdapter(new MapViewPagerAdapter(getContext().getApplicationContext(), latLngsArrayList));
                 for(int i=0; i<latLngsArrayList.size(); i++){
@@ -237,8 +247,25 @@ public class MapActivity extends ProgressFragment {
             }
         });
     }
-    private void handleMap() {
 
+    private int getLocation(double lat, double lng){
+        Location location2 = new Location("location2");
+        double distance=0.0;
+        GPSTracker gps = new GPSTracker(getContext().getApplicationContext());
+        if(gps.canGetLocation()){
+            location2.setLatitude(gps.getLatitude());
+            location2.setLongitude(gps.getLongitude());
+            Location location1 = new Location("");
+            location1.setLongitude(lng);
+            location1.setLatitude(lat);
+            distance=location1.distanceTo(location2);
+        }
+        return (int)Math.round(distance*0.000621371192); }
+
+    private void handleMap() {
+        setContentShown(false);
+        mHandler = new Handler();
+        mHandler.postDelayed(mShowContentRunnable, 2000);
         if (map != null) {
             if (ActivityCompat.checkSelfPermission(getActivity(), android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getActivity(), android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                 // TODO: Consider calling
@@ -365,7 +392,6 @@ public class MapActivity extends ProgressFragment {
                     }
 
                     handleMap();
-
                 }
             });
 
@@ -401,14 +427,42 @@ public class MapActivity extends ProgressFragment {
             View itemView = inflater.inflate(R.layout.row_map_pager, null);
 
             LinearLayout lnr_main = (LinearLayout) itemView.findViewById(R.id.lnr_main);
-            TextView tv_name = (TextView) itemView.findViewById(R.id.tv_name);
+            TextView tv_name = (TextView) itemView.findViewById(R.id.tv_event_name);
             tv_name.setText(nameList.get(position));
 
-            TextView tv_desc = (TextView)itemView.findViewById(R.id.tv_desc);
-            tv_desc.setText(descList.get(position)+" "+getString(R.string.lorem_ipsum));
+            TextView tv_preference = (TextView)itemView.findViewById(R.id.tv_event_preference);
+            tv_preference.setText(prefList.get(position));
 
-            ImageView tv_image = (ImageView)itemView.findViewById(R.id.tv_image);
-            Picasso.with(getContext().getApplicationContext()).load(imageList.get(position)).fit().into(tv_image);
+            TextView tv_location = (TextView)itemView.findViewById(R.id.tv_event_location);
+            tv_location.setText(locationList.get(position));
+
+            TextView tv_cost = (TextView)itemView.findViewById(R.id.cost);
+            tv_cost.setText(costList.get(position));
+
+            //TextView tv_desc = (TextView)itemView.findViewById(R.id.tv_e);
+            //tv_desc.setText(descList.get(position)+" "+getString(R.string.lorem_ipsum));
+
+            final ProgressBar progressBar = (ProgressBar)itemView.findViewById(R.id.progress_bar);
+            ImageView tv_image = (ImageView)itemView.findViewById(R.id.iv_event_image);
+            Glide.with(getContext())
+                    .load(imageList.get(position))
+                    .placeholder(R.drawable.progress)
+                    .error(R.drawable.placeholder)
+                    .listener(new RequestListener<String, GlideDrawable>() {
+                        @Override
+                        public boolean onException(Exception e, String model, com.bumptech.glide.request.target.Target<GlideDrawable> target, boolean isFirstResource) {
+                            progressBar.setVisibility(View.GONE);
+                            return false;
+                        }
+
+                        @Override
+                        public boolean onResourceReady(GlideDrawable resource, String model, com.bumptech.glide.request.target.Target<GlideDrawable> target, boolean isFromMemoryCache, boolean isFirstResource) {
+                            progressBar.setVisibility(View.GONE);
+                            return false;
+                        }
+                    })
+                    .into(tv_image);
+            //Picasso.with(getContext().getApplicationContext()).load(imageList.get(position)).fit().into(tv_image);
 
             tv_image.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -424,8 +478,8 @@ public class MapActivity extends ProgressFragment {
                     bundle.putString("eventLocation", locationList.get(position));
                     bundle.putString("eventCost", costList.get(position));
                     bundle.putString("eventTime", timeList.get(position));
-                    bundle.putDouble("eventLat", Double.parseDouble(latsArrayList.get(position)));
-                    bundle.putDouble("eventLng", Double.parseDouble(lngsArrayList.get(position)));
+                    bundle.putDouble("eventLat", latsArrayList.get(position));
+                    bundle.putDouble("eventLng", lngsArrayList.get(position));
                     bundle.putString("eventDistance", distanceList.get(position)+"");
                     bundle.putInt("mapImage", 1);
                     Intent intent = new Intent(getActivity(), DisplayEvent.class);

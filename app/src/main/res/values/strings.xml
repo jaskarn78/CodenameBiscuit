@@ -74,7 +74,7 @@
     <string name="google_maps_key" templateMergeStrategy="preserve">AIzaSyDXcIGF3rFsw_ZcxCS6udrjz5cpVeaCK4I</string>
 
     <string name="DATABASE_MAIN_EVENTS_PULLER">http://athena.ecs.csus.edu/~teamone/php/android/pull_main_events_list.php</string>
-    <!--string name="IMAGE_URL_PATH">http://jagpal-development.com/events/</string-->
+    <string name="IMAGE_URL_PATH">http://jagpal-development.com/events/</string>
     <!--string name="IMAGE_URL_PATH">http://athena.ecs.csus.edu/~teamone/events/</string-->
 
     <string name="DATABASE_STORE_SAVED_EVENTS">http://athena.ecs.csus.edu/~teamone/php/android/store_saved_events.php</string>
@@ -84,10 +84,12 @@
     <string name="DATABASE_RESTORE_SAVED_EVENTS">http://athena.ecs.csus.edu/~teamone/php/android/restore_saved_events.php</string>
     <string name="DATABASE_RESTORE_DELETED_EVENTS">http://athena.ecs.csus.edu/~teamone/php/android/restore_deleted_events.php</string>
     <string name="PULL_USER_PREFERENCES">http://athena.ecs.csus.edu/~teamone/php/android/pull_preferences.php</string>
+    <string name="PUSH_USER_PREFERENCES">http://athena.ecs.csus.edu/~teamone/php/android/push_user_preferences.php</string>
+
 
 
     <!--string name="IMAGE_URL_PATH">http://athena.ecs.csus.edu/~teamone/AndroidUploadImage/uploads/</string-->
-    <string name="IMAGE_URL_PATH">http://athena.ecs.csus.edu/~teamone/events/</string>
+    <!--string name="IMAGE_URL_PATH">http://athena.ecs.csus.edu/~teamone/events/</string-->
 
     <!--string name="DATABASE_MAIN_EVENTS_PULLER">http://192.168.7.35/php/pull_main_events_list.php</string-->
     <!--string name="PUSH_UER_PREFERENCES">http://192.168.7.35/php/push_user_preferences.php</string>
@@ -104,6 +106,8 @@
     <string name="title_activity_archived_events">ArchivedEvents</string>
     <string name="togglepref">Toggle Preferences</string>
     <string name="anchorpref">Anchor Preferences</string>
+    <string name="refresh">Refresh</string>
+    <string name="launch_map">Launch Map</string>
 
 
 </resources>

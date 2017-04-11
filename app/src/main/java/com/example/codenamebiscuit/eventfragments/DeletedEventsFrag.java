@@ -44,7 +44,7 @@ import java.util.concurrent.ExecutionException;
  * Created by jaskarnjagpal on 2/23/17.
  */
 
-public class DeletedEventsFrag extends ProgressFragment implements ClickListener{
+public class DeletedEventsFrag extends ProgressFragment{
     private static final String TAG = "Saved Events Fragment";
 
     private EventAdapter mAdapter;
@@ -61,7 +61,8 @@ public class DeletedEventsFrag extends ProgressFragment implements ClickListener
 
         @Override
         public void run() {
-            setContentShown(true);
+            if(isAdded())
+                setContentShown(true);
         }
 
     };
@@ -95,8 +96,8 @@ public class DeletedEventsFrag extends ProgressFragment implements ClickListener
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState){
         mContentView = inflater.inflate(R.layout.activity_main, container, false);
-        swipeContainer = (SwipeRefreshLayout) mContentView.findViewById(R.id.swipeContainer);
-        setupSwipeDownRefresh();
+        //swipeContainer = (SwipeRefreshLayout) mContentView.findViewById(R.id.swipeContainer);
+        //setupSwipeDownRefresh();
         mRecyclerView = (RecyclerView) mContentView.findViewById(R.id.recyclerview_events);
         eventData = new ArrayList<>();
 
@@ -140,7 +141,7 @@ public class DeletedEventsFrag extends ProgressFragment implements ClickListener
         setContentShown(false);
 
         mHandler = new Handler();
-        mHandler.postDelayed(mShowContentRunnable, 1000);
+        mHandler.postDelayed(mShowContentRunnable, 2000);
         try {
             data = new QueryEventList(getString(R.string.DATABASE_DELETED_EVENTS_PULLER)).execute(currentUserId).get();
         } catch (InterruptedException e) {
@@ -199,20 +200,5 @@ public class DeletedEventsFrag extends ProgressFragment implements ClickListener
                 android.R.color.holo_orange_light,
                 android.R.color.holo_red_light);
     }
-
-    /**********************************************************************************************
-     * Handles the drop down functionality in the list view of the event data
-     * When image button is clicked, additional event information is revealed
-     * @param view
-     * @param position
-     **********************************************************************************************/
-
-    @Override
-    public void itemClicked(View view, int position) {
-        RelativeLayout layout = (RelativeLayout)view.findViewById(R.id.extend);
-        if (layout.getVisibility() == View.GONE)
-            layout.setVisibility(View.VISIBLE);
-        else
-            layout.setVisibility(View.GONE);}
 
 }

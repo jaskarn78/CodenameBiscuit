@@ -22,7 +22,7 @@
                 android:fitsSystemWindows="true"
                 app:contentScrim="@android:color/transparent"
                 app:expandedTitleMarginStart="48dp"
-                app:expandedTitleMarginEnd="64dp">
+                app:expandedTitleMarginEnd="54dp">
 
                 <ImageView
                     android:layout_width="match_parent"
@@ -31,11 +31,12 @@
                     />
                 <RelativeLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="70dp"
                     android:background="@color/transLivinBlack"
                     android:id="@+id/eventName_layout"
                     android:isScrollContainer="false"
                     android:layout_gravity="bottom"
+                    android:layout_marginTop="15dp"
                     app:layout_collapseMode="pin"
                     android:fitsSystemWindows="true"
                     >
@@ -43,20 +44,10 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Event Name"
-                        android:textSize="25sp"
-                        android:layout_marginStart="15dp"
-                        android:textColor="@color/livinWhite"
-                        android:id="@+id/display_event_name"
-                        />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
                         android:text="Event Hoster"
-                        android:layout_below="@id/display_event_name"
-                        android:textSize="15sp"
+                        android:textSize="20sp"
                         android:layout_marginStart="15dp"
+                        android:layout_marginTop="15dp"
                         android:textColor="@color/livinWhite"
                         android:id="@+id/event_hoster"
                         />
@@ -71,22 +62,7 @@
                         android:text="0.5 mi"
                         android:id="@+id/display_event_distance"
                         />
-                    <io.techery.properratingbar.ProperRatingBar
-                        android:id="@+id/upperRatingBar"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_toEndOf="@id/display_event_distance"
-                        android:layout_below="@+id/display_event_name"
-                        android:layout_marginStart="10dp"
-                        android:layout_marginBottom="20dp"
-                        android:textSize="18sp"
-                        android:textStyle="bold"
-                        app:prb_defaultRating="1"
-                        app:prb_symbolicTick="$$$"
-                        app:prb_symbolicTickNormalColor="@android:color/darker_gray"
-                        app:prb_symbolicTickSelectedColor="@android:color/holo_green_dark"
-                        app:prb_totalTicks="1"
-                        />
+
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -133,9 +109,6 @@
             android:orientation="vertical"
             >
 
-
-
-
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -160,6 +133,7 @@
                     android:layout_marginEnd="25dp"
                     android:tint="@color/livinPink"
                     android:id="@+id/event_call"
+                    android:foreground="?android:attr/selectableItemBackgroundBorderless"
                     android:clickable="true"
                     />
 
@@ -173,6 +147,7 @@
                     android:layout_marginBottom="10dp"
                     android:tint="@color/livinPink"
                     android:id="@+id/event_directions"
+                    android:foreground="?android:attr/selectableItemBackgroundBorderless"
                     android:clickable="true"
                     />
                 <com.mikepenz.iconics.view.IconicsImageView
@@ -185,6 +160,7 @@
                     android:layout_marginBottom="10dp"
                     android:tint="@color/livinPink"
                     android:id="@+id/event_share"
+                    android:foreground="?android:attr/selectableItemBackgroundBorderless"
                     android:clickable="true"
                     />
                 <com.mikepenz.iconics.view.IconicsImageView
@@ -197,6 +173,7 @@
                     android:layout_marginEnd="10dp"
                     android:tint="@color/livinPink"
                     android:id="@+id/event_website"
+                    android:foreground="?android:attr/selectableItemBackgroundBorderless"
                     android:clickable="true"
                     />
             </LinearLayout>

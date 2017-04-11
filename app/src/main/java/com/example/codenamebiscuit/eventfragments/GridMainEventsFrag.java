@@ -4,16 +4,19 @@ package com.example.codenamebiscuit.eventfragments;
  * Created by jaskarnjagpal on 3/1/17.
  */
 
+import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.widget.SlidingPaneLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.preference.PreferenceManager;
 import android.support.v7.widget.CardView;
@@ -27,11 +30,14 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.devspark.progressfragment.ProgressFragment;
+import com.example.codenamebiscuit.MainActivity;
 import com.example.codenamebiscuit.MapActivity;
 import com.example.codenamebiscuit.R;
 import com.example.codenamebiscuit.helper.FlipAnimation;
@@ -39,23 +45,29 @@ import com.example.codenamebiscuit.helper.QueryEventList;
 import com.example.codenamebiscuit.helper.UpdateDbOnSwipe;
 import com.example.codenamebiscuit.rv.ClickListener;
 import com.example.codenamebiscuit.rv.EventAdapter;
+import com.geniusforapp.fancydialog.FancyAlertDialog;
 import com.github.brnunes.swipeablerecyclerview.SwipeableRecyclerViewTouchListener;
+import com.mikepenz.iconics.view.IconicsImageView;
 import com.muddzdev.styleabletoastlibrary.StyleableToast;
 import com.rohit.recycleritemclicksupport.RecyclerItemClickSupport;
+import com.wunderlist.slidinglayer.SlidingLayer;
+import com.wunderlist.slidinglayer.transformer.AlphaTransformer;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 
+import mehdi.sakout.fancybuttons.FancyButton;
 
 
 /**
  * Created by jaskarnjagpal on 2/23/17.
  */
 
-public class GridMainEventsFrag extends Fragment implements ClickListener {
+public class GridMainEventsFrag extends Fragment  {
 
     private RecyclerView mRecyclerView;
     private EventAdapter mAdapter;
@@ -64,15 +76,12 @@ public class GridMainEventsFrag extends Fragment implements ClickListener {
     private SharedPreferences pref;
     private JSONObject currentUserId = new JSONObject();
     private SwipeRefreshLayout swipeContainer;
+    private int size;
     private JSONObject saveEvent, deleteEvent;
     private ArrayList<JSONObject> data;
     private View mContentView;
-
-
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-    }
+    private SlidingLayer mSlidingLayer;
+    private IconicsImageView downArrow;
 
 
     @Override
@@ -92,65 +101,50 @@ public class GridMainEventsFrag extends Fragment implements ClickListener {
         setHasOptionsMenu(true);
     }
 
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState){
+                             Bundle savedInstanceState) {
 
         mContentView = inflater.inflate(R.layout.activity_main, container, false);
+       // mSlidingLayer = (SlidingLayer) getActivity().findViewById(R.id.slidingLayer1);
+        //downArrow = (IconicsImageView)getActivity().findViewById(R.id.down_arrow);
+        eventData = new ArrayList<JSONObject>();
+        mRecyclerView = (RecyclerView) mContentView.findViewById(R.id.recyclerview_events);
         return mContentView;
-
     }
 
-    private void obtainData(){
+    private void obtainData() {
         try {
-            data = new QueryEventList(getString(R.string.DATABASE_MAIN_EVENTS_PULLER)).execute(currentUserId).get();
+            data = new QueryEventList(getString(R.string.DATABASE_MAIN_EVENTS_PULLER), getActivity())
+                    .execute(currentUserId).get();
+            mAdapter = new EventAdapter(getContext().getApplicationContext(), 2, "", getFragmentManager(), getActivity());
         } catch (InterruptedException e) {
             e.printStackTrace();
         } catch (ExecutionException e) {
             e.printStackTrace();
         }
     }
+
     public static GridMainEventsFrag newInstance() {
         GridMainEventsFrag myFragment = new GridMainEventsFrag();
         return myFragment;
     }
+
     private boolean isNetworkAvailable() {
         ConnectivityManager connectivityManager
                 = (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
         return activeNetworkInfo != null && activeNetworkInfo.isConnected();
     }
+
     @Override
     public void onPrepareOptionsMenu(final Menu menu) {
-        menu.findItem(R.id.map_action).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem item) {
-                Bundle bundle = new Bundle();
-                bundle.putStringArrayList("latList", mAdapter.getLatsArrayList());
-                bundle.putStringArrayList("lngList", mAdapter.getLngsArrayList());
-                bundle.putStringArrayList("nameList", mAdapter.getEventNameList());
-                bundle.putStringArrayList("imageList", mAdapter.getEventImageList());
-                bundle.putStringArrayList("descList", mAdapter.getEventDescList());
-                bundle.putStringArrayList("hosterList", mAdapter.getHosterArrayList());
-                bundle.putStringArrayList("costList", mAdapter.getCostArrayList());
-                bundle.putStringArrayList("startList", mAdapter.getEventStartList());
-                bundle.putStringArrayList("timeList", mAdapter.getEventTimeList());
-                bundle.putStringArrayList("prefList", mAdapter.getEventPrefList());
-                bundle.putStringArrayList("locationList", mAdapter.getEventLocationList());
-                bundle.putIntegerArrayList("distanceList", mAdapter.getEventDistanceList());
+        final SwipeEvents swipeEvents = SwipeEvents.newInstance();
 
-                Fragment fragment = new MapActivity();
-                fragment.setArguments(bundle);
-                FragmentTransaction ft = getFragmentManager().beginTransaction();
-                ft.setCustomAnimations(R.anim.enter, R.anim.exit);
-                ft.replace(R.id.fragment_container, fragment);
-                ft.addToBackStack(null);
-                ft.commit();
-                getFragmentManager().executePendingTransactions();
-                return false;
-            }
-        });
     }
+
+
 
 
     /**********************************************************************************************
@@ -162,29 +156,20 @@ public class GridMainEventsFrag extends Fragment implements ClickListener {
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         //initialize event dataset
-
-        eventData = new ArrayList<JSONObject>();
-        mAdapter = new EventAdapter(getContext().getApplicationContext(), 2, "", getFragmentManager(), getActivity());
-
         obtainData();
-
-        swipeContainer = (SwipeRefreshLayout) mContentView.findViewById(R.id.swipeContainer);
-        setupSwipeDownRefresh();
-        mRecyclerView = (RecyclerView)mContentView.findViewById(R.id.recyclerview_events);
 
         mAdapter.setEventData(data);
         mRecyclerView.setAdapter(mAdapter);
 
-
-        StaggeredGridLayoutManager staggeredGridLayoutManager = new StaggeredGridLayoutManager(2, 1);
+        StaggeredGridLayoutManager staggeredGridLayoutManager = new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL);
         mRecyclerView.setLayoutManager(staggeredGridLayoutManager);
 
         mRecyclerView.setHasFixedSize(false);
-        mRecyclerView.setItemViewCacheSize(data.size());
+        mRecyclerView.setItemViewCacheSize(100);
         mRecyclerView.setDrawingCacheEnabled(true);
         mRecyclerView.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_AUTO);
 
-        TextView textView = (TextView)getActivity().findViewById(R.id.toolbar_title);
+        TextView textView = (TextView) getActivity().findViewById(R.id.toolbar_title);
         textView.setText("LIV IT");
         StyleableToast st = new StyleableToast(getContext(), "Network not detected!", Toast.LENGTH_LONG);
         //Custom stylable toast*
@@ -201,11 +186,11 @@ public class GridMainEventsFrag extends Fragment implements ClickListener {
                         FlipAnimation flipAnimation = new FlipAnimation(cv, cvBack);
                         if (cv.getVisibility() == View.GONE)
                             flipAnimation.reverse();
-                        view.startAnimation(flipAnimation); }
+                        view.startAnimation(flipAnimation);
+                    }
                 });
-        if(!isNetworkAvailable())
+        if (!isNetworkAvailable())
             st.show();
-
         enableCardSwiping();
     }
 
@@ -219,7 +204,6 @@ public class GridMainEventsFrag extends Fragment implements ClickListener {
     @Override
     public void onResume() {  // After a pause OR at startup
         super.onResume();
-        //mAdapter.notifyDataSetChanged();
     }
 
     @Override
@@ -229,44 +213,17 @@ public class GridMainEventsFrag extends Fragment implements ClickListener {
     }
 
     /**********************************************************************************************
-     * setup up swipe container to refresh event list when performing down swipe gesture
-     * when swipeContainer.setRefresh(true) load the event data
-     * after data has been loaded, set swipeContainer.setRefresh(false)
-     **********************************************************************************************/
-    private void setupSwipeDownRefresh() {
-        swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                swipeContainer.setRefreshing(true);
-                try {
-                    data = new QueryEventList(getString(R.string.DATABASE_MAIN_EVENTS_PULLER)).execute(currentUserId).get();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                } catch (ExecutionException e) {
-                    e.printStackTrace();
-                }
-                mAdapter.setEventData(data);
-                swipeContainer.setRefreshing(false); }
-        });
-        swipeContainer.setColorSchemeResources(android.R.color.holo_blue_bright,
-                android.R.color.holo_green_light,
-                android.R.color.holo_orange_light,
-                android.R.color.holo_red_light); }
-
-    /**********************************************************************************************
      * Handles the drop down functionality in the list view of the event data
      * When image button is clicked, additional event information is revealed
-     * @param view
-     * @param position
-     **********************************************************************************************/
+     *
+     **********************************************************************************************
     @Override
     public void itemClicked(View view, int position) {
         RelativeLayout layout = (RelativeLayout)view.findViewById(R.id.extend);
         if (layout.getVisibility() == View.GONE)
             layout.setVisibility(View.VISIBLE);
         else
-            layout.setVisibility(View.GONE); }
-
+            layout.setVisibility(View.GONE); }*/
 
 
     private void enableCardSwiping(){
@@ -300,12 +257,12 @@ public class GridMainEventsFrag extends Fragment implements ClickListener {
                                         st.show();
                                         data.remove(position);
                                         mAdapter.notifyItemRemoved(position);
-
+                                        new UpdateDbOnSwipe(getString(R.string.DATABASE_STORE_DELETED_EVENTS)).execute(deleteEvent);
                                     } catch (JSONException e) {
                                         e.printStackTrace();
                                     }
-                                    mAdapter.notifyDataSetChanged();}
-                                new UpdateDbOnSwipe(getString(R.string.DATABASE_STORE_DELETED_EVENTS)).execute(deleteEvent);}
+                                    //mAdapter.notifyDataSetChanged();
+                                } }
 
                             @Override
                             public void onDismissedBySwipeRight(RecyclerView recyclerView, int[] ints) {
@@ -323,15 +280,35 @@ public class GridMainEventsFrag extends Fragment implements ClickListener {
                                         st.setMaxAlpha();
                                         st.show();
                                         data.remove(position);
+                                        new UpdateDbOnSwipe(getString(R.string.DATABASE_STORE_SAVED_EVENTS)).execute(saveEvent);
                                         mAdapter.notifyItemRemoved(position);
 
                                     } catch (JSONException e) {
                                         e.printStackTrace();
                                     }
-                                    mAdapter.notifyDataSetChanged();}
-                                new UpdateDbOnSwipe(getString(R.string.DATABASE_STORE_SAVED_EVENTS)).execute(saveEvent);
+                                   // mAdapter.notifyDataSetChanged();
+                                }
                             }
                         });
         mRecyclerView.addOnItemTouchListener(swipeTouchListener);
     }
+
+    public Bundle createBundle(){
+        Bundle bundle = new Bundle();
+        bundle.putStringArrayList("latList", mAdapter.getLatsArrayList());
+        bundle.putStringArrayList("lngList", mAdapter.getLngsArrayList());
+        bundle.putStringArrayList("nameList", mAdapter.getEventNameList());
+        bundle.putStringArrayList("imageList", mAdapter.getEventImageList());
+        bundle.putStringArrayList("descList", mAdapter.getEventDescList());
+        bundle.putStringArrayList("hosterList", mAdapter.getHosterArrayList());
+        bundle.putStringArrayList("costList", mAdapter.getCostArrayList());
+        bundle.putStringArrayList("startList", mAdapter.getEventStartList());
+        bundle.putStringArrayList("timeList", mAdapter.getEventTimeList());
+        bundle.putStringArrayList("prefList", mAdapter.getEventPrefList());
+        bundle.putStringArrayList("locationList", mAdapter.getEventLocationList());
+        bundle.putIntegerArrayList("distanceList", mAdapter.getEventDistanceList());
+        return bundle;
+
+    }
+
 }

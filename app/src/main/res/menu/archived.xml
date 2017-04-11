@@ -1,0 +1,11 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:sothree="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/refresh_saved"
+        android:icon="@drawable/ic_refresh_white_48dp"
+        sothree:showAsAction="ifRoom"
+        android:title="@string/refresh"
+        />
+
+</menu>

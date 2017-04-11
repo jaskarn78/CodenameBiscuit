@@ -364,7 +364,7 @@ public class UserSettingsActivity
             e.printStackTrace();
         }
 
-        new ChangePreferences().execute(pref);
+        //new ChangePreferences().execute(pref);
     }
 
 

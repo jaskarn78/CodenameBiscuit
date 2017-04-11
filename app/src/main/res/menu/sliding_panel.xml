@@ -12,11 +12,14 @@
         android:orderInCategory="200"
         sothree:showAsAction="never"
         android:title="@string/anchorpref"/>
+
+
     <item
-        android:id="@+id/map_action"
-        android:icon="@drawable/ic_map_white_48dp"
-        sothree:showAsAction="ifRoom"
-        android:title="@string/faw_map"
+        android:id="@+id/action_grid_to_full"
+        android:title="list_to_grid"
+        android:orderInCategory="1"
+        sothree:showAsAction="always"
+        android:visible="false"
         />
 
 </menu>

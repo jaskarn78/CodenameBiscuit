@@ -19,6 +19,7 @@ import android.webkit.WebViewClient;
 import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.codenamebiscuit.R;
 import com.google.android.gms.maps.CameraUpdate;
@@ -53,6 +54,7 @@ public class DisplayEvent extends AppCompatActivity{
     private String eventName, eventImage, eventDate, eventCost;
     private String eventTime, eventDescription, eventLocation;
     private String eventPreferences, eventHoster, eventDistance;
+    private String eventWebsite;
     private int mapImage;
     private LikeButton likeButton;
     private String eventId;
@@ -91,7 +93,7 @@ public class DisplayEvent extends AppCompatActivity{
         setSupportActionBar(toolbar);
         this.getSupportActionBar().setDisplayShowTitleEnabled(false);
         final Drawable upArrow = getResources().getDrawable(R.drawable.ic_arrow_back_black_18dp);
-        upArrow.setColorFilter(getResources().getColor(R.color.livinPink), PorterDuff.Mode.SRC_ATOP);
+        upArrow.setColorFilter(getResources().getColor(R.color.livinWhite), PorterDuff.Mode.SRC_ATOP);
         this.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         this.getSupportActionBar().setHomeAsUpIndicator(upArrow);
 
@@ -132,7 +134,7 @@ public class DisplayEvent extends AppCompatActivity{
         webView = (WebView)findViewById(R.id.webView);
 
 
-        displayEventName = (TextView)findViewById(R.id.display_event_name);
+        //displayEventName = (TextView)findViewById(R.id.display_event_name);
         displayEventHoster = (TextView)findViewById(R.id.event_hoster);
         displayEventDistance = (TextView)findViewById(R.id.display_event_distance);
         displayEventPref = (TextView)findViewById(R.id.display_event_preference);
@@ -163,6 +165,7 @@ public class DisplayEvent extends AppCompatActivity{
         eventLat = bundle.getDouble("eventLat");
         eventLng = bundle.getDouble("eventLng");
         mapImage = bundle.getInt("mapImage");
+        eventWebsite = bundle.getString("eventWebsite");
         Log.i("coords", eventLat+", "+eventLng);
 
     }
@@ -181,11 +184,11 @@ public class DisplayEvent extends AppCompatActivity{
 
         loadImage();
 
-        displayEventName.setText(eventName);
+       // displayEventName.setText(eventName);
         displayEventHoster.setText("Presented By: "+eventHoster);
         displayEventDistance.setText(eventDistance);
         displayEventPref.setText(eventPreferences+" | Sports | Music");
-        displayEventLocation.setText("1234 Example Way "+eventLocation+" 95826");
+        displayEventLocation.setText(eventLocation+" 95826");
         displayEventStartDate.setText("Start Date: "+parseDate(eventDate));
         displayEventStartTIme.setText("Start Time: "+parseTime(eventTime));
         displayEventCost.setText("Entry Fee $"+ eventCost);
@@ -199,19 +202,19 @@ public class DisplayEvent extends AppCompatActivity{
         setupNavigateBtn();
         setupPhone();
 
-
-
     }
 
     @Override
     public void onResume() {
-        super.onResume();
         mapView.onResume();
+        super.onResume();
+
     }
     @Override
     public void onStop() {
         super.onStop();
     }
+
     @Override
     public void onPause() {
         super.onPause();
@@ -229,7 +232,6 @@ public class DisplayEvent extends AppCompatActivity{
         super.onLowMemory();
         mapView.onLowMemory();
     }
-
 
 
     private void setupWebsiteBtn(){
@@ -254,8 +256,9 @@ public class DisplayEvent extends AppCompatActivity{
             @Override
             public void onClick(View v) {
                 if(webView.getVisibility()==View.GONE) {
+                    Toast.makeText(DisplayEvent.this, "Loading: "+eventWebsite, Toast.LENGTH_SHORT).show();
                     webView.setVisibility(View.VISIBLE);
-                    webView.loadUrl("https://www.google.com");
+                    webView.loadUrl(eventWebsite);
                 }
                 else
                     webView.setVisibility(View.GONE); }

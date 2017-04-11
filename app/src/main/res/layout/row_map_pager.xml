@@ -12,66 +12,10 @@
         android:id="@+id/lnr_main"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/rounded_rectangle_blue_border"
+        android:background="@drawable/map_pager_border"
         android:orientation="vertical">
 
-        <RelativeLayout
-            xmlns:fancy="http://schemas.android.com/apk/res-auto"
-
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@android:color/transparent"
-            >
-
-            <ImageView
-                android:layout_width="30dp"
-                android:layout_height="40dp"
-                android:id="@+id/pin"
-                android:src="@drawable/ic_near_normal_pin" />
-
-            <TextView
-                android:id="@+id/tv_name"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_toRightOf="@+id/pin"
-                android:padding="4dp"
-                android:singleLine="true"
-                android:text="Event Name"
-                android:textColor="#318FED"
-                android:textSize="18sp"
-                android:textStyle="bold" />
-            <ImageView
-                android:id="@+id/tv_image"
-                android:layout_width="100dp"
-                android:layout_height="100dp"
-                android:background="@drawable/rounded_rectangle_blue_border"
-                android:layout_alignParentRight="true"
-                android:layout_marginTop="20dp"
-                android:padding="4dp"
-                android:src="@drawable/ic_near_normal_pin" />
-
-            <ScrollView
-                android:id="@+id/scroll"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/pin"
-                android:layout_toStartOf="@+id/tv_image"
-                >
-
-                <TextView
-                    android:id="@+id/tv_desc"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:lines="4"
-                    android:text="@string/lorem_ipsum"
-                    android:padding="4dp"
-                    android:textColor="#FF131F71"
-                    android:textSize="18sp" />
-            </ScrollView>
-
-        </RelativeLayout>
-
-
+       <include layout="@layout/standard_layout"/>
 
 
     </LinearLayout>

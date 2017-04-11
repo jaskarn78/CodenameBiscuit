@@ -9,7 +9,6 @@
     >
 
 
-
 <android.support.v7.widget.CardView
     xmlns:card_view="http://schemas.android.com/apk/res-auto"
     xmlns:android="http://schemas.android.com/apk/res/android"
@@ -25,6 +24,12 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:id="@+id/front_view">
+
+            <ProgressBar
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:id="@+id/front_progress"
+                />
 
             <ImageView
                 android:id="@+id/offer_image"
@@ -64,15 +69,11 @@
                     fab:fab_colorPressed="@color/livinWhite"
                     fab:fab_size="normal"/>
 
-
             </com.getbase.floatingactionbutton.FloatingActionsMenu>
-
 
         </RelativeLayout>
 
-    </android.support.v7.widget.CardView>
-
-
+</android.support.v7.widget.CardView>
 
     <android.support.v7.widget.CardView
         xmlns:card_view="http://schemas.android.com/apk/res-auto"
@@ -100,6 +101,11 @@
             >
 
 
+            <ProgressBar
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:id="@+id/back_progress"
+                />
         <ImageView
             android:layout_width="match_parent"
             android:layout_height="200dp"

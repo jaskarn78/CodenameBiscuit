@@ -8,17 +8,23 @@ import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.app.NavUtils;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.WindowManager;
 import android.widget.TextView;
 
 import com.example.codenamebiscuit.eventfragments.DeletedEventsFrag;
 import com.example.codenamebiscuit.eventfragments.SavedEventsFrag;
+import com.example.codenamebiscuit.helper.QueryEventList;
+import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
 
 import java.util.ArrayList;
+import java.util.concurrent.ExecutionException;
 
 import devlight.io.library.ntb.NavigationTabBar;
 
@@ -52,6 +58,21 @@ public class ArchivedEvents extends AppCompatActivity {
         this.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         initiUI();
     }
+
+    /*********************************************************************************
+     Create Menu
+     **********************************************************************************************/
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.archived, menu);
+        return true;
+    }
+
+    @Override
+    public void onBackPressed(){
+        NavUtils.navigateUpFromSameTask(this);
+    }
+
 
 
     @Override
