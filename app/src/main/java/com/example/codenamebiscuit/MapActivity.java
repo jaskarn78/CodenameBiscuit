@@ -9,6 +9,7 @@ import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Point;
+import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.os.Bundle;
@@ -64,7 +65,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.concurrent.ExecutionException;
 
-public class MapActivity extends ProgressFragment {
+public class MapActivity extends AppCompatActivity {
     private ArrayList<Double> latsArrayList;
     private ArrayList <Double> lngsArrayList;
     private ArrayList <String> nameList;
@@ -77,10 +78,7 @@ public class MapActivity extends ProgressFragment {
     private ArrayList<String> prefList;
     private ArrayList<String> locationList;
     private ArrayList<Integer> distanceList;
-    private ArrayList<JSONObject> data;
-    private SharedPreferences sharedPreferences;
     private JSONObject currentUser;
-    private Double currentLat, currentLng;
 
 
     private ArrayList<MyLocation> latLngsArrayList;
@@ -88,61 +86,46 @@ public class MapActivity extends ProgressFragment {
     public static GoogleMap map;
     private SupportMapFragment supportMapFragment;
     Marker hamburg, previousSelectedMarker;
-    private View mContentView;
-    private static ViewPager event_pager;
+    private ViewPager event_pager;
     CustomMap customMap;
-    private Handler mHandler;
-    private Runnable mShowContentRunnable = new Runnable() {
-        @Override
-        public void run() {
-            setContentShown(true);
-        }
 
-    };
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        setContentView(R.layout.activity_map);
+
         currentUser = new JSONObject();
         try {
             currentUser.put("user_id", sharedPreferences.getString("user_id", null));
         } catch (JSONException e) {
             e.printStackTrace();
         }
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+
+        setSupportActionBar(toolbar);
+        this.getSupportActionBar().setDisplayShowTitleEnabled(false);
+        final Drawable upArrow = getResources().getDrawable(R.drawable.ic_arrow_back_black_18dp);
+        upArrow.setColorFilter(getResources().getColor(R.color.livinWhite), PorterDuff.Mode.SRC_ATOP);
+        this.getSupportActionBar().setHomeAsUpIndicator(upArrow);
+        this.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        setContents();
     }
 
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState){
-        mContentView = inflater.inflate(R.layout.activity_map, container, false);
-        return super.onCreateView(inflater, container, savedInstanceState);
 
-    }
-    @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        setContents(mContentView);
-
-
-    }
-    public MapActivity newInstance() {
-        MapActivity mapActivity = new MapActivity();
-        return mapActivity;
-    }
-    public void onDestroyView()
+    public void onDestroy()
     {
-        super.onDestroyView();
+        super.onDestroy();
     }
     @Override
     public void onResume() {
         super.onResume();
-        //((AppCompatActivity)getActivity()).getSupportActionBar().hide();
     }
     @Override
     public void onStop() {
         super.onStop();
-        //((AppCompatActivity)getActivity()).getSupportActionBar().show();
     }
 
     private void loadData(){
@@ -160,12 +143,12 @@ public class MapActivity extends ProgressFragment {
         locationList = new ArrayList<>();
         distanceList = new ArrayList<>();
         try{
-            data = new QueryEventList(getString(R.string.DATABASE_MAIN_EVENTS_PULLER), getContext()).execute(currentUser).get();
-            for(int i=0; i<data.size(); i++){
+            ArrayList<JSONObject> data = new QueryEventList(getString(R.string.DATABASE_MAIN_EVENTS_PULLER), this).execute(currentUser).get();
+            for(int i = 0; i< data.size(); i++){
                 latsArrayList.add(data.get(i).getDouble("lat"));
                 lngsArrayList.add(data.get(i).getDouble("lng"));
                 nameList.add(data.get(i).getString("event_name"));
-                imageList.add(getString(R.string.IMAGE_URL_PATH)+data.get(i).getString("img_path"));
+                imageList.add(getString(R.string.IMAGE_URL_PATH)+ data.get(i).getString("img_path"));
                 descList.add(data.get(i).getString("event_description"));
                 hosterList.add(data.get(i).getString("event_sponsor"));
                 prefList.add(data.get(i).getString("preference_name"));
@@ -181,7 +164,7 @@ public class MapActivity extends ProgressFragment {
         }
     }
 
-    private void setContents(View rootView){
+    private void setContents(){
         loadData();
 
         for(int i=0; i<lngsArrayList.size(); i++){
@@ -190,12 +173,12 @@ public class MapActivity extends ProgressFragment {
         }
 
 
-        slide_out_down = AnimationUtils.loadAnimation(getActivity().getApplicationContext(), R.anim.slide_out_down);
-        slide_in_up = AnimationUtils.loadAnimation(getActivity().getApplicationContext(), R.anim.slide_in_up);
+        slide_out_down = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.slide_out_down);
+        slide_in_up = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.slide_in_up);
 
-        event_pager = (ViewPager)rootView.findViewById(R.id.event_pager);
+        event_pager = (ViewPager)findViewById(R.id.event_pager);
 
-        supportMapFragment = (SupportMapFragment) this.getChildFragmentManager().findFragmentById(R.id.map);
+        supportMapFragment = (SupportMapFragment)getSupportFragmentManager().findFragmentById(R.id.map);
         supportMapFragment.getMapAsync(new OnMapReadyCallback() {
             @Override
             public void onMapReady(GoogleMap googleMap) {
@@ -207,7 +190,7 @@ public class MapActivity extends ProgressFragment {
                         new LatLng(location.getLatitude(), location.getLongitude()));
                 mappoint.set(mappoint.x, mappoint.y - 30);
                 map.animateCamera(CameraUpdateFactory.newLatLng(map.getProjection().fromScreenLocation(mappoint)));
-                customMap = new CustomMap(map, latLngsArrayList, getContext().getApplicationContext());
+                customMap = new CustomMap(map, latLngsArrayList, getApplicationContext());
 
                 try {
                     //customMap.setCustomMapStyle(R.raw.mapstyle);
@@ -215,9 +198,8 @@ public class MapActivity extends ProgressFragment {
                 } catch (Resources.NotFoundException e) {
                     Log.e("Explore detail activity", "Can't find style. Error: " + e);
                 }
-                setContentView(mContentView);
                 handleMap();
-                event_pager.setAdapter(new MapViewPagerAdapter(getContext().getApplicationContext(), latLngsArrayList));
+                event_pager.setAdapter(new MapViewPagerAdapter(getApplicationContext(), latLngsArrayList));
                 for(int i=0; i<latLngsArrayList.size(); i++){
                     customMap.addPin(latLngsArrayList.get(i), i);
                 }
@@ -251,7 +233,7 @@ public class MapActivity extends ProgressFragment {
     private int getLocation(double lat, double lng){
         Location location2 = new Location("location2");
         double distance=0.0;
-        GPSTracker gps = new GPSTracker(getContext().getApplicationContext());
+        GPSTracker gps = new GPSTracker(getApplicationContext());
         if(gps.canGetLocation()){
             location2.setLatitude(gps.getLatitude());
             location2.setLongitude(gps.getLongitude());
@@ -262,12 +244,9 @@ public class MapActivity extends ProgressFragment {
         }
         return (int)Math.round(distance*0.000621371192); }
 
-    private void handleMap() {
-        setContentShown(false);
-        mHandler = new Handler();
-        mHandler.postDelayed(mShowContentRunnable, 2000);
+    private void handleMap() {;
         if (map != null) {
-            if (ActivityCompat.checkSelfPermission(getActivity(), android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getActivity(), android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                 // TODO: Consider calling
                 //    ActivityCompat#requestPermissions
                 // here to request the missing permissions, and then overriding
@@ -382,7 +361,7 @@ public class MapActivity extends ProgressFragment {
 
                     map = googleMap;
                     map.setMapType(GoogleMap.MAP_TYPE_NORMAL);
-                    customMap = new CustomMap(map, latLngsArrayList, getContext().getApplicationContext());
+                    customMap = new CustomMap(map, latLngsArrayList,getApplicationContext());
 
                     try {
                         customMap.setCustomMapStyle(R.raw.mapstyle);
@@ -437,14 +416,14 @@ public class MapActivity extends ProgressFragment {
             tv_location.setText(locationList.get(position));
 
             TextView tv_cost = (TextView)itemView.findViewById(R.id.cost);
-            tv_cost.setText(costList.get(position));
+            tv_cost.setText("Entry Fee: $"+costList.get(position));
 
             //TextView tv_desc = (TextView)itemView.findViewById(R.id.tv_e);
             //tv_desc.setText(descList.get(position)+" "+getString(R.string.lorem_ipsum));
 
             final ProgressBar progressBar = (ProgressBar)itemView.findViewById(R.id.progress_bar);
             ImageView tv_image = (ImageView)itemView.findViewById(R.id.iv_event_image);
-            Glide.with(getContext())
+            Glide.with(getApplicationContext())
                     .load(imageList.get(position))
                     .placeholder(R.drawable.progress)
                     .error(R.drawable.placeholder)
@@ -482,9 +461,9 @@ public class MapActivity extends ProgressFragment {
                     bundle.putDouble("eventLng", lngsArrayList.get(position));
                     bundle.putString("eventDistance", distanceList.get(position)+"");
                     bundle.putInt("mapImage", 1);
-                    Intent intent = new Intent(getActivity(), DisplayEvent.class);
+                    Intent intent = new Intent(MapActivity.this, DisplayEvent.class);
                     intent.putExtras(bundle);
-                    getContext().startActivity(intent);
+                    startActivity(intent);
                 }
             });
             final MyLocation myLocation = arr_LocationList.get(position);

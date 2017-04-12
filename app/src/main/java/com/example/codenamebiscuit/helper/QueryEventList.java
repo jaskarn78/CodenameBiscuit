@@ -91,7 +91,7 @@ public class QueryEventList extends AsyncTask<JSONObject, Void, ArrayList<JSONOb
 
             // Read Server Response
             while ((line = reader.readLine()) != null) {
-                //Log.v("PrintLine", line);
+                Log.v("PrintLine", line);
                 sb.append(line);
             }
 
@@ -99,11 +99,9 @@ public class QueryEventList extends AsyncTask<JSONObject, Void, ArrayList<JSONOb
             jArray = new JSONArray(sb.toString());
             eventList = new ArrayList<JSONObject>();
 
-            if (jArray != null) {
-                for (int i = 0; i < jArray.length(); i++) {
-                    eventList.add(jArray.getJSONObject(i));
-                    //Log.v("PrintLine", eventList.get(i).toString());
-                }
+            for (int i = 0; i < jArray.length(); i++) {
+                eventList.add(jArray.getJSONObject(i));
+                //Log.v("PrintLine", eventList.get(i).toString());
             }
 
             wr.close(); // close OutputStreamWriter
@@ -126,16 +124,11 @@ public class QueryEventList extends AsyncTask<JSONObject, Void, ArrayList<JSONOb
     @Override
     protected void onPostExecute(ArrayList<JSONObject> objs) {
         if (objs != null) {
-            ArrayList<JSONObject> eventList = objs;
-            setEventList(eventList);
+            setEventList(objs);
         }
 
     }
-    public ArrayList<JSONObject> getEventList(){
-        Log.i("event list", eventList.toString());
-        return eventList;
 
-    }
     public void setEventList(ArrayList<JSONObject> list){
          eventList = list;
     }

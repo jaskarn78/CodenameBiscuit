@@ -69,18 +69,6 @@ public class DisplayEvent extends AppCompatActivity{
     private GoogleMap googleMap;
     Typeface typeface;
 
-
-
-    public DisplayEvent() {
-    }
-
-
-    // TODO: Rename and change types and number of parameters
-    public static DisplayEvent newInstance() {
-        DisplayEvent fragment = new DisplayEvent();
-        return fragment;
-    }
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -100,7 +88,7 @@ public class DisplayEvent extends AppCompatActivity{
         typeface= Typeface.createFromAsset(this.getAssets(), "fonts/Raleway-Black.ttf");
         bindViews(savedInstanceState);
 
-        setupMap(savedInstanceState);
+        setupMap();
 
     }
 
@@ -134,7 +122,6 @@ public class DisplayEvent extends AppCompatActivity{
         webView = (WebView)findViewById(R.id.webView);
 
 
-        //displayEventName = (TextView)findViewById(R.id.display_event_name);
         displayEventHoster = (TextView)findViewById(R.id.event_hoster);
         displayEventDistance = (TextView)findViewById(R.id.display_event_distance);
         displayEventPref = (TextView)findViewById(R.id.display_event_preference);
@@ -170,7 +157,7 @@ public class DisplayEvent extends AppCompatActivity{
 
     }
 
-    public void setupMap(Bundle savedInstanceState){
+    public void setupMap(){
         mapView.getMapAsync(new OnMapReadyCallback() {
             @Override
             public void onMapReady(GoogleMap gMap) {
@@ -330,12 +317,12 @@ public class DisplayEvent extends AppCompatActivity{
     }
 
     public String getImageURL(String path) {
-        if(mapImage!=1)
-            return getResources().getString(R.string.IMAGE_URL_PATH) + path;
-        else
+        if(path.contains("http"))
             return path;
-    }
+        else
+            return getResources().getString(R.string.IMAGE_URL_PATH) + path;
 
+    }
 
 
     public interface OnFragmentInteractionListener {

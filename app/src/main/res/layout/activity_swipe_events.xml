@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.constraint.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:fab="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -29,18 +27,31 @@
         swipedeck:layout_constraintLeft_toLeftOf="parent"
         swipedeck:layout_constraintTop_toTopOf="parent">
 
-        <com.example.codenamebiscuit.swipedeck.SwipeDeck
-            android:id="@+id/swipe_deck"
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            swipedeck:max_visible="2"
-            swipedeck:render_above="false"
-            swipedeck:card_spacing="6dp">
+            android:layout_height="match_parent"
+            >
 
-        </com.example.codenamebiscuit.swipedeck.SwipeDeck>
+        <com.example.codenamebiscuit.swipedeck.SwipeDeck
+                android:id="@+id/swipe_deck"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                swipedeck:max_visible="2"
+                swipedeck:render_above="false"
+                swipedeck:card_spacing="6dp"/>
 
+
+            <android.support.v4.view.ViewPager
+                android:id="@+id/event_pager"
+                android:background="@color/livinBlack"
+                android:layout_above="@+id/swipe_deck"
+                android:layout_width="match_parent"
+                android:layout_height="102dp"
+                android:layout_marginBottom="2dp"
+                android:layout_alignParentBottom="true"
+                 />
+        </RelativeLayout>
     </com.example.codenamebiscuit.swipedeck.layouts.SwipeFrameLayout>
-
 
 
 </android.support.constraint.ConstraintLayout>

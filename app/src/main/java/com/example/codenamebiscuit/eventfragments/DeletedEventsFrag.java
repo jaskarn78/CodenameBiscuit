@@ -48,10 +48,8 @@ public class DeletedEventsFrag extends ProgressFragment{
     private static final String TAG = "Saved Events Fragment";
 
     private EventAdapter mAdapter;
-    private ArrayList<JSONObject> eventData;
     protected SharedPreferences pref;
     private JSONObject currentUserId = new JSONObject();
-    private SwipeRefreshLayout swipeContainer;
     private RecyclerView mRecyclerView;
     private ArrayList<JSONObject> data;
     private View mContentView;
@@ -96,12 +94,10 @@ public class DeletedEventsFrag extends ProgressFragment{
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState){
         mContentView = inflater.inflate(R.layout.activity_main, container, false);
-        //swipeContainer = (SwipeRefreshLayout) mContentView.findViewById(R.id.swipeContainer);
-        //setupSwipeDownRefresh();
-        mRecyclerView = (RecyclerView) mContentView.findViewById(R.id.recyclerview_events);
-        eventData = new ArrayList<>();
 
-        mAdapter = new EventAdapter(getActivity().getApplicationContext(), 1, "deleted", getFragmentManager(), getActivity());
+        mRecyclerView = (RecyclerView) mContentView.findViewById(R.id.recyclerview_events);
+
+        mAdapter = new EventAdapter(getActivity().getApplicationContext(), 1, "deleted",getActivity());
         return super.onCreateView(inflater, container, savedInstanceState);
     }
 
@@ -144,16 +140,13 @@ public class DeletedEventsFrag extends ProgressFragment{
         mHandler.postDelayed(mShowContentRunnable, 2000);
         try {
             data = new QueryEventList(getString(R.string.DATABASE_DELETED_EVENTS_PULLER)).execute(currentUserId).get();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (ExecutionException e) {
+        } catch (InterruptedException | ExecutionException e) {
             e.printStackTrace();
         }
     }
 
     public static DeletedEventsFrag newInstance() {
-        DeletedEventsFrag myFragment = new DeletedEventsFrag();
-        return myFragment;
+        return new DeletedEventsFrag();
     }
 
     /**********************************************************************************************
@@ -173,32 +166,4 @@ public class DeletedEventsFrag extends ProgressFragment{
     public void onStart() {
         super.onStart();
     }
-
-    /**********************************************************************************************
-     * setup up swipe container to refresh event list when performing down swipe gesture
-     * when swipeContainer.setRefresh(true) load the event data
-     * after data has been loaded, set swipeContainer.setRefresh(false)
-     **********************************************************************************************/
-    private void setupSwipeDownRefresh() {
-        swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                swipeContainer.setRefreshing(true);
-                try {
-                    data = new QueryEventList(getString(R.string.DATABASE_DELETED_EVENTS_PULLER)).execute(currentUserId).get();
-                    mAdapter.setEventData(data);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                } catch (ExecutionException e) {
-                    e.printStackTrace();
-                }
-                swipeContainer.setRefreshing(false);
-            }
-        });
-        swipeContainer.setColorSchemeResources(android.R.color.holo_blue_bright,
-                android.R.color.holo_green_light,
-                android.R.color.holo_orange_light,
-                android.R.color.holo_red_light);
-    }
-
 }

@@ -1,0 +1,117 @@
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="102dp"
+    android:background="@drawable/border_black">
+
+    <ImageView
+        android:id="@+id/pager_menu"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_alignParentEnd="true"
+        android:layout_margin="5dp"
+        android:layout_below="@+id/tv_event_name"
+        android:clickable="true"
+        android:background="@android:color/transparent"
+        android:src="@drawable/ic_shortcut_more_vert" />
+
+
+    <ImageView
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:scaleType="fitXY"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp"
+        android:layout_marginStart="5dp"
+        android:layout_marginEnd="15dp"
+        android:id="@+id/pager_event_image"
+        android:layout_alignParentStart="true"
+        android:background="@drawable/border_black"
+        />
+
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/tv_event_name"
+        android:ellipsize="marquee"
+        android:focusableInTouchMode="true"
+        android:focusable="true"
+        android:marqueeRepeatLimit="marquee_forever"
+        android:scrollHorizontally="true"
+        android:maxLines="1"
+        android:layout_toEndOf="@+id/pager_event_image"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="10dp"
+        android:textColor="@color/livinWhite"
+        android:text="Event Name"
+        android:textSize="16sp"
+        />
+
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/tv_event_location"
+        android:ellipsize="marquee"
+        android:focusableInTouchMode="true"
+        android:focusable="true"
+        android:marqueeRepeatLimit="marquee_forever"
+        android:scrollHorizontally="true"
+        android:maxLines="1"
+        android:layout_toRightOf="@+id/pager_event_image"
+        android:layout_below="@+id/tv_event_hoster"
+        android:textColor="@color/livinWhite"
+        android:text="Sacramento, CA"
+        />
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/tv_event_preference"
+        android:textSize="12sp"
+        android:layout_below="@+id/tv_event_location"
+        android:textColor="@color/livinPink"
+        android:layout_toRightOf="@+id/pager_event_image"
+        android:text="Music"
+        />
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/tv_event_preference2"
+        android:textSize="12sp"
+        android:layout_below="@+id/tv_event_location"
+        android:layout_marginStart="5dp"
+        android:textColor="@color/livinPink"
+        android:layout_toRightOf="@+id/tv_event_preference"
+        />
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/tv_event_preference3"
+        android:textSize="12sp"
+        android:layout_below="@+id/tv_event_location"
+        android:layout_marginStart="5dp"
+        android:textColor="@color/livinPink"
+        android:layout_toEndOf="@+id/tv_event_preference2"
+        />
+
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/tv_event_hoster"
+        android:ellipsize="marquee"
+        android:focusableInTouchMode="true"
+        android:focusable="true"
+        android:marqueeRepeatLimit="marquee_forever"
+        android:scrollHorizontally="true"
+        android:maxLines="1"
+        android:textColor="@color/livinWhite"
+        android:layout_toEndOf="@+id/pager_event_image"
+        android:layout_below="@+id/tv_event_name"
+        android:text="Presented By"
+        android:textSize="10sp"
+        />
+
+</RelativeLayout>

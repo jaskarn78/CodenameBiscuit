@@ -4,8 +4,27 @@
     <item
         android:id="@+id/refresh_saved"
         android:icon="@drawable/ic_refresh_white_48dp"
-        sothree:showAsAction="ifRoom"
+        sothree:showAsAction="never"
+        android:orderInCategory="100"
         android:title="@string/refresh"
+        />
+    <item
+        android:id="@+id/restore_saved"
+        sothree:showAsAction="never"
+        android:orderInCategory="101"
+        android:title="@string/restore_all_saved"
+        />
+    <item
+        android:id="@+id/restore_removed"
+        sothree:showAsAction="never"
+        android:orderInCategory="104"
+        android:title="@string/restore_all_removed"
+        />
+    <item
+        android:id="@+id/restore_dialog"
+        sothree:showAsAction="never"
+        android:orderInCategory="104"
+        android:title="@string/show_dialog"
         />
 
 </menu>

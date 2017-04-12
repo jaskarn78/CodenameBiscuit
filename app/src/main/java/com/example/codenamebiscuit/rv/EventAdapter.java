@@ -1,10 +1,13 @@
 package com.example.codenamebiscuit.rv;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.Typeface;
 
@@ -23,6 +26,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.preference.PreferenceManager;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
@@ -37,6 +41,8 @@ import android.view.animation.AnimationUtils;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -80,17 +86,13 @@ import java.util.Calendar;
 public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapterViewHolder> {
     private ArrayList<JSONObject> mEventData;
     private Context context;
-    private Typeface typeface;
     private String message;
     private int type;
-    private FragmentManager fragmentManager;
-    private FragmentManager childFragmentManager;
-    private int lastPosition = -1;
     private ImageView rowMenu;
     private Activity activity;
-    private Bundle eventBundle;
     private Bundle bundle;
     private View rootView;
+    private SharedPreferences sharedPreferences;
 
     private static ArrayList<String> latsArrayList = new ArrayList<>();
     private static ArrayList<String> lngsArrayList = new ArrayList<>();
@@ -110,17 +112,14 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
 
 
 
-    public EventAdapter(Context context, int type, String message,
-                        FragmentManager fragmentManager, Activity activity) {
+    public EventAdapter(Context context, int type, String message, Activity activity) {
         this.context = context;
         mEventData = new ArrayList<>();
-        typeface = Typeface.createFromAsset(context.getAssets(), "fonts/Raleway-Black.ttf");
         this.message=message;
         this.type=type;
-        this.fragmentManager=fragmentManager;
         this.activity=activity;
-        eventBundle = new Bundle();
         bundle=new Bundle();
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(activity);
     }
 
 
@@ -134,9 +133,7 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
             layoutIdForListItem=R.layout.grid_events;
 
         LayoutInflater inflater = LayoutInflater.from(context);
-        boolean shouldAttachToParentImmediately = false;
-
-        View view = inflater.inflate(layoutIdForListItem, viewGroup, shouldAttachToParentImmediately);
+        View view = inflater.inflate(layoutIdForListItem, viewGroup, false);
 
         return new EventAdapterViewHolder(view);
     }
@@ -152,15 +149,12 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
         public final TextView mEventCost, mEventCostBack;
         public final ImageView mEventImage, mEventImageback;
         public final TextView mEventStartDate, mEventStartTime;
-        public final TextView mEventInfoBack;//, mEventInfo;
-        //public final ImageButton mSaveImageButton, mLinkImageButton;
-        //public final ImageButton mShareButton;
+        public final TextView mEventInfoBack;
         public final TextView mEventHoster, mEventDistanceBack;
         public final TextView mEventDistance;
         public final CardView cardView, cardViewBack;
         public IconicsImageView infoIcon;
         public TextView moreInfo;
-        //public final RelativeLayout layout;
         public final WebView mWebView;
         SwipeLayout mSwipeLayout;
         Button buttonDelete;
@@ -178,7 +172,6 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
 
             mEventDistance = (TextView)view.findViewById(R.id.event_distance);
             mEventDistanceBack = (TextView)view.findViewById(R.id.event_distance_back);
-           // mEventInfo = (TextView)view.findViewById(R.id.extra_info);
 
             mSwipeLayout = (SwipeLayout) itemView.findViewById(R.id.swipe);
             buttonDelete = (Button) itemView.findViewById(R.id.delete);
@@ -201,28 +194,19 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
             mEventStartDate = (TextView)view.findViewById(R.id.start_date);
             mEventStartTime = (TextView)view.findViewById(R.id.start_time);
 
-            //mSaveImageButton = (ImageButton)view.findViewById(R.id.saveButton);
-            //mShareButton = (ImageButton)view.findViewById(R.id.shareButton);
-
             mEventInfoBack = (TextView)view.findViewById(R.id.event_info_back);
             mEventImageback = (ImageView)view.findViewById(R.id.iv_event_image_back);
 
             mEventHoster = (TextView)view.findViewById(R.id.tv_event_hoster);
-            //layout = (RelativeLayout) view.findViewById(R.id.extend);
 
             mEventImage = (ImageView) view.findViewById(R.id.iv_event_image);
             cardView = (CardView) view.findViewById(R.id.cardview);
             cardViewBack = (CardView)view.findViewById(R.id.card_view_back);
 
             mWebView = (WebView)view.findViewById(R.id.webView);
-            //mLinkImageButton = (ImageButton)view.findViewById(R.id.linkButton);
 
-            //itemView.setOnClickListener(this);
-            //itemView.setOnLongClickListener(this);
             view.setOnClickListener(this);
             view.setOnLongClickListener(this);
-            //this.layout.setOnClickListener(this);
-            //.cardView.setOnLongClickListener(this);
 
         }
 
@@ -306,7 +290,6 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
         setBundle(bundle);
 
         if(type==1) {
-            //setAnimation(eventAdapterViewHolder.itemView, position);
             rowMenu.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -328,42 +311,6 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
                 }
             });
 
-            /********************************************************************************
-             * assigns distance from current location to event location
-             *******************************************************************************/
-            //eventAdapterViewHolder.mEventDistance.setText("Distance: " + getLocation(lat, lng) + " miles");
-
-            /********************************************************************************
-             * Loads event image from url obtained from database and assigns
-             * the loaded image to the event imageview in the layout
-             ******************************************************************************/
-
-            loadImage(eventAdapterViewHolder.mEventImage, getImageURL(eventPath));
-            //eventAdapterViewHolder.mEventInfo.setText("Additional Event Information");
-
-            /********************************************************************************
-             * Implements add to calendar funcitonality, will add event to
-             * internal mobile calendar with the event name, date, time, and
-             * event description
-             *******************************************************************************
-            eventAdapterViewHolder.mSaveImageButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Calendar cal = Calendar.getInstance();
-                    Intent intent = new Intent(Intent.ACTION_EDIT);
-                    intent.setType("vnd.android.cursor.item/event");
-                    intent.putExtra("beginTime", cal.getTimeInMillis());
-                    intent.putExtra("allDay", false);
-                    intent.putExtra("rrule", "FREQ=DAILY");
-                    intent.putExtra("endTime", cal.getTimeInMillis() + 60 * 60 * 1000);
-                    intent.putExtra("title", finalEvent);
-                    intent.putExtra(CalendarContract.Events.EVENT_LOCATION, finalEventLocation);
-                    intent.putExtra(CalendarContract.Events.DESCRIPTION, finalEventInfo1);
-                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                    context.startActivity(intent);
-                }
-            });*/
-
             /***************************************************************************************
              * Handles the swipe to restore operation in saved events and deleted events
              ***************************************************************************************/
@@ -375,11 +322,31 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
                 }
             });
 
+
+            /********************************************************************************
+             * Loads event image from url obtained from database and assigns
+             * the loaded image to the event imageview in the layout
+             ******************************************************************************/
+
+            loadImage(eventAdapterViewHolder.mEventImage, getImageURL(eventPath));
+
+
+            eventAdapterViewHolder.mEventHoster.setText("Presented By: " + eventHoster);
+            eventAdapterViewHolder.mEventCost.setText("Entry Fee: $" + cost);
+
             /*****************************************************************************************
              * Swiping on the cardview will display a remove button, when pressed
              * swiped event will be removed from saved/deleted events and placed into
              * the main events list
              ****************************************************************************************/
+            final AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(activity);
+            LayoutInflater inflater = activity.getLayoutInflater();
+            final View dialogView = inflater.inflate(R.layout.restore_event, null);
+            dialogBuilder.setView(dialogView);
+            final ImageView dialogImage = (ImageView)dialogView.findViewById(R.id.dialog_image);
+            final TextView dialogEvent = (TextView)dialogView.findViewById(R.id.dialog_event_name);
+            final CheckBox dialogCheckbox = (CheckBox)dialogView.findViewById(R.id.checkbox_event);
+
             eventAdapterViewHolder.buttonDelete.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -389,43 +356,44 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
-                    FancyAlertDialog.Builder alert = new FancyAlertDialog.Builder(activity)
-                            .setTextTitle(eventAdapterViewHolder.mEventName.getText()+"")
-                            .setImageDrawable(eventAdapterViewHolder.mEventImage.getDrawable().getCurrent())
-                            .setTextSubTitle("Restore Event")
-                            .setBody("Restore this event back to main events list")
-                            .setPositiveButtonText("Continue")
-                            .setPositiveColor(R.color.livinPink)
-                            .setOnPositiveClicked(new FancyAlertDialog.OnPositiveClicked() {
-                                @Override
-                                public void OnClick(View view, Dialog dialog) {
-                                    mEventData.remove(position);
-                                    notifyItemRemoved(position);
-                                    notifyItemRangeChanged(position, mEventData.size());
-                                    if (message.equals("saved"))
-                                        new UpdateDbOnSwipe(context.getString(R.string.DATABASE_RESTORE_SAVED_EVENTS)).execute(restoreEvent);
-                                    else
-                                        new UpdateDbOnSwipe(context.getString(R.string.DATABASE_RESTORE_DELETED_EVENTS)).execute(restoreEvent);
-                                    dialog.dismiss();
-                                }
-                            })
-                            .setNegativeButtonText("Cancel")
-                            .setOnNegativeClicked(new FancyAlertDialog.OnNegativeClicked() {
-                                @Override
-                                public void OnClick(View view, Dialog dialog) {
-                                    dialog.dismiss();
-                                }
-                            })
-                            .build();
-                    alert.show();
+                    if(!sharedPreferences.getBoolean("showDialog", false)) {
+                        dialogImage.setImageDrawable(eventAdapterViewHolder.mEventImage.getDrawable());
+                        dialogEvent.setText(eventAdapterViewHolder.mEventName.getText());
+                        dialogBuilder.setPositiveButton("Restore", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                mEventData.remove(position);
+                                notifyItemRemoved(position);
+                                notifyItemRangeChanged(position, mEventData.size());
+                                if (message.equals("saved"))
+                                    new UpdateDbOnSwipe(context.getString(R.string.DATABASE_RESTORE_SAVED_EVENTS)).execute(restoreEvent);
+                                else
+                                    new UpdateDbOnSwipe(context.getString(R.string.DATABASE_RESTORE_DELETED_EVENTS)).execute(restoreEvent);
+                                dialog.dismiss(); }
+                        });
 
+                        dialogBuilder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.dismiss(); }
+                        });
 
+                        dialogCheckbox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                            @Override
+                            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                                sharedPreferences.edit().putBoolean("showDialog", isChecked).apply(); } });
+                        AlertDialog alertDialog = dialogBuilder.create();
+                        alertDialog.show();
+
+                    }else{
+                        mEventData.remove(position); notifyItemRemoved(position);
+                        notifyItemRangeChanged(position, mEventData.size());
+                        if (message.equals("saved"))
+                            new UpdateDbOnSwipe(context.getString(R.string.DATABASE_RESTORE_SAVED_EVENTS)).execute(restoreEvent);
+                        else
+                            new UpdateDbOnSwipe(context.getString(R.string.DATABASE_RESTORE_DELETED_EVENTS)).execute(restoreEvent); }
                 }
             });
-
-            eventAdapterViewHolder.mEventHoster.setText("Presented By: " + eventHoster);
-            eventAdapterViewHolder.mEventCost.setText("Entry Fee: $" + cost);
-
 
 
             /*****************************************************************************************
@@ -448,12 +416,10 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
 
 
 
-
         /*****************************************************************************************
          * Type 2 represents the grid layout and its corresponding views are set
          * ****************************************************************************************/
         if(type==2) {
-            //setGridAnimation(eventAdapterViewHolder.itemView, position);
             eventAdapterViewHolder.mEventPreferenceTVBack.setText(eventPref);
             eventAdapterViewHolder.mEventNameBack.setText(event);
             eventAdapterViewHolder.mEventLocationTVBack.setText("1234 Example St. "+eventLocation);
@@ -461,6 +427,9 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
             eventAdapterViewHolder.mEventAgeBack.setText("Age Restriction: 21+");
             eventAdapterViewHolder.mEventInfoBack.setText("Description: "+eventInfo);
             eventAdapterViewHolder.mEventDistanceBack.setText("Distance: "+getLocation(lat, lng)+" miles");
+            eventAdapterViewHolder.mEventNameBack.setSelected(true);
+            eventAdapterViewHolder.mEventLocationTVBack.setSelected(true);
+            eventAdapterViewHolder.mEventPreferenceTVBack.setSelected(true);
 
 
             /****************************************************************************
@@ -476,6 +445,7 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
                     context.startActivity(intent);
                 }
             });
+
             final ProgressBar progressBar = (ProgressBar)rootView.findViewById(R.id.grid_progress);
             Log.i("images", getImageURL(eventPath));
             Glide.with(context.getApplicationContext())
@@ -502,13 +472,10 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
                     .load(getImageURL(eventPath))
                     .placeholder(R.drawable.progress)
                     .error(R.drawable.placeholder)
-                    .into(eventAdapterViewHolder.mEventImageback);
-
-
-        }
-
-
+                    .into(eventAdapterViewHolder.mEventImageback); }
     }
+
+
     public void setBundle(Bundle bundle){
         this.bundle=bundle;
     }

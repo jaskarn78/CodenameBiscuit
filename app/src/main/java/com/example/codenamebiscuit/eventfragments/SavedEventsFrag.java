@@ -40,14 +40,11 @@ public class SavedEventsFrag extends ProgressFragment implements ClickListener{
 
     private RecyclerView mRecyclerView;
     private EventAdapter mAdapter;
-    private ArrayList<JSONObject> eventData;
     private SharedPreferences pref;
     private JSONObject currentUserId = new JSONObject();
-    private SwipeRefreshLayout swipeContainer;
     private ArrayList<JSONObject> data;
     private View mContentView;
     private Handler mHandler;
-    private boolean saved;
     private Runnable mShowContentRunnable = new Runnable() {
 
         @Override
@@ -99,13 +96,8 @@ public class SavedEventsFrag extends ProgressFragment implements ClickListener{
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         mContentView = inflater.inflate(R.layout.activity_main, container, false);
-        //swipeContainer = (SwipeRefreshLayout) mContentView.findViewById(R.id.swipeContainer);
-        //setupSwipeDownRefresh();
         mRecyclerView = (RecyclerView) mContentView.findViewById(R.id.recyclerview_events);
-        eventData = new ArrayList<JSONObject>();
-
         return super.onCreateView(inflater, container, savedInstanceState);
-
     }
 
     /**********************************************************************************************
@@ -157,7 +149,7 @@ public class SavedEventsFrag extends ProgressFragment implements ClickListener{
         mHandler.postDelayed(mShowContentRunnable, 2000);
         try {
             data = new QueryEventList(getString(R.string.DATABASE_SAVED_EVENTS_PULLER)).execute(currentUserId).get();
-            mAdapter = new EventAdapter(getActivity().getApplicationContext(), 1, "saved", getChildFragmentManager(), getActivity());
+            mAdapter = new EventAdapter(getActivity().getApplicationContext(), 1, "saved", getActivity());
         } catch (InterruptedException | ExecutionException e) {
             e.printStackTrace();
         }
@@ -208,31 +200,5 @@ public class SavedEventsFrag extends ProgressFragment implements ClickListener{
     public ArrayList<JSONObject> getData(){
         return data;
     }
-
-    /**********************************************************************************************
-     * setup up swipe container to refresh event list when performing down swipe gesture
-     * when swipeContainer.setRefresh(true) load the event data
-     * after data has been loaded, set swipeContainer.setRefresh(false)
-     **********************************************************************************************/
-    private void setupSwipeDownRefresh() {
-        swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                swipeContainer.setRefreshing(true);
-                try {
-                    data = new QueryEventList(getString(R.string.DATABASE_SAVED_EVENTS_PULLER)).execute(currentUserId).get();
-                    mAdapter.setEventData(data);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                } catch (ExecutionException e) {
-                    e.printStackTrace();
-                }
-                swipeContainer.setRefreshing(false);
-            }
-        });
-        swipeContainer.setColorSchemeResources(android.R.color.holo_blue_bright,
-                android.R.color.holo_green_light,
-                android.R.color.holo_orange_light,
-                android.R.color.holo_red_light); }
 
 }

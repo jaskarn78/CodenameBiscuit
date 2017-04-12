@@ -1,30 +1,35 @@
 package com.example.codenamebiscuit;
 
+import android.app.Dialog;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.NavUtils;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.preference.PreferenceManager;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.view.WindowManager;
 import android.widget.TextView;
 
 import com.example.codenamebiscuit.eventfragments.DeletedEventsFrag;
 import com.example.codenamebiscuit.eventfragments.SavedEventsFrag;
-import com.example.codenamebiscuit.helper.QueryEventList;
-import com.sothree.slidinguppanel.SlidingUpPanelLayout;
+import com.example.codenamebiscuit.helper.RunQuery;
+import com.geniusforapp.fancydialog.FancyAlertDialog;
 
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.concurrent.ExecutionException;
 
 import devlight.io.library.ntb.NavigationTabBar;
 
@@ -32,6 +37,8 @@ public class ArchivedEvents extends AppCompatActivity {
     private Toolbar toolbar;
     private TextView toolbarTitle;
     private int page;
+    private SharedPreferences sharedPreferences;
+    private JSONObject currentUserId;
     private Bundle bundle;
 
 
@@ -40,6 +47,12 @@ public class ArchivedEvents extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_archived_events);
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        currentUserId = new JSONObject();
+        try {
+            currentUserId.put("user_id", sharedPreferences.getString("user_id", null));
+        } catch (JSONException e) {
+            e.printStackTrace(); }
 
         if(savedInstanceState!=null)
             page=savedInstanceState.getInt("page");
@@ -66,6 +79,64 @@ public class ArchivedEvents extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.archived, menu);
         return true;
+    }
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.restore_dialog:
+                sharedPreferences.edit().putBoolean("showDialog", false).apply();
+                break;
+            case R.id.restore_saved:
+                FancyAlertDialog.Builder alert = new FancyAlertDialog.Builder(ArchivedEvents.this)
+                        .setTextTitle("Restore Saved Events")
+                        .setImageDrawable(getDrawable(R.mipmap.livlogoweb))
+                        .setTextSubTitle(sharedPreferences.getString("fName", null)+" "
+                                +sharedPreferences.getString("lName", null))
+                        .setBody("Restore all saved events?")
+                        .setPositiveButtonText("Continue")
+                        .setOnPositiveClicked(new FancyAlertDialog.OnPositiveClicked() {
+                            @Override
+                            public void OnClick(View view, Dialog dialog) {
+                                new RunQuery(getString(R.string.RESTORE_ALL_SAVED_EVENTS)).execute(currentUserId);
+                                dialog.dismiss();
+                                finish();
+                                startActivity(getIntent()); }
+                        })
+                        .setNegativeButtonText("Exit")
+                        .setOnNegativeClicked(new FancyAlertDialog.OnNegativeClicked() {
+                            @Override
+                            public void OnClick(View view, Dialog dialog) {
+                                dialog.dismiss(); }
+                        })
+                        .build();
+                alert.show();
+                break;
+            case R.id.restore_removed:
+                alert = new FancyAlertDialog.Builder(ArchivedEvents.this)
+                        .setTextTitle("Restore Removed Events")
+                        .setImageDrawable(getDrawable(R.mipmap.livlogoweb))
+                        .setTextSubTitle(sharedPreferences.getString("fName", null)+" "
+                                +sharedPreferences.getString("lName", null))
+                        .setBody("Restore all removed events?")
+                        .setPositiveButtonText("Continue")
+                        .setOnPositiveClicked(new FancyAlertDialog.OnPositiveClicked() {
+                            @Override
+                            public void OnClick(View view, Dialog dialog) {
+                                new RunQuery(getString(R.string.RESTORE_ALL_DELETED_EVENTS)).execute(currentUserId);
+                                dialog.dismiss();
+                                finish();
+                                startActivity(getIntent()); }
+                        })
+                        .setNegativeButtonText("Exit")
+                        .setOnNegativeClicked(new FancyAlertDialog.OnNegativeClicked() {
+                            @Override
+                            public void OnClick(View view, Dialog dialog) {
+                                dialog.dismiss(); }
+                        })
+                        .build();
+                alert.show();
+        }
+            return false;
     }
 
     @Override

@@ -71,24 +71,16 @@ public class GridMainEventsFrag extends Fragment  {
 
     private RecyclerView mRecyclerView;
     private EventAdapter mAdapter;
-    private ArrayList<JSONObject> eventData;
-    private LinearLayoutManager mLinearLayoutManager;
-    private SharedPreferences pref;
     private JSONObject currentUserId = new JSONObject();
-    private SwipeRefreshLayout swipeContainer;
-    private int size;
     private JSONObject saveEvent, deleteEvent;
     private ArrayList<JSONObject> data;
-    private View mContentView;
-    private SlidingLayer mSlidingLayer;
-    private IconicsImageView downArrow;
 
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        pref = PreferenceManager.getDefaultSharedPreferences(getContext());
+        SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(getContext());
         saveEvent = new JSONObject();
         deleteEvent = new JSONObject();
 
@@ -96,8 +88,7 @@ public class GridMainEventsFrag extends Fragment  {
         try {
             currentUserId.put("user_id", user_id);
         } catch (JSONException e) {
-            e.printStackTrace();
-        }
+            e.printStackTrace(); }
         setHasOptionsMenu(true);
     }
 
@@ -106,10 +97,7 @@ public class GridMainEventsFrag extends Fragment  {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        mContentView = inflater.inflate(R.layout.activity_main, container, false);
-       // mSlidingLayer = (SlidingLayer) getActivity().findViewById(R.id.slidingLayer1);
-        //downArrow = (IconicsImageView)getActivity().findViewById(R.id.down_arrow);
-        eventData = new ArrayList<JSONObject>();
+        View mContentView = inflater.inflate(R.layout.activity_main, container, false);
         mRecyclerView = (RecyclerView) mContentView.findViewById(R.id.recyclerview_events);
         return mContentView;
     }
@@ -118,17 +106,13 @@ public class GridMainEventsFrag extends Fragment  {
         try {
             data = new QueryEventList(getString(R.string.DATABASE_MAIN_EVENTS_PULLER), getActivity())
                     .execute(currentUserId).get();
-            mAdapter = new EventAdapter(getContext().getApplicationContext(), 2, "", getFragmentManager(), getActivity());
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (ExecutionException e) {
-            e.printStackTrace();
-        }
+            mAdapter = new EventAdapter(getContext().getApplicationContext(), 2, "", getActivity());
+        } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace(); }
     }
 
     public static GridMainEventsFrag newInstance() {
-        GridMainEventsFrag myFragment = new GridMainEventsFrag();
-        return myFragment;
+        return new GridMainEventsFrag();
     }
 
     private boolean isNetworkAvailable() {
@@ -137,14 +121,6 @@ public class GridMainEventsFrag extends Fragment  {
         NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
         return activeNetworkInfo != null && activeNetworkInfo.isConnected();
     }
-
-    @Override
-    public void onPrepareOptionsMenu(final Menu menu) {
-        final SwipeEvents swipeEvents = SwipeEvents.newInstance();
-
-    }
-
-
 
 
     /**********************************************************************************************
@@ -155,6 +131,7 @@ public class GridMainEventsFrag extends Fragment  {
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+
         //initialize event dataset
         obtainData();
 
@@ -172,7 +149,7 @@ public class GridMainEventsFrag extends Fragment  {
         TextView textView = (TextView) getActivity().findViewById(R.id.toolbar_title);
         textView.setText("LIV IT");
         StyleableToast st = new StyleableToast(getContext(), "Network not detected!", Toast.LENGTH_LONG);
-        //Custom stylable toast*
+
         st.setBackgroundColor(Color.RED);
         st.setTextColor(Color.WHITE);
         st.spinIcon();
@@ -194,13 +171,6 @@ public class GridMainEventsFrag extends Fragment  {
         enableCardSwiping();
     }
 
-
-    /**********************************************************************************************
-     * When activity resumes after a pause, check to see if any new events have been added
-     * set swipeContainer.setRefreshing to true
-     * load the event data
-     * set swipecontainer.setRefreshing to false
-     **********************************************************************************************/
     @Override
     public void onResume() {  // After a pause OR at startup
         super.onResume();
@@ -211,19 +181,6 @@ public class GridMainEventsFrag extends Fragment  {
         super.onStart();
 
     }
-
-    /**********************************************************************************************
-     * Handles the drop down functionality in the list view of the event data
-     * When image button is clicked, additional event information is revealed
-     *
-     **********************************************************************************************
-    @Override
-    public void itemClicked(View view, int position) {
-        RelativeLayout layout = (RelativeLayout)view.findViewById(R.id.extend);
-        if (layout.getVisibility() == View.GONE)
-            layout.setVisibility(View.VISIBLE);
-        else
-            layout.setVisibility(View.GONE); }*/
 
 
     private void enableCardSwiping(){
@@ -259,9 +216,7 @@ public class GridMainEventsFrag extends Fragment  {
                                         mAdapter.notifyItemRemoved(position);
                                         new UpdateDbOnSwipe(getString(R.string.DATABASE_STORE_DELETED_EVENTS)).execute(deleteEvent);
                                     } catch (JSONException e) {
-                                        e.printStackTrace();
-                                    }
-                                    //mAdapter.notifyDataSetChanged();
+                                        e.printStackTrace(); }
                                 } }
 
                             @Override
@@ -284,9 +239,7 @@ public class GridMainEventsFrag extends Fragment  {
                                         mAdapter.notifyItemRemoved(position);
 
                                     } catch (JSONException e) {
-                                        e.printStackTrace();
-                                    }
-                                   // mAdapter.notifyDataSetChanged();
+                                        e.printStackTrace(); }
                                 }
                             }
                         });

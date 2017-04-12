@@ -19,7 +19,6 @@ import android.widget.TextView;
 
 import com.example.codenamebiscuit.R;
 import com.example.codenamebiscuit.helper.App;
-import com.example.codenamebiscuit.helper.ChangePreferences;
 import com.example.codenamebiscuit.login.ChooseLogin;
 import com.facebook.AccessToken;
 import com.facebook.FacebookSdk;
@@ -364,7 +363,7 @@ public class UserSettingsActivity
             e.printStackTrace();
         }
 
-        //new ChangePreferences().execute(pref);
+        //new RunQuery().execute(pref);
     }
 
 

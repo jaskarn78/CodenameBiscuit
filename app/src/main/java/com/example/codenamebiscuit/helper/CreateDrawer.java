@@ -208,7 +208,7 @@ public class CreateDrawer {
                             else if(drawerItem.getIdentifier()==2)
                                 intent = new Intent(activity, ArchivedEvents.class);
                             else if(drawerItem.getIdentifier()==3) {
-                                fragment = new MapActivity().newInstance();
+                                intent = new Intent(activity, MapActivity.class);
                             }
                             else if (drawerItem.getIdentifier()==4)
                                 intent = new Intent(activity, UserSettingsActivity.class);

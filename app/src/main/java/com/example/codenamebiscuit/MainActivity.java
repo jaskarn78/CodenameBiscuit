@@ -3,7 +3,6 @@ package com.example.codenamebiscuit;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
@@ -22,7 +21,7 @@ import android.widget.TextView;
 import com.example.codenamebiscuit.eventfragments.GridMainEventsFrag;
 import com.example.codenamebiscuit.eventfragments.SwipeEvents;
 
-import com.example.codenamebiscuit.helper.ChangePreferences;
+import com.example.codenamebiscuit.helper.RunQuery;
 import com.example.codenamebiscuit.helper.CreateDrawer;
 import com.example.codenamebiscuit.helper.GPSTracker;
 import com.example.codenamebiscuit.helper.QueryEventList;
@@ -49,9 +48,6 @@ public class MainActivity extends AppCompatActivity {
     private SlidingLayer mSlidingLayer;
     private TextView swipeText;
     private SlidingUpPanelLayout mLayout;
-    private FancyButton musicFancyButton, sportsButton, foodButton;
-    private FancyButton healthButton, outdoorButton, entertainmentButton;
-    private FancyButton familyButton, retailButton, performingButton;
     private IconicsImageView downArrow;
     private JSONObject preferences, removed;
     private GridMainEventsFrag eventsFrag;
@@ -60,11 +56,9 @@ public class MainActivity extends AppCompatActivity {
     CreateDrawer createDrawer;
     private ProgressBar progressBar;
     List<JSONObject> prefList;
+
     GPSTracker gps;
-    static {
-        AppCompatDelegate.setDefaultNightMode(
-                AppCompatDelegate.MODE_NIGHT_YES);
-    }
+
 
 
     /**********************************************************************************************
@@ -101,7 +95,7 @@ public class MainActivity extends AppCompatActivity {
         swipeEvents = new SwipeEvents();
         eventsFrag = new GridMainEventsFrag();
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        transaction.setCustomAnimations(R.anim.swing_up_left, R.anim.exit);
+        transaction.setCustomAnimations(R.anim.slide_in_up, R.anim.slide_out_down);
         transaction.replace(R.id.fragment_container, eventsFrag, "mainFrag");
         transaction.commit();
 
@@ -121,7 +115,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        System.exit(0);
     }
 
     /**********************************************************************************
@@ -132,15 +125,17 @@ public class MainActivity extends AppCompatActivity {
         swipeText = (TextView) findViewById(R.id.swipeText);
         mSlidingLayer.setLayerTransformer(new AlphaTransformer());
         mSlidingLayer.setVisibility(View.INVISIBLE);
-        musicFancyButton = (FancyButton)findViewById(R.id.btn_music);
-        sportsButton = (FancyButton)findViewById(R.id.btn_sports);
-        foodButton = (FancyButton)findViewById(R.id.btn_food);
-        outdoorButton=(FancyButton)findViewById(R.id.btn_outdoors);
-        healthButton=(FancyButton)findViewById(R.id.btn_health);
-        entertainmentButton=(FancyButton)findViewById(R.id.btn_entertainment);
-        performingButton=(FancyButton)findViewById(R.id.btn_performing);
-        retailButton=(FancyButton)findViewById(R.id.btn_retail);
-        familyButton=(FancyButton)findViewById(R.id.btn_family);
+
+        FancyButton musicFancyButton = (FancyButton) findViewById(R.id.btn_music);
+        FancyButton sportsButton = (FancyButton) findViewById(R.id.btn_sports);
+        FancyButton foodButton = (FancyButton) findViewById(R.id.btn_food);
+        FancyButton outdoorButton = (FancyButton) findViewById(R.id.btn_outdoors);
+        FancyButton healthButton = (FancyButton) findViewById(R.id.btn_health);
+        FancyButton entertainmentButton = (FancyButton) findViewById(R.id.btn_entertainment);
+        FancyButton performingButton = (FancyButton) findViewById(R.id.btn_performing);
+        FancyButton retailButton = (FancyButton) findViewById(R.id.btn_retail);
+        FancyButton familyButton = (FancyButton) findViewById(R.id.btn_family);
+
         downArrow = (IconicsImageView)findViewById(R.id.down_arrow);
         downArrow.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -230,6 +225,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+        fragmentTransaction.setCustomAnimations(R.anim.slide_in_up, R.anim.slide_out_down);
 
         switch (item.getItemId()) {
             case R.id.action_anchor:
@@ -244,14 +240,12 @@ public class MainActivity extends AppCompatActivity {
              case R.id.action_grid_to_full:
                 if(eventsFrag.isAdded()){
                     fragmentTransaction.replace(R.id.fragment_container, swipeEvents, "swipe");
-                    fragmentTransaction.setCustomAnimations(R.anim.swing_up_left, R.anim.slide_out_down);
-                    fragmentTransaction.commit();
+                    fragmentTransaction.commitNow();
 
                 }
                 else if(swipeEvents.isAdded()){
                     fragmentTransaction.replace(R.id.fragment_container, eventsFrag, "eventsFrag");
-                    fragmentTransaction.setCustomAnimations(R.anim.slide_in_up, R.anim.slide_out_down);
-                    fragmentTransaction.commit();
+                    fragmentTransaction.commitNow();
                 }
         }
         return super.onOptionsItemSelected(item); }
@@ -316,7 +310,7 @@ public class MainActivity extends AppCompatActivity {
                             preferences.put("pref_id" + (finalI + 1), 1);
                         } catch (JSONException e) {
                             e.printStackTrace(); }
-                        new ChangePreferences().execute(preferences);
+                        new RunQuery(getString(R.string.PUSH_USER_PREFERENCES)).execute(preferences);
                     } else {
                         btnList.get(finalI).setBackgroundColor(getColor(R.color.translivinPink));
                         btnList.get(finalI).setSelected(false);
@@ -324,7 +318,7 @@ public class MainActivity extends AppCompatActivity {
                             preferences.put("pref_id" + (finalI + 1), 0);
                         } catch (JSONException e) {
                             e.printStackTrace(); }
-                        new ChangePreferences().execute(preferences);} }
+                        new RunQuery(getString(R.string.PUSH_USER_PREFERENCES)).execute(preferences);} }
             });
         }
     }
@@ -350,7 +344,8 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onPreviewShowed() {
                 downArrow.setImageDrawable(getDrawable(R.drawable.ic_keyboard_arrow_down_white_48dp));
-                refresh(); }
+                //refresh();
+            }
 
             @Override
             public void onClosed() {
@@ -360,15 +355,11 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void refresh(){
-        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
         if(touched) {
-            if(eventsFrag.isAdded()) {
-                fragmentTransaction.detach(eventsFrag); fragmentTransaction.attach(eventsFrag);
-            }
-            else
-                fragmentTransaction.detach(swipeEvents); fragmentTransaction.attach(swipeEvents);
-            fragmentTransaction.commit();
+            finish();
+            startActivity(getIntent());
         }
-        touched=false; }
+        touched=false;
+    }
 
 }

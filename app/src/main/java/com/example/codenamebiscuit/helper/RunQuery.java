@@ -18,10 +18,14 @@ import java.util.ArrayList;
  * Created by Tommy on 1/30/17.
  */
 
-public class ChangePreferences extends AsyncTask<JSONObject, Void, Void> {
-    private static final String DATABASE_MAIN_EVENTS_PULLER = "http://athena.ecs.csus.edu/~teamone/php/android/push_user_preferences.php";
+public class RunQuery extends AsyncTask<JSONObject, Void, Void> {
+    private String URL;
     //private static final String REMOVE_USER_PREFERENCES = "http://athena.ecs.csus.edu/~teamone/php/android/remove_user_preferences.php";
     private static ArrayList<JSONObject> mEventList;
+
+    public RunQuery(String URL){
+        this.URL = URL;
+    }
 
     @Override
     protected Void doInBackground(JSONObject... objs) {
@@ -38,7 +42,7 @@ public class ChangePreferences extends AsyncTask<JSONObject, Void, Void> {
 
 
             // Connect to the URL
-            URL url = new URL(DATABASE_MAIN_EVENTS_PULLER);
+            URL url = new URL(URL);
             URLConnection conn = url.openConnection();
 
             conn.setDoOutput(true);

@@ -4,7 +4,6 @@ import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.percent.PercentLayoutHelper;
@@ -24,7 +23,6 @@ import com.example.codenamebiscuit.MainActivity;
 import com.example.codenamebiscuit.Manifest;
 import com.example.codenamebiscuit.R;
 import com.example.codenamebiscuit.helper.App;
-import com.example.codenamebiscuit.helper.DatabaseHelper;
 import com.facebook.AccessToken;
 import com.facebook.AccessTokenTracker;
 import com.facebook.CallbackManager;
@@ -71,7 +69,6 @@ public class ChooseLogin extends AppCompatActivity implements GoogleApiClient.On
     private static final int RC_SIGN_IN = 9001;
     private SharedPreferences pref;
     private String first_name, last_name;
-    private DatabaseHelper db;
     private boolean isFacebookScreen = true;
     private TextView tvSignupInvoker;
     private LinearLayout llSignup;
@@ -120,7 +117,6 @@ public class ChooseLogin extends AppCompatActivity implements GoogleApiClient.On
             }
         });
         mGoogleApiClient = App.getGoogleApiHelper().getApiClient();
-        db = new DatabaseHelper(this);
         llSignup = (LinearLayout)findViewById(R.id.llSignup);
         llSignin = (LinearLayout)findViewById(R.id.llSignin);
         tvSignupInvoker = (TextView) findViewById(R.id.tvSignupInvoker);
@@ -210,7 +206,7 @@ public class ChooseLogin extends AppCompatActivity implements GoogleApiClient.On
             obj.put("gender", "M/F");
 
             first_name = acct.getGivenName();
-            last_name = acct.getGivenName();
+            last_name = acct.getFamilyName();
 
             try {
                 Log.v("DATA BITCH", obj.toString());
@@ -271,6 +267,7 @@ public class ChooseLogin extends AppCompatActivity implements GoogleApiClient.On
 
                                     // Update Database
                                     InsertUserDB userSignin = new InsertUserDB();
+                                    assert bFacebookData != null;
                                     if(bFacebookData.length()!=0) {
                                         userSignin.execute(bFacebookData);
                                         mProgressDialog.dismiss(); }
@@ -344,10 +341,9 @@ public class ChooseLogin extends AppCompatActivity implements GoogleApiClient.On
                 })
                 .build();
         alert.show();
-        //startActivity(main);
     }
     @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, this);}
 
