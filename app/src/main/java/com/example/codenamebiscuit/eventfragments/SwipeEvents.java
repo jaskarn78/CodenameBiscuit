@@ -126,7 +126,7 @@ public class SwipeEvents extends ProgressFragment{
     private void obtainData(){
         setContentShown(false);
         mHandler = new Handler();
-        mHandler.postDelayed(mShowContentRunnable, 700);
+        mHandler.postDelayed(mShowContentRunnable, 900);
         try {
             data = new QueryEventList(getString(R.string.DATABASE_MAIN_EVENTS_PULLER), userId).execute().get();
             Events.fromJson(data,getContext());

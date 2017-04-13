@@ -21,6 +21,10 @@ import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.drawable.GlideDrawable;
+import com.bumptech.glide.request.RequestListener;
+import com.bumptech.glide.request.target.Target;
 import com.example.codenamebiscuit.R;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -41,7 +45,6 @@ import java.util.Date;
  * Activities that contain this fragment must implement the
  * {@link DisplayEvent.OnFragmentInteractionListener} interface
  * to handle interaction events.
- * Use the {@link DisplayEvent#newInstance} factory method to
  * create an instance of this fragment.
  */
 public class DisplayEvent extends AppCompatActivity{
@@ -306,8 +309,11 @@ public class DisplayEvent extends AppCompatActivity{
     }
 
     private void loadImage(){
-        Picasso.with(this).load(getImageURL(eventImage))
-                .centerCrop().fit().into(displayEventImage);
+        Glide.with(this)
+                .load(getImageURL(eventImage))
+                .centerCrop()
+                .placeholder(R.drawable.progress)
+                .error(R.drawable.placeholder);
     }
 
     @Override

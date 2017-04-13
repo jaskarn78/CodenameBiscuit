@@ -138,7 +138,7 @@ public class SavedEventsFrag extends ProgressFragment implements ClickListener{
         mHandler = new Handler();
         mHandler.postDelayed(mShowContentRunnable, 00);
         try {
-            data = new QueryEventList(getString(R.string.DATABASE_DELETED_EVENTS_PULLER), userId).execute().get();
+            data = new QueryEventList(getString(R.string.DATABASE_SAVED_EVENTS_PULLER), userId).execute().get();
             mAdapter = new EventAdapter(getActivity().getApplicationContext(), 1, "saved", getActivity());
         } catch (InterruptedException | ExecutionException e) {
             e.printStackTrace();

@@ -357,7 +357,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void refresh(){
         if(touched) {
-            finish();
+            this.finish();
             startActivity(getIntent());
         }
         touched=false;
