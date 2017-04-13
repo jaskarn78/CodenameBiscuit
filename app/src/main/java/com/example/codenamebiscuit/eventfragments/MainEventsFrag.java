@@ -44,7 +44,7 @@ import java.util.concurrent.ExecutionException;
  */
 
 public class MainEventsFrag extends Fragment {
-
+    private String userId;
     private RecyclerView mRecyclerView, mRecyclerViewFeatured;
     private EventAdapter mAdapter;
     private ArrayList<JSONObject> eventData;
@@ -79,19 +79,11 @@ public class MainEventsFrag extends Fragment {
         deleteEvent=new JSONObject();
 
 
-        String user_id = pref.getString("user_id", null);
-        try {
-            currentUserId.put("user_id", user_id);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+        userId = pref.getString("user_id", null);
         //initialize event dataset
         eventData = new ArrayList<JSONObject>();
         data = new ArrayList<JSONObject>();
         //Custom stylable toast*
-        if (savedInstanceState == null) {
-
-        }
 
     }
 
@@ -168,7 +160,7 @@ public class MainEventsFrag extends Fragment {
     public void onResume() {  // After a pause OR at startup
         super.onResume();
         try {
-            data = new QueryEventList(getString(R.string.DATABASE_MAIN_EVENTS_PULLER)).execute(currentUserId).get();
+            data = new QueryEventList(getString(R.string.DATABASE_MAIN_EVENTS_PULLER), userId).execute().get();
             mAdapter.setEventData(data);
         } catch (InterruptedException e) {
             e.printStackTrace();
@@ -200,7 +192,7 @@ public class MainEventsFrag extends Fragment {
             public void onRefresh() {
                 swipeContainer.setRefreshing(true);
                 try {
-                    data = new QueryEventList(getString(R.string.DATABASE_MAIN_EVENTS_PULLER)).execute(currentUserId).get();
+                    data = new QueryEventList(getString(R.string.DATABASE_MAIN_EVENTS_PULLER), userId).execute().get();
                     mAdapter.setEventData(data);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
@@ -219,26 +211,6 @@ public class MainEventsFrag extends Fragment {
     }
 
 
-
-    /**********************************************************************************************
-     * HTTP request to run python script which contains sql command
-     * to retrieve all event data filtered by user id
-     **********************************************************************************************/
-    private void loadEventData(){
-            QueryEventList list = (QueryEventList)
-                    new QueryEventList(getString(R.string.DATABASE_MAIN_EVENTS_PULLER), getActivity()).execute(currentUserId);
-        try {
-            Log.i("list size: ",list.get()+"");
-            setEventData(list.get());
-            data = list.get();
-            mAdapter.setEventData(data);
-
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (ExecutionException e) {
-            e.printStackTrace();
-        }
-    }
     public ArrayList<JSONObject> getEventList(){
         return eventData;
     }

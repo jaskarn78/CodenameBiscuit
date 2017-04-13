@@ -82,6 +82,7 @@ public class MapActivity extends AppCompatActivity {
 
 
     private ArrayList<MyLocation> latLngsArrayList;
+    private String userId;
     private Animation slide_out_down, slide_in_up;
     public static GoogleMap map;
     private SupportMapFragment supportMapFragment;
@@ -97,12 +98,8 @@ public class MapActivity extends AppCompatActivity {
         this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_map);
 
-        currentUser = new JSONObject();
-        try {
-            currentUser.put("user_id", sharedPreferences.getString("user_id", null));
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+        userId=sharedPreferences.getString("user_id", null);
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
 
         setSupportActionBar(toolbar);
@@ -143,7 +140,7 @@ public class MapActivity extends AppCompatActivity {
         locationList = new ArrayList<>();
         distanceList = new ArrayList<>();
         try{
-            ArrayList<JSONObject> data = new QueryEventList(getString(R.string.DATABASE_MAIN_EVENTS_PULLER), this).execute(currentUser).get();
+            ArrayList<JSONObject> data = new QueryEventList(getString(R.string.DATABASE_MAIN_EVENTS_PULLER),userId).execute().get();
             for(int i = 0; i< data.size(); i++){
                 latsArrayList.add(data.get(i).getDouble("lat"));
                 lngsArrayList.add(data.get(i).getDouble("lng"));
@@ -315,10 +312,10 @@ public class MapActivity extends AppCompatActivity {
                             }
                         });
 
-                        event_pager.setCurrentItem(mPosition, true);
+                        event_pager.setCurrentItem(0, true);
 
                     } else {
-                        event_pager.setCurrentItem(mPosition, true);
+                        event_pager.setCurrentItem(0, true);
                     }
 
                     return false;
@@ -418,8 +415,6 @@ public class MapActivity extends AppCompatActivity {
             TextView tv_cost = (TextView)itemView.findViewById(R.id.cost);
             tv_cost.setText("Entry Fee: $"+costList.get(position));
 
-            //TextView tv_desc = (TextView)itemView.findViewById(R.id.tv_e);
-            //tv_desc.setText(descList.get(position)+" "+getString(R.string.lorem_ipsum));
 
             final ProgressBar progressBar = (ProgressBar)itemView.findViewById(R.id.progress_bar);
             ImageView tv_image = (ImageView)itemView.findViewById(R.id.iv_event_image);

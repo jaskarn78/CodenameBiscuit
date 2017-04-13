@@ -154,7 +154,7 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
         public final TextView mEventDistance;
         public final CardView cardView, cardViewBack;
         public IconicsImageView infoIcon;
-        public TextView moreInfo;
+        public com.rey.material.widget.Button buttonInfo;
         public final WebView mWebView;
         SwipeLayout mSwipeLayout;
         Button buttonDelete;
@@ -166,8 +166,7 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
             rootView = view;
             rowMenu = (ImageView)view.findViewById(R.id.row_menu);
 
-            moreInfo = (TextView) view.findViewById(R.id.more_info);
-
+            buttonInfo = (com.rey.material.widget.Button)view.findViewById(R.id.button_info);
             infoIcon = (IconicsImageView)view.findViewById(R.id.info_icon);
 
             mEventDistance = (TextView)view.findViewById(R.id.event_distance);
@@ -227,7 +226,7 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
         String event = null;            String eventInfo = "";      String startDate=null;
         String startTime=null;          String eventid = null;      String userId=null;
         String eventHoster=null;        String cost=null;           Double lat=0.0;
-        String eventWebsite = null;
+        String eventWebsite = null;     int eventDistance = 0;
         Double lng=0.0;                 final JSONObject restoreEvent = new JSONObject();
 
 
@@ -246,6 +245,7 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
             lng=mEventData.get(position).getDouble("lng");
             eventInfo = mEventData.get(position).getString("event_description");
             eventWebsite = mEventData.get(position).getString("event_website");
+            eventDistance = mEventData.get(position).getInt("event_distance");
             Log.i("website: ", eventWebsite);
 
             eventNameList.add(event);
@@ -254,7 +254,7 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
             eventDescList.add(eventInfo);
             latsArrayList.add(lat+"");
             lngsArrayList.add(lng+"");
-            eventDistanceList.add(getLocation(lat,lng));
+            eventDistanceList.add(eventDistance);
 
             hosterArrayList.add(eventHoster);
             costArrayList.add(cost);
@@ -281,7 +281,7 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
         bundle.putString("eventPreference", eventPref);
         bundle.putString("eventDescription", eventInfo);
         bundle.putString("eventHoster", eventHoster);
-        bundle.putString("eventDistance", getLocation(lat, lng)+" mi");
+        bundle.putString("eventDistance", eventDistance+"");
         bundle.putString("eventCost", cost);
         bundle.putString("eventId", eventid);
         bundle.putDouble("eventLat", lat);
@@ -422,11 +422,11 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
         if(type==2) {
             eventAdapterViewHolder.mEventPreferenceTVBack.setText(eventPref);
             eventAdapterViewHolder.mEventNameBack.setText(event);
-            eventAdapterViewHolder.mEventLocationTVBack.setText("1234 Example St. "+eventLocation);
-            eventAdapterViewHolder.mEventCostBack.setText("Event Price: $20.00");
+            eventAdapterViewHolder.mEventLocationTVBack.setText(eventLocation);
+            eventAdapterViewHolder.mEventCostBack.setText("Entry Fee: $"+cost);
             eventAdapterViewHolder.mEventAgeBack.setText("Age Restriction: 21+");
             eventAdapterViewHolder.mEventInfoBack.setText("Description: "+eventInfo);
-            eventAdapterViewHolder.mEventDistanceBack.setText("Distance: "+getLocation(lat, lng)+" miles");
+            eventAdapterViewHolder.mEventDistanceBack.setText("Distance: "+eventDistance+" miles");
             eventAdapterViewHolder.mEventNameBack.setSelected(true);
             eventAdapterViewHolder.mEventLocationTVBack.setSelected(true);
             eventAdapterViewHolder.mEventPreferenceTVBack.setSelected(true);
@@ -436,7 +436,7 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
              *Sets up Bundle object to pass to DisplayEvent fragment
              * DisplayEvent fragment displays all event information
              ***************************************************************************/
-            eventAdapterViewHolder.moreInfo.setOnClickListener(new View.OnClickListener() {
+            eventAdapterViewHolder.buttonInfo.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     Intent intent = new Intent(activity, DisplayEvent.class);

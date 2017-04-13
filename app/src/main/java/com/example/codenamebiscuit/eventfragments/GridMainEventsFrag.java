@@ -37,6 +37,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.devspark.progressfragment.ProgressFragment;
+import com.example.codenamebiscuit.Events;
 import com.example.codenamebiscuit.MainActivity;
 import com.example.codenamebiscuit.MapActivity;
 import com.example.codenamebiscuit.R;
@@ -68,27 +69,20 @@ import mehdi.sakout.fancybuttons.FancyButton;
  */
 
 public class GridMainEventsFrag extends Fragment  {
-
     private RecyclerView mRecyclerView;
     private EventAdapter mAdapter;
-    private JSONObject currentUserId = new JSONObject();
     private JSONObject saveEvent, deleteEvent;
     private ArrayList<JSONObject> data;
-
+    private String userId;
+    private View mContentView;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(getContext());
         saveEvent = new JSONObject();
         deleteEvent = new JSONObject();
-
-        String user_id = pref.getString("user_id", null);
-        try {
-            currentUserId.put("user_id", user_id);
-        } catch (JSONException e) {
-            e.printStackTrace(); }
+        userId = getArguments().getString("currentUserId");
         setHasOptionsMenu(true);
     }
 
@@ -97,18 +91,21 @@ public class GridMainEventsFrag extends Fragment  {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        View mContentView = inflater.inflate(R.layout.activity_main, container, false);
+        mContentView = inflater.inflate(R.layout.activity_main, container, false);
         mRecyclerView = (RecyclerView) mContentView.findViewById(R.id.recyclerview_events);
         return mContentView;
     }
 
     private void obtainData() {
         try {
-            data = new QueryEventList(getString(R.string.DATABASE_MAIN_EVENTS_PULLER), getActivity())
-                    .execute(currentUserId).get();
+            data = new QueryEventList(getString(R.string.DATABASE_MAIN_EVENTS_PULLER), userId).execute().get();
+            Events.fromJson(data,getContext());
             mAdapter = new EventAdapter(getContext().getApplicationContext(), 2, "", getActivity());
         } catch (InterruptedException | ExecutionException e) {
             e.printStackTrace(); }
+    }
+    public ArrayList<JSONObject> getData(){
+        return data;
     }
 
     public static GridMainEventsFrag newInstance() {
@@ -131,8 +128,6 @@ public class GridMainEventsFrag extends Fragment  {
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-
-        //initialize event dataset
         obtainData();
 
         mAdapter.setEventData(data);
@@ -157,19 +152,16 @@ public class GridMainEventsFrag extends Fragment  {
         RecyclerItemClickSupport.addTo(mRecyclerView).setOnItemClickListener(
                 new RecyclerItemClickSupport.OnItemClickListener() {
                     @Override
-                    public void onItemClicked(RecyclerView recyclerView, int position, View view) {
+                    public void onItemClicked(RecyclerView recyclerView, int position, final View view) {
                         final CardView cv = (CardView) view.findViewById(R.id.cardview);
                         final CardView cvBack = (CardView) view.findViewById(R.id.card_view_back);
-                        FlipAnimation flipAnimation = new FlipAnimation(cv, cvBack);
+                        final FlipAnimation flipAnimation = new FlipAnimation(cv, cvBack);
                         if (cv.getVisibility() == View.GONE)
                             flipAnimation.reverse();
-                        view.startAnimation(flipAnimation);
-                    }
-                });
+                        view.startAnimation(flipAnimation); } });
         if (!isNetworkAvailable())
             st.show();
-        enableCardSwiping();
-    }
+        enableCardSwiping(); }
 
     @Override
     public void onResume() {  // After a pause OR at startup
@@ -177,10 +169,8 @@ public class GridMainEventsFrag extends Fragment  {
     }
 
     @Override
-    public void onStart() {
-        super.onStart();
-
-    }
+    public void onStart()
+    {super.onStart(); }
 
 
     private void enableCardSwiping(){
@@ -242,26 +232,6 @@ public class GridMainEventsFrag extends Fragment  {
                                         e.printStackTrace(); }
                                 }
                             }
-                        });
-        mRecyclerView.addOnItemTouchListener(swipeTouchListener);
-    }
-
-    public Bundle createBundle(){
-        Bundle bundle = new Bundle();
-        bundle.putStringArrayList("latList", mAdapter.getLatsArrayList());
-        bundle.putStringArrayList("lngList", mAdapter.getLngsArrayList());
-        bundle.putStringArrayList("nameList", mAdapter.getEventNameList());
-        bundle.putStringArrayList("imageList", mAdapter.getEventImageList());
-        bundle.putStringArrayList("descList", mAdapter.getEventDescList());
-        bundle.putStringArrayList("hosterList", mAdapter.getHosterArrayList());
-        bundle.putStringArrayList("costList", mAdapter.getCostArrayList());
-        bundle.putStringArrayList("startList", mAdapter.getEventStartList());
-        bundle.putStringArrayList("timeList", mAdapter.getEventTimeList());
-        bundle.putStringArrayList("prefList", mAdapter.getEventPrefList());
-        bundle.putStringArrayList("locationList", mAdapter.getEventLocationList());
-        bundle.putIntegerArrayList("distanceList", mAdapter.getEventDistanceList());
-        return bundle;
-
-    }
+                        }); mRecyclerView.addOnItemTouchListener(swipeTouchListener); }
 
 }

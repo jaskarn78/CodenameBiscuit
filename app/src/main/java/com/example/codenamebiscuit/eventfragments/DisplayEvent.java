@@ -173,9 +173,9 @@ public class DisplayEvent extends AppCompatActivity{
 
        // displayEventName.setText(eventName);
         displayEventHoster.setText("Presented By: "+eventHoster);
-        displayEventDistance.setText(eventDistance);
+        displayEventDistance.setText(eventDistance+" miles");
         displayEventPref.setText(eventPreferences+" | Sports | Music");
-        displayEventLocation.setText(eventLocation+" 95826");
+        displayEventLocation.setText(eventLocation);
         displayEventStartDate.setText("Start Date: "+parseDate(eventDate));
         displayEventStartTIme.setText("Start Time: "+parseTime(eventTime));
         displayEventCost.setText("Entry Fee $"+ eventCost);

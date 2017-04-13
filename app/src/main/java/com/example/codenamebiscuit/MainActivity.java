@@ -2,7 +2,11 @@ package com.example.codenamebiscuit;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
@@ -15,6 +19,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -28,6 +33,7 @@ import com.example.codenamebiscuit.helper.QueryEventList;
 import com.example.codenamebiscuit.login.ChooseLogin;
 import com.facebook.FacebookSdk;
 import com.mikepenz.iconics.view.IconicsImageView;
+import com.mikepenz.materialdrawer.AccountHeader;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 import com.wunderlist.slidinglayer.SlidingLayer;
 import com.wunderlist.slidinglayer.transformer.AlphaTransformer;
@@ -46,7 +52,6 @@ public class MainActivity extends AppCompatActivity {
     private SharedPreferences pref;
     private Toolbar toolbar;
     private SlidingLayer mSlidingLayer;
-    private TextView swipeText;
     private SlidingUpPanelLayout mLayout;
     private IconicsImageView downArrow;
     private JSONObject preferences, removed;
@@ -56,6 +61,9 @@ public class MainActivity extends AppCompatActivity {
     CreateDrawer createDrawer;
     private ProgressBar progressBar;
     List<JSONObject> prefList;
+    private String userId;
+    private static int RESULT_LOAD_IMAGE = 1;
+    private AccountHeader header;
 
     GPSTracker gps;
 
@@ -91,15 +99,21 @@ public class MainActivity extends AppCompatActivity {
 
         FacebookSdk.sdkInitialize(getApplicationContext());
         checkIfFbOrGoogleLogin(savedInstanceState);
+        Bundle bundle = new Bundle();
+        bundle.putString("currentUserId", userId);
 
         swipeEvents = new SwipeEvents();
+        swipeEvents.setArguments(bundle);
+
         eventsFrag = new GridMainEventsFrag();
+        eventsFrag.setArguments(bundle);
+
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         transaction.setCustomAnimations(R.anim.slide_in_up, R.anim.slide_out_down);
-        transaction.replace(R.id.fragment_container, eventsFrag, "mainFrag");
+        transaction.replace(R.id.fragment_container, eventsFrag, "eventsFrag");
         transaction.commit();
-
     }
+
 
     @Override
     protected void onResume() {
@@ -114,7 +128,18 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        super.onBackPressed();
+        if(!swipeEvents.isVisible()) {
+            Intent intent = new Intent(Intent.ACTION_MAIN);
+            intent.addCategory(Intent.CATEGORY_HOME);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(intent);
+        }else{
+            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+            ft.setCustomAnimations(R.anim.slide_in_up, R.anim.slide_out_down);
+            ft.addToBackStack("swipeEvents");
+            ft.replace(R.id.fragment_container, eventsFrag, "eventsFrag");
+            ft.commit();
+        }
     }
 
     /**********************************************************************************
@@ -122,7 +147,6 @@ public class MainActivity extends AppCompatActivity {
      **********************************************************************************/
     private void bindViews() {
         mSlidingLayer = (SlidingLayer) findViewById(R.id.slidingLayer1);
-        swipeText = (TextView) findViewById(R.id.swipeText);
         mSlidingLayer.setLayerTransformer(new AlphaTransformer());
         mSlidingLayer.setVisibility(View.INVISIBLE);
 
@@ -190,7 +214,8 @@ public class MainActivity extends AppCompatActivity {
 
         } else {
             try {
-                currentUserId.put("user_id", pref.getString("user_id", null));
+                userId=pref.getString("user_id", null);
+                currentUserId.put("user_id", userId);
             } catch (JSONException e) {
                 e.printStackTrace(); }
             loadDrawer(savedstate);
@@ -239,59 +264,39 @@ public class MainActivity extends AppCompatActivity {
                 break;
              case R.id.action_grid_to_full:
                 if(eventsFrag.isAdded()){
-                    fragmentTransaction.replace(R.id.fragment_container, swipeEvents, "swipe");
-                    fragmentTransaction.commitNow();
+                    fragmentTransaction.replace(R.id.fragment_container, swipeEvents, "swipeFrag");
+                    fragmentTransaction.commit();
 
                 }
                 else if(swipeEvents.isAdded()){
                     fragmentTransaction.replace(R.id.fragment_container, eventsFrag, "eventsFrag");
-                    fragmentTransaction.commitNow();
+                    fragmentTransaction.commit();
                 }
         }
         return super.onOptionsItemSelected(item); }
 
 
     private void loadDrawer(Bundle savedState) {
-        final String pic = pref.getString("user_image", null);
-        final String fName = pref.getString("fName", null);
-        final String lName = pref.getString("lName", null);
-        final String email = pref.getString("email", null);
-        FragmentManager manager = getSupportFragmentManager();
-        createDrawer = new CreateDrawer(fName, lName, pic, email, savedState, toolbar,
-                getApplicationContext(), this, manager, getLat(), getLng());
-        createDrawer.loadDrawer(); }
 
-
-    private String getLat(){
-        double currentLat=0.0;
-        if(gps.canGetLocation()){
-            currentLat=gps.getLatitude();
-        }
-        return currentLat+""; }
-
-    private String getLng(){
-        double currentLng=0.0;
-        if(gps.canGetLocation()){
-            currentLng=gps.getLongitude();
-        }
-        return currentLng+""; }
+        createDrawer = new CreateDrawer(savedState, toolbar, this, userId);
+        createDrawer.loadDrawer();
+    }
 
     public void setupPreferences(final List<FancyButton> btnList) {
         try {
-            preferences.put("user_id", pref.getString("user_id", null));
-            removed.put("user_id", pref.getString("user_id", null));
-            prefList = new QueryEventList(getString(R.string.PULL_USER_PREFERENCES)).execute(currentUserId).get();
+            preferences.put("user_id", userId);
+            removed.put("user_id", userId);
+            prefList = new QueryEventList(getString(R.string.PULL_USER_PREFERENCES), userId).execute().get();
+
             if (prefList.size() == 0) {
                 mSlidingLayer.setVisibility(View.VISIBLE);
                 mSlidingLayer.openLayer(true);
             }
             for (int i = 0; i < prefList.size(); i++) {
                 if (Integer.parseInt(prefList.get(i).getString("preference_id")) > 0) {
-                    Log.i("preferences" + i, prefList.get(i).getString("preference_id"));
                     btnList.get(Integer.parseInt(prefList.get(i).getString("preference_id")) - 1).setBackgroundColor(getColor(R.color.livinPink));
                     btnList.get(Integer.parseInt(prefList.get(i).getString("preference_id")) - 1).setSelected(true);
-                    preferences.put("pref_id" + (Integer.parseInt(prefList.get(i).getString("preference_id"))), 1);
-                    Log.i("true/false: pref_id:" + (Integer.parseInt(prefList.get(i).getString("preference_id"))), "1"); }
+                    preferences.put("pref_id" + (Integer.parseInt(prefList.get(i).getString("preference_id"))), 1);}
             }
 
         } catch (JSONException | InterruptedException | ExecutionException e) {
@@ -318,9 +323,7 @@ public class MainActivity extends AppCompatActivity {
                             preferences.put("pref_id" + (finalI + 1), 0);
                         } catch (JSONException e) {
                             e.printStackTrace(); }
-                        new RunQuery(getString(R.string.PUSH_USER_PREFERENCES)).execute(preferences);} }
-            });
-        }
+                        new RunQuery(getString(R.string.PUSH_USER_PREFERENCES)).execute(preferences);} } }); }
     }
 
     private void setupSlidingLayer(){
@@ -344,15 +347,12 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onPreviewShowed() {
                 downArrow.setImageDrawable(getDrawable(R.drawable.ic_keyboard_arrow_down_white_48dp));
-                //refresh();
             }
 
             @Override
             public void onClosed() {
                 downArrow.setImageDrawable(getDrawable(R.drawable.ic_keyboard_arrow_down_white_48dp));
-                refresh(); }
-        });
-    }
+                refresh(); } }); }
 
     private void refresh(){
         if(touched) {

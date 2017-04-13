@@ -6,6 +6,7 @@ import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Parcelable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
@@ -39,6 +40,7 @@ import com.bumptech.glide.load.resource.drawable.GlideDrawable;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
 import com.devspark.progressfragment.ProgressFragment;
+import com.example.codenamebiscuit.Events;
 import com.example.codenamebiscuit.R;
 import com.example.codenamebiscuit.helper.FlipAnimation;
 import com.example.codenamebiscuit.helper.ItemClickSupport;
@@ -70,6 +72,7 @@ public class SwipeEvents extends ProgressFragment{
     private SwipeDeckAdapter adapter;
     private JSONObject saveEvent, deleteEvent;
     private String image;
+    private String userId;
     private JSONObject user;
     private ArrayList<JSONObject> data;
     private ViewPager event_pager;
@@ -93,15 +96,10 @@ public class SwipeEvents extends ProgressFragment{
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(getContext());
-        String user_id = pref.getString("user_id", null);
+        userId= getArguments().getString("currentUserId");
         user=new JSONObject();
         data = new ArrayList<>();
         bundle=new Bundle();
-        try {
-            user.put("user_id", user_id);
-        } catch (JSONException e) {
-            e.printStackTrace();}
     }
 
     @Override
@@ -128,13 +126,13 @@ public class SwipeEvents extends ProgressFragment{
     private void obtainData(){
         setContentShown(false);
         mHandler = new Handler();
-        mHandler.postDelayed(mShowContentRunnable, 800);
+        mHandler.postDelayed(mShowContentRunnable, 700);
         try {
-            data = new QueryEventList(getString(R.string.DATABASE_MAIN_EVENTS_PULLER)).execute(user).get();
+            data = new QueryEventList(getString(R.string.DATABASE_MAIN_EVENTS_PULLER), userId).execute().get();
+            Events.fromJson(data,getContext());
             adapter = new SwipeDeckAdapter(getContext());
         } catch (InterruptedException | ExecutionException e) {
-            e.printStackTrace();
-        }
+            e.printStackTrace(); }
     }
 
 
@@ -222,7 +220,6 @@ public class SwipeEvents extends ProgressFragment{
     @Override
     public void onStop() {
         super.onStop();
-        ((AppCompatActivity)getActivity()).getSupportActionBar().show();
     }
     @Override
     public void onPause() {
@@ -241,15 +238,12 @@ public class SwipeEvents extends ProgressFragment{
 
 
 
-
-
     /**
      * Assigns values to views within the cards
      * Handles flip animation to reveal additional event information
      * inflates layout cards.xml and assigns values to the views
      */
     public class SwipeDeckAdapter extends BaseAdapter {
-
         private Context context;
 
         public SwipeDeckAdapter(Context context) {
@@ -278,20 +272,11 @@ public class SwipeEvents extends ProgressFragment{
         @Override
         public View getView(final int position, View convertView, final ViewGroup parent) {
             View v;
-
                 LayoutInflater inflater = getActivity().getLayoutInflater();
                 v = inflater.inflate(R.layout.cards, parent, false);
             try {
                 image = getImageURL(data.get(position).getString("img_path"));
-                String event_id = data.get(position).getString("event_id");
-                String user_id = data.get(position).getString("user_id");
-                String event_location = data.get(position).getString("event_location");
-                String event_name = data.get(position).getString("event_name");
-                String event_preference = data.get(position).getString("preference_name");
-                String event_description = data.get(position).getString("event_description");
-                String event_hoster = data.get(position).getString("event_sponsor");
                 event_pager.setCurrentItem(position-1);
-
             } catch (JSONException e) {
                 e.printStackTrace();}
 
@@ -304,14 +289,10 @@ public class SwipeEvents extends ProgressFragment{
             final ProgressBar progress = (ProgressBar) v.findViewById(R.id.card_progress);
             ImageView frontCardImage = (ImageView) v.findViewById(R.id.offer_image);
             loadImage(frontCardImage, progress);
-            return v;
-
-        }
-
+            return v; }
 
         private String getImageURL(String path) {
             return context.getString(R.string.IMAGE_URL_PATH) + path; }
-
 
         private void loadImage(ImageView imageView, final ProgressBar progress){
             Glide.with(SwipeEvents.this)
@@ -328,12 +309,10 @@ public class SwipeEvents extends ProgressFragment{
                         @Override
                         public boolean onResourceReady(GlideDrawable resource, String model, Target<GlideDrawable> target, boolean isFromMemoryCache, boolean isFirstResource) {
                             progress.setVisibility(View.GONE);
-                            return false;
-                        }
+                            return false;}
                     })
-                    .into(imageView);
-        }
-    }
+                    .into(imageView); } }
+
     private class CardPagerAdapter extends PagerAdapter{
         Context context;
         ArrayList<JSONObject> data;
@@ -361,39 +340,20 @@ public class SwipeEvents extends ProgressFragment{
                 eventPreference.setText(data.get(position).getString("preference_name"));
                 eventHoster.setText("Presented By: "+data.get(event_pager.getCurrentItem()).getString("event_sponsor"));
 
-                bundle.putString("eventDescription", object.getString("event_description"));
-                bundle.putString("eventPreference", object.getString("preference_name"));
-                bundle.putString("eventHoster", object.getString("event_sponsor"));
-                bundle.putString("eventLocation", object.getString("event_location"));
-                bundle.putString("eventId", object.getString("event_id"));
-                bundle.putString("eventName", object.getString("event_name"));
-                bundle.putString("eventImage", object.getString("img_path"));
-                bundle.putString("eventTime", object.getString("start_time"));
-                bundle.putString("eventDate", object.getString("start_date"));
-                bundle.putString("eventCost", object.getString("event_cost"));
-                bundle.putDouble("eventLat", object.getDouble("lat"));
-                bundle.putDouble("eventLng", object.getDouble("lng"));
-                bundle.putString("eventWebsite", object.getString("event_website"));
-                setBundle(bundle);
+                setBundle(bundle, object);
 
-                Glide.with(SwipeEvents.this)
-                        .load(imagePager)
-                        .placeholder(R.drawable.progress)
-                        .into(eventImage);
-            } catch (JSONException e) {
-                e.printStackTrace();}
+                Glide.with(SwipeEvents.this).load(imagePager).placeholder(R.drawable.progress).into(eventImage); }
+            catch (JSONException e) { e.printStackTrace();}
 
             menuImage.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     Intent intent = new Intent(getActivity(), DisplayEvent.class);
                     intent.putExtras(getBundle());
-                    context.startActivity(intent);
-                }
+                    context.startActivity(intent); }
             });
             container.addView(itemView);
-            return itemView;
-        }
+            return itemView; }
 
         @Override
         public int getCount() {
@@ -414,9 +374,24 @@ public class SwipeEvents extends ProgressFragment{
             return context.getString(R.string.IMAGE_URL_PATH) + path; }
     }
 
-    private void setBundle(Bundle extra){
+    private void setBundle(Bundle extra, JSONObject object) throws JSONException {
         bundle=extra;
+        bundle.putString("eventDescription", object.getString("event_description"));
+        bundle.putString("eventPreference", object.getString("preference_name"));
+        bundle.putString("eventHoster", object.getString("event_sponsor"));
+        bundle.putString("eventLocation", object.getString("event_location"));
+        bundle.putString("eventId", object.getString("event_id"));
+        bundle.putString("eventName", object.getString("event_name"));
+        bundle.putString("eventImage", object.getString("img_path"));
+        bundle.putString("eventTime", object.getString("start_time"));
+        bundle.putString("eventDate", object.getString("start_date"));
+        bundle.putString("eventCost", object.getString("event_cost"));
+        bundle.putDouble("eventLat", object.getDouble("lat"));
+        bundle.putDouble("eventLng", object.getDouble("lng"));
+        bundle.putString("eventWebsite", object.getString("event_website"));
+        bundle.putString("eventDistance", object.getString("event_distance"));
     }
+
     private Bundle getBundle(){
         return bundle;
     }

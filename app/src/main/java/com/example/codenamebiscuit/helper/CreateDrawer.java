@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.location.Address;
@@ -71,7 +72,7 @@ import java.util.concurrent.ExecutionException;
  */
 
 public class CreateDrawer {
-    private String fName, lName, pic, email;
+    private String fName, lName, pic, email, userId;
     private Bundle savedState;
     private Toolbar toolbar;
     private Context context;
@@ -82,40 +83,39 @@ public class CreateDrawer {
     private FragmentManager fragmentManager;
     private int livinPink, overlay;
     private int livinBlack, livinWhite;
-    private int numOfSavedEvents, numOfDeletedEvents, totalNumEvents;
-    private String currentLat, currentLng;
-    private PrimaryDrawerItem gridEvents, mapEvents,fullScreen,archivedEvents,account,logOut;
+    private PrimaryDrawerItem gridEvents;
+    private PrimaryDrawerItem mapEvents;
+    private PrimaryDrawerItem archivedEvents;
+    private PrimaryDrawerItem account;
+    private PrimaryDrawerItem logOut;
     GPSTracker gps;
     LatLng latLng;
+    private Bitmap bitmap;
     SharedPreferences preferences;
 
 
-    public CreateDrawer(String fName, String lName, String pic, String email, Bundle savedState,
-                        Toolbar toolbar, Context context, Activity activity,
-                        FragmentManager fragmentManager, String currentLat, String currentLng) {
+    public CreateDrawer(Bundle savedState, Toolbar toolbar, Activity activity, String userId) {
 
-        this.fName=fName; this.lName=lName;
-        this.pic=pic; this.email=email;
+        preferences = PreferenceManager.getDefaultSharedPreferences(activity.getApplicationContext());
+        this.pic=preferences.getString("user_image", null);
+        this.fName=preferences.getString("fName", null);
+        this.lName=preferences.getString("lName", null);
+        this.email=preferences.getString("email", null);
+        this.userId=userId;
         this.savedState=savedState; this.toolbar=toolbar;
-        this.context=context;
         this.activity=activity;
-        this.fragmentManager=fragmentManager;
-        this.currentLat=currentLat;
-        this.currentLng=currentLng;
         this.bundle = new Bundle();
 
-        livinPink=context.getColor(R.color.livinPink);
-        overlay=context.getColor(R.color.black_overlay);
-        livinBlack=context.getColor(R.color.livinBlack);
-        livinWhite=context.getColor(R.color.livinWhite);
-        preferences=PreferenceManager.getDefaultSharedPreferences(context);
+        livinPink=activity.getColor(R.color.livinPink);
+        overlay=activity.getColor(R.color.black_overlay);
+        livinBlack=activity.getColor(R.color.livinBlack);
+        livinWhite=activity.getColor(R.color.livinWhite);
         gridEvents = new PrimaryDrawerItem();
-        fullScreen = new PrimaryDrawerItem();
+
         archivedEvents = new PrimaryDrawerItem();
         account = new PrimaryDrawerItem();
         logOut = new PrimaryDrawerItem();
         mapEvents = new PrimaryDrawerItem();
-        //getNumberOfEvents();
 
     }
 
@@ -131,8 +131,11 @@ public class CreateDrawer {
         IProfile profile = new ProfileDrawerItem().withName(fName + " " + lName).withIcon(Uri.parse(pic)).withEmail(email).withIdentifier(100);
         headerResult = new AccountHeaderBuilder()
                 .withActivity(activity)
-                .withHeaderBackground(R.drawable.header)
                 .addProfiles(profile)
+                .withCurrentProfileHiddenInList(true)
+                .withProfileImagesClickable(true)
+                .withHeaderBackground(R.drawable.livbg)
+                .withHeaderBackgroundScaleType(ImageView.ScaleType.CENTER_CROP)
                 .withSavedInstance(savedState)
                 .build();
 
@@ -140,9 +143,9 @@ public class CreateDrawer {
         result = new DrawerBuilder()
                 .withActivity(activity)
                 .withToolbar(toolbar)
-                .withSliderBackgroundColor(context.getColor(R.color.black_overlay))
-                .withDelayDrawerClickEvent(150)
-                //.withDelayOnDrawerClose(300)
+                .withSliderBackgroundColor(activity.getColor(R.color.black_overlay))
+                //.withDelayDrawerClickEvent(150)
+                .withDelayOnDrawerClose(50)
                 .withAccountHeader(headerResult)
                 .addDrawerItems(
                         gridEvents
@@ -151,9 +154,9 @@ public class CreateDrawer {
                                 .withIdentifier(1)
                                 .withTextColor(livinWhite)
                                 .withIconColor(livinWhite)
-                                .withSelectedTextColor(livinPink)
-                                .withSelectedIconColor(livinPink)
-                                .withSelectedColor(context.getColor(R.color.translivinPink))
+                                .withSelectedTextColor(livinWhite)
+                                .withSelectedIconColor(livinWhite)
+                                .withSelectedColor(activity.getColor(R.color.translivinPink))
                                 .withSetSelected(true),
                         new DividerDrawerItem(),
 
@@ -198,8 +201,6 @@ public class CreateDrawer {
                     @Override
                     public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
                         // do something with the clicked item :D
-
-                        Fragment fragment = null;
                         if (drawerItem != null) {
                             Intent intent = null;
 
@@ -221,22 +222,11 @@ public class CreateDrawer {
                                 preferences.edit().putString("email", null).apply();
                                 intent = new Intent(activity, ChooseLogin.class);
                             }
-
                             if (intent != null) {
                                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                                context.startActivity(intent); }
-                            if(fragment!=null){
-                                Bundle bundle = new Bundle();
-                                bundle.putString("currentLat", currentLat);
-                                bundle.putString("currentLng", currentLng);
-                                fragment.setArguments(bundle);
-                                FragmentTransaction ft = fragmentManager.beginTransaction();
-                                ft.setCustomAnimations(R.anim.enter, R.anim.exit);
-                                ft.replace(R.id.fragment_container, fragment);
-                                ft.commit();
-                                fragmentManager.executePendingTransactions();
-                                return false;
-                            } }
+                                intent.putExtra("userId", userId);
+                                activity.startActivity(intent); }
+                            }
                         return false; }
                 })
                 .withSavedInstance(savedState)
@@ -255,58 +245,26 @@ public class CreateDrawer {
             if (drawerItem.getIdentifier()==8) {
                 if(isChecked) {
                     Log.i("material-drawer", "DrawerItem: " + ((Nameable) drawerItem).getName() + " - toggleChecked: " + isChecked);
-                    toolbar.setBackgroundColor(context.getColor(R.color.livinBlack));
-                    v.setBackgroundColor(context.getColor(R.color.livinBlack));
+                    toolbar.setBackgroundColor(activity.getColor(R.color.livinBlack));
+                    v.setBackgroundColor(activity.getColor(R.color.livinBlack));
                     title.setTextColor(livinPink);
 
                 }else {
-                    toolbar.setBackgroundColor(context.getColor(R.color.livinPink));
-                    v.setBackgroundColor(context.getColor(R.color.material_drawer_background));
-                    title.setTextColor(context.getColor(R.color.livinBlack)); } } } };
+                    toolbar.setBackgroundColor(activity.getColor(R.color.livinPink));
+                    v.setBackgroundColor(activity.getColor(R.color.material_drawer_background));
+                    title.setTextColor(activity.getColor(R.color.livinBlack)); } } } };
 
-    /**********************************************************************************************
-     * Obtains the users current location via GPS location services
-     * Location is converted into Lat and Lng coordinates
-     * Coordinates are then passed into a Geocoder to retrieve the current address
-     **********************************************************************************************/
 
-    private void getLocation(){
-        double latitude=0; double longitude=0;
-        gps = new GPSTracker(context.getApplicationContext());
-        if(gps.canGetLocation()){
-            latitude = gps.getLatitude();
-            longitude = gps.getLongitude();
-            latLng = new LatLng(latitude, longitude);
-            Geocoder geocoder;
-            List<Address> addresses;
-            geocoder = new Geocoder(activity.getApplicationContext(), Locale.getDefault());
-            try {
-                addresses = geocoder.getFromLocation(latitude, longitude, 1);
-                StyleableToast st = new StyleableToast(context.getApplicationContext(),
-                        addresses.get(0).getAddressLine(0) + "\n" + addresses.get(0).getLocality() + ", "
-                                + addresses.get(0).getAdminArea() + " " + addresses.get(0).getPostalCode(), Toast.LENGTH_SHORT);
-                st.spinIcon();
-                st.setBackgroundColor(Color.BLUE);
-                st.setTextColor(Color.WHITE);
-                st.show();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-
-    }
     public void setBundle(Bundle bundle){
         this.bundle=bundle;
     }
 
-    public Drawer getResult(){
-        return result;
+    public void setBitmap(Bitmap picture){
+        bitmap=picture;
     }
-    public AccountHeader getHeader(){
+
+    public AccountHeader getHeaderResult(){
         return headerResult;
-    }
-    public PrimaryDrawerItem getMapEvents(){
-        return mapEvents;
     }
 
 }

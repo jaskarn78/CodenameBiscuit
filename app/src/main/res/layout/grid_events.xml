@@ -214,17 +214,17 @@
             android:id="@+id/event_distance_back"
             android:textSize="15sp"/>
 
-        <TextView
+
+        <com.rey.material.widget.Button
+            android:id="@+id/button_info"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="40dp"
             android:layout_below="@+id/event_distance_back"
-            android:layout_marginTop="5dp"
-            android:layout_marginStart="15dp"
+            android:layout_marginTop="25dp"
+            android:layout_alignParentBottom="true"
             android:text="More Info"
             android:textColor="@color/livinPink"
-            android:id="@+id/more_info"
-            android:clickable="true"
-            android:textSize="25sp"/>
+            android:background="@drawable/my_ripple"/>
 
         <com.mikepenz.iconics.view.IconicsImageView
             android:layout_width="30dp"
@@ -233,7 +233,6 @@
             android:src="@drawable/ic_arrow_forward_black_48dp"
             android:layout_marginTop="2dp"
             android:layout_marginLeft="4dp"
-            android:layout_toEndOf="@+id/more_info"
             android:layout_below="@id/event_distance_back"
             android:tint="@color/livinPink"
             android:visibility="gone"

@@ -46,9 +46,9 @@ import java.util.concurrent.ExecutionException;
 
 public class DeletedEventsFrag extends ProgressFragment{
     private static final String TAG = "Saved Events Fragment";
-
     private EventAdapter mAdapter;
     protected SharedPreferences pref;
+    private String userId;
     private JSONObject currentUserId = new JSONObject();
     private RecyclerView mRecyclerView;
     private ArrayList<JSONObject> data;
@@ -77,14 +77,9 @@ public class DeletedEventsFrag extends ProgressFragment{
         super.onCreate(savedInstanceState);
         bundle = new Bundle();
         pref = PreferenceManager.getDefaultSharedPreferences(getContext());
-        String user_id = pref.getString("user_id", null);
-        try {
-            currentUserId.put("user_id", user_id); }
-        catch (JSONException e) {
-            e.printStackTrace(); }
-
-
+        userId = pref.getString("user_id", null);
     }
+
     @Override
     public void onSaveInstanceState(Bundle savedInstanceState) {
         super.onSaveInstanceState(savedInstanceState);
@@ -137,9 +132,9 @@ public class DeletedEventsFrag extends ProgressFragment{
         setContentShown(false);
 
         mHandler = new Handler();
-        mHandler.postDelayed(mShowContentRunnable, 2000);
+        mHandler.postDelayed(mShowContentRunnable, 800);
         try {
-            data = new QueryEventList(getString(R.string.DATABASE_DELETED_EVENTS_PULLER)).execute(currentUserId).get();
+            data = new QueryEventList(getString(R.string.DATABASE_DELETED_EVENTS_PULLER), userId).execute().get();
         } catch (InterruptedException | ExecutionException e) {
             e.printStackTrace();
         }

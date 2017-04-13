@@ -37,24 +37,18 @@ import java.util.concurrent.ExecutionException;
 
 public class SavedEventsFrag extends ProgressFragment implements ClickListener{
     private static final String TAG = "Saved Events Fragment";
-
     private RecyclerView mRecyclerView;
     private EventAdapter mAdapter;
     private SharedPreferences pref;
-    private JSONObject currentUserId = new JSONObject();
     private ArrayList<JSONObject> data;
     private View mContentView;
     private Handler mHandler;
+    private String userId;
     private Runnable mShowContentRunnable = new Runnable() {
-
         @Override
         public void run() {
             if(isAdded())
-                setContentShown(true);
-        }
-
-    };
-
+                setContentShown(true); } };
 
     @Override
     public void itemClicked(View view, int position) {
@@ -72,11 +66,7 @@ public class SavedEventsFrag extends ProgressFragment implements ClickListener{
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         pref = PreferenceManager.getDefaultSharedPreferences(getContext());
-        String user_id = pref.getString("user_id", null);
-        try {
-            currentUserId.put("user_id", user_id);
-        } catch (JSONException e) {
-            e.printStackTrace(); }
+        userId = pref.getString("user_id", null);
         setHasOptionsMenu(true);
 
     }
@@ -133,7 +123,7 @@ public class SavedEventsFrag extends ProgressFragment implements ClickListener{
             public boolean onMenuItemClick(MenuItem item) {
                 try {
                     mAdapter.clear();
-                    data = new QueryEventList(getString(R.string.DATABASE_SAVED_EVENTS_PULLER)).execute(currentUserId).get();
+                    data = new QueryEventList(getString(R.string.DATABASE_SAVED_EVENTS_PULLER), userId).execute().get();
                     mAdapter.addAll(data);
                     mAdapter.notifyDataSetChanged();
                 } catch (InterruptedException | ExecutionException e) {
@@ -146,9 +136,9 @@ public class SavedEventsFrag extends ProgressFragment implements ClickListener{
     private void obtainData(){
         setContentShown(false);
         mHandler = new Handler();
-        mHandler.postDelayed(mShowContentRunnable, 2000);
+        mHandler.postDelayed(mShowContentRunnable, 00);
         try {
-            data = new QueryEventList(getString(R.string.DATABASE_SAVED_EVENTS_PULLER)).execute(currentUserId).get();
+            data = new QueryEventList(getString(R.string.DATABASE_DELETED_EVENTS_PULLER), userId).execute().get();
             mAdapter = new EventAdapter(getActivity().getApplicationContext(), 1, "saved", getActivity());
         } catch (InterruptedException | ExecutionException e) {
             e.printStackTrace();

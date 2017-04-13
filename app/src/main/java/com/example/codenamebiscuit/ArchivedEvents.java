@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.NavUtils;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
@@ -37,9 +38,12 @@ public class ArchivedEvents extends AppCompatActivity {
     private Toolbar toolbar;
     private TextView toolbarTitle;
     private int page;
+    private String userId;
     private SharedPreferences sharedPreferences;
     private JSONObject currentUserId;
     private Bundle bundle;
+    private SavedEventsFrag savedEventsFrag;
+    private DeletedEventsFrag deletedEventsFrag;
 
 
     @Override
@@ -48,9 +52,10 @@ public class ArchivedEvents extends AppCompatActivity {
         this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_archived_events);
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        userId=getIntent().getStringExtra("userId");
         currentUserId = new JSONObject();
         try {
-            currentUserId.put("user_id", sharedPreferences.getString("user_id", null));
+            currentUserId.put("user_id", userId);
         } catch (JSONException e) {
             e.printStackTrace(); }
 
@@ -99,8 +104,10 @@ public class ArchivedEvents extends AppCompatActivity {
                             public void OnClick(View view, Dialog dialog) {
                                 new RunQuery(getString(R.string.RESTORE_ALL_SAVED_EVENTS)).execute(currentUserId);
                                 dialog.dismiss();
-                                finish();
-                                startActivity(getIntent()); }
+                                FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+                                ft.detach(savedEventsFrag); ft.attach(savedEventsFrag);
+                                ft.commit();
+                            }
                         })
                         .setNegativeButtonText("Exit")
                         .setOnNegativeClicked(new FancyAlertDialog.OnNegativeClicked() {
@@ -124,8 +131,10 @@ public class ArchivedEvents extends AppCompatActivity {
                             public void OnClick(View view, Dialog dialog) {
                                 new RunQuery(getString(R.string.RESTORE_ALL_DELETED_EVENTS)).execute(currentUserId);
                                 dialog.dismiss();
-                                finish();
-                                startActivity(getIntent()); }
+                                FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+                                ft.detach(deletedEventsFrag); ft.attach(deletedEventsFrag);
+                                ft.commit();
+                            }
                         })
                         .setNegativeButtonText("Exit")
                         .setOnNegativeClicked(new FancyAlertDialog.OnNegativeClicked() {
@@ -210,6 +219,7 @@ public class ArchivedEvents extends AppCompatActivity {
     }
     private class MyPagerAdapter extends FragmentPagerAdapter {
 
+        public Bundle bundle  = new Bundle();
         public MyPagerAdapter(FragmentManager fm) {
             super(fm);
         }
@@ -219,11 +229,11 @@ public class ArchivedEvents extends AppCompatActivity {
             switch(pos) {
 
                 case 0:
-                    return SavedEventsFrag.newInstance();
+                    return savedEventsFrag=SavedEventsFrag.newInstance();
                 case 1:
-                    return DeletedEventsFrag.newInstance();
+                    return deletedEventsFrag=DeletedEventsFrag.newInstance();
                 default:
-                    return SavedEventsFrag.newInstance();
+                    return savedEventsFrag=SavedEventsFrag.newInstance();
             }
         }
 

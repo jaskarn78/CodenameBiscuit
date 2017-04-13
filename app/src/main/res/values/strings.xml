@@ -85,9 +85,8 @@
     <string name="PUSH_USER_PREFERENCES">http://athena.ecs.csus.edu/~teamone/php/android/push_user_preferences.php</string>
     <string name="RESTORE_ALL_SAVED_EVENTS">http://athena.ecs.csus.edu/~teamone/php/android/restore_all_saved_events.php</string>
     <string name="RESTORE_ALL_DELETED_EVENTS">http://athena.ecs.csus.edu/~teamone/php/android/restore_all_deleted_events.php</string>
-
-
-
+    <string name="DISTANCE">https://maps.googleapis.com/maps/api/distancematrix/json?</string>
+    <string name="MAP_KEY">&amp;mode=driving&amp;units=imperial&amp;language=fr-FR&amp;key=AIzaSyBlO5pNtSW6d40ByCqCOPsjht2ohbnOKPA</string>
 
     <!--string name="IMAGE_URL_PATH">http://jagpal-development.com/events/</string-->
 

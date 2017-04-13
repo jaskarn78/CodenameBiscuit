@@ -38,6 +38,7 @@
                 android:layout_height="wrap_content"
                 swipedeck:max_visible="2"
                 swipedeck:render_above="false"
+                android:layout_alignParentTop="true"
                 swipedeck:card_spacing="6dp"/>
 
 
@@ -47,7 +48,8 @@
                 android:layout_above="@+id/swipe_deck"
                 android:layout_width="match_parent"
                 android:layout_height="102dp"
-                android:layout_marginBottom="2dp"
+                android:layout_marginTop="1dp"
+                android:layout_marginBottom="1dp"
                 android:layout_alignParentBottom="true"
                  />
         </RelativeLayout>
