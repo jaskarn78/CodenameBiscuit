@@ -326,7 +326,6 @@ public class ChooseLogin extends AppCompatActivity implements GoogleApiClient.On
                 .setOnPositiveClicked(new FancyAlertDialog.OnPositiveClicked() {
                     @Override
                     public void OnClick(View view, Dialog dialog) {
-                        finish();
                         startActivity(main);
                         dialog.dismiss();
                     }

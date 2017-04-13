@@ -9,7 +9,7 @@
         <item name="preferenceTheme">@style/PreferenceThemeOverlay</item>
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
-        <item name="android:colorControlHighlight">@color/accent</item>
+        <item name="android:colorControlHighlight">@color/transparentFB</item>
 
     </style>
     <style name="MenuItemRippleStyle" parent="Material.Drawable.Ripple.Wave">

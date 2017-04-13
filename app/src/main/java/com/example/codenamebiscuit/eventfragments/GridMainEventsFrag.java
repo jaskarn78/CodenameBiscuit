@@ -4,64 +4,36 @@ package com.example.codenamebiscuit.eventfragments;
  * Created by jaskarnjagpal on 3/1/17.
  */
 
-import android.app.Dialog;
 import android.content.Context;
-import android.content.Intent;
-import android.content.SharedPreferences;
+
 import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v4.widget.SlidingPaneLayout;
-import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.preference.PreferenceManager;
 import android.support.v7.widget.CardView;
-import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
-import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
-import android.widget.ProgressBar;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import com.devspark.progressfragment.ProgressFragment;
 import com.example.codenamebiscuit.Events;
-import com.example.codenamebiscuit.MainActivity;
-import com.example.codenamebiscuit.MapActivity;
 import com.example.codenamebiscuit.R;
 import com.example.codenamebiscuit.helper.FlipAnimation;
 import com.example.codenamebiscuit.helper.QueryEventList;
 import com.example.codenamebiscuit.helper.UpdateDbOnSwipe;
-import com.example.codenamebiscuit.rv.ClickListener;
 import com.example.codenamebiscuit.rv.EventAdapter;
-import com.geniusforapp.fancydialog.FancyAlertDialog;
 import com.github.brnunes.swipeablerecyclerview.SwipeableRecyclerViewTouchListener;
-import com.mikepenz.iconics.view.IconicsImageView;
 import com.muddzdev.styleabletoastlibrary.StyleableToast;
 import com.rohit.recycleritemclicksupport.RecyclerItemClickSupport;
-import com.wunderlist.slidinglayer.SlidingLayer;
-import com.wunderlist.slidinglayer.transformer.AlphaTransformer;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.ExecutionException;
-
-import mehdi.sakout.fancybuttons.FancyButton;
 
 
 /**
@@ -195,13 +167,6 @@ public class GridMainEventsFrag extends Fragment  {
                                     try {
                                         deleteEvent.put("user_id", mAdapter.getObject().get(position).getString("user_id"));
                                         deleteEvent.put("event_id", mAdapter.getObject().get(position).getString("event_id"));
-
-                                        st.setBackgroundColor(Color.RED);
-                                        st.setTextColor(Color.WHITE);
-                                        st.setIcon(R.drawable.ic_delete_black_24dp);
-                                        st.spinIcon();
-                                        st.setMaxAlpha();
-                                        st.show();
                                         data.remove(position);
                                         mAdapter.notifyItemRemoved(position);
                                         new UpdateDbOnSwipe(getString(R.string.DATABASE_STORE_DELETED_EVENTS)).execute(deleteEvent);
@@ -218,12 +183,6 @@ public class GridMainEventsFrag extends Fragment  {
                                     try {
                                         saveEvent.put("user_id", mAdapter.getObject().get(position).getString("user_id"));
                                         saveEvent.put("event_id", mAdapter.getObject().get(position).getString("event_id"));
-                                        st.setBackgroundColor(Color.parseColor("#ff9dfc"));
-                                        st.setTextColor(Color.WHITE);
-                                        st.setIcon(R.drawable.ic_save_black_24dp);
-                                        st.spinIcon();
-                                        st.setMaxAlpha();
-                                        st.show();
                                         data.remove(position);
                                         new UpdateDbOnSwipe(getString(R.string.DATABASE_STORE_SAVED_EVENTS)).execute(saveEvent);
                                         mAdapter.notifyItemRemoved(position);

@@ -99,19 +99,7 @@ public class MainActivity extends AppCompatActivity {
 
         FacebookSdk.sdkInitialize(getApplicationContext());
         checkIfFbOrGoogleLogin(savedInstanceState);
-        Bundle bundle = new Bundle();
-        bundle.putString("currentUserId", userId);
 
-        swipeEvents = new SwipeEvents();
-        swipeEvents.setArguments(bundle);
-
-        eventsFrag = new GridMainEventsFrag();
-        eventsFrag.setArguments(bundle);
-
-        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        transaction.setCustomAnimations(R.anim.slide_in_up, R.anim.slide_out_down);
-        transaction.replace(R.id.fragment_container, eventsFrag, "eventsFrag");
-        transaction.commit();
     }
 
 
@@ -206,12 +194,9 @@ public class MainActivity extends AppCompatActivity {
      * if facebook id and google id return null, redirect to the login screen
      **********************************************************************************************/
     private void checkIfFbOrGoogleLogin(Bundle savedstate) {
-        if (pref.getString("user_id", null) == null) {
-            Log.i("user id status", "null");
+        if (pref.getString("user_id", null)==null) {
             Intent intent = new Intent(MainActivity.this, ChooseLogin.class);
             startActivity(intent);
-            finish();
-
         } else {
             try {
                 userId=pref.getString("user_id", null);
@@ -220,6 +205,20 @@ public class MainActivity extends AppCompatActivity {
                 e.printStackTrace(); }
             loadDrawer(savedstate);
             bindViews();
+            Bundle bundle = new Bundle();
+            bundle.putString("currentUserId", userId);
+
+            swipeEvents = new SwipeEvents();
+            swipeEvents.setArguments(bundle);
+
+            eventsFrag = new GridMainEventsFrag();
+            eventsFrag.setArguments(bundle);
+
+            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+            transaction.setCustomAnimations(R.anim.slide_in_up, R.anim.slide_out_down);
+            transaction.replace(R.id.fragment_container, eventsFrag, "eventsFrag");
+            transaction.commit();
+
         }
     }
 
@@ -241,10 +240,12 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
         MenuItem item =menu.findItem(R.id.action_grid_to_full).setVisible(true);
-        if(eventsFrag.isVisible())
-            item.setIcon(R.drawable.ic_fullscreen_white_48dp);
-        else if(swipeEvents.isVisible())
-            item.setIcon(R.drawable.ic_grid_on_white_48dp);
+        if(eventsFrag!=null && swipeEvents!=null) {
+            if (eventsFrag.isVisible())
+                item.setIcon(R.drawable.ic_fullscreen_white_48dp);
+            else if (swipeEvents.isVisible())
+                item.setIcon(R.drawable.ic_grid_on_white_48dp);
+        }
         return super.onPrepareOptionsMenu(menu); }
 
     @Override
