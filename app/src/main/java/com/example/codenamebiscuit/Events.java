@@ -157,6 +157,18 @@ public class Events implements Serializable{
         return eventsList;
     }
 
+    public static void toFurthest(ArrayList<JSONObject> eventList){
+        Collections.sort(eventList, new Comparator<JSONObject>() {
+            @Override
+            public int compare(JSONObject o1, JSONObject o2) {
+                if(getDistance(o1)==getDistance(o2))
+                    return 0;
+                else
+                    return getDistance(o2)-getDistance(o1);
+            }
+        });
+    }
+
 
     public static int calculateDistance(Location location2, double eventLat, double eventLng) {
         double distance;

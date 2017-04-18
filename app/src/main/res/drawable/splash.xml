@@ -2,11 +2,11 @@
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
-        android:drawable="@color/livinBlack"/>
+        android:drawable="@color/translivinPink"/>
 
     <item>
         <bitmap
-            android:gravity="center"
+            android:gravity="fill_vertical"
             android:mipMap="true"
             android:src="@drawable/logo"/>
     </item>

@@ -2,41 +2,47 @@ package com.example.codenamebiscuit;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.database.Cursor;
-import android.graphics.BitmapFactory;
-import android.net.Uri;
+import android.database.DataSetObserver;
 import android.os.Bundle;
-import android.provider.MediaStore;
-import android.support.v4.app.FragmentManager;
+import android.support.design.widget.Snackbar;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.AppCompatDelegate;
 import android.support.v7.preference.PreferenceManager;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.WindowManager;
-import android.widget.ImageView;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.ProgressBar;
+import android.widget.Spinner;
+import android.widget.SpinnerAdapter;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.codenamebiscuit.eventfragments.GridMainEventsFrag;
 import com.example.codenamebiscuit.eventfragments.SwipeEvents;
 
-import com.example.codenamebiscuit.helper.RunQuery;
+import com.example.codenamebiscuit.requests.RunQuery;
 import com.example.codenamebiscuit.helper.CreateDrawer;
 import com.example.codenamebiscuit.helper.GPSTracker;
-import com.example.codenamebiscuit.helper.QueryEventList;
+import com.example.codenamebiscuit.requests.QueryEventList;
 import com.example.codenamebiscuit.login.ChooseLogin;
 import com.facebook.FacebookSdk;
+import com.jaredrummler.materialspinner.MaterialSpinner;
+import com.mikepenz.iconics.typeface.GenericFont;
 import com.mikepenz.iconics.view.IconicsImageView;
 import com.mikepenz.materialdrawer.AccountHeader;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 import com.wunderlist.slidinglayer.SlidingLayer;
 import com.wunderlist.slidinglayer.transformer.AlphaTransformer;
+
+import net.cachapa.expandablelayout.ExpandableLayout;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -53,17 +59,19 @@ public class MainActivity extends AppCompatActivity {
     private Toolbar toolbar;
     private SlidingLayer mSlidingLayer;
     private SlidingUpPanelLayout mLayout;
-    private IconicsImageView downArrow;
+    private IconicsImageView closeLayout;
     private JSONObject preferences, removed;
     private GridMainEventsFrag eventsFrag;
     private SwipeEvents swipeEvents;
     private boolean touched;
     CreateDrawer createDrawer;
-    private ProgressBar progressBar;
     List<JSONObject> prefList;
+    private MaterialSpinner toolbarSpinner;
     private String userId;
     private static int RESULT_LOAD_IMAGE = 1;
     private AccountHeader header;
+    private ExpandableLayout expandableLayout;
+    private IconicsImageView expandButton;
 
     GPSTracker gps;
 
@@ -85,7 +93,6 @@ public class MainActivity extends AppCompatActivity {
         this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
         setContentView(R.layout.launch_layout);
-        progressBar = (ProgressBar)findViewById(R.id.progress_launch);
         gps = new GPSTracker(this);
 
 
@@ -97,6 +104,9 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar); getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         this.getSupportActionBar().setDisplayShowTitleEnabled(false);
 
+        toolbarSpinner = (MaterialSpinner) findViewById(R.id.spinner);
+        setupSpinner();
+
         FacebookSdk.sdkInitialize(getApplicationContext());
         checkIfFbOrGoogleLogin(savedInstanceState);
 
@@ -106,7 +116,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        progressBar.setVisibility(View.GONE);
     }
 
     @Override
@@ -134,9 +143,9 @@ public class MainActivity extends AppCompatActivity {
      * View binding
      **********************************************************************************/
     private void bindViews() {
-        mSlidingLayer = (SlidingLayer) findViewById(R.id.slidingLayer1);
-        mSlidingLayer.setLayerTransformer(new AlphaTransformer());
-        mSlidingLayer.setVisibility(View.INVISIBLE);
+        expandableLayout = (ExpandableLayout)findViewById(R.id.expandable_layout);
+        expandButton = (IconicsImageView)findViewById(R.id.closeLayout);
+
 
         FancyButton musicFancyButton = (FancyButton) findViewById(R.id.btn_music);
         FancyButton sportsButton = (FancyButton) findViewById(R.id.btn_sports);
@@ -147,25 +156,21 @@ public class MainActivity extends AppCompatActivity {
         FancyButton performingButton = (FancyButton) findViewById(R.id.btn_performing);
         FancyButton retailButton = (FancyButton) findViewById(R.id.btn_retail);
         FancyButton familyButton = (FancyButton) findViewById(R.id.btn_family);
-
-        downArrow = (IconicsImageView)findViewById(R.id.down_arrow);
-        downArrow.setOnClickListener(new View.OnClickListener() {
+        expandButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(mSlidingLayer.isOpened())
-                    mSlidingLayer.closeLayer(true);
+                if(expandableLayout.isExpanded()) {
+                    expandableLayout.collapse();
+                    refresh(); }
                 else
-                    mSlidingLayer.openLayer(true);
-            }
-        });
-        setupSlidingLayer();
+                    expandableLayout.expand();}});
+
 
         List<FancyButton> btnList = new ArrayList();
         btnList.add(musicFancyButton);btnList.add(foodButton); btnList.add(sportsButton);
         btnList.add(outdoorButton); btnList.add(healthButton); btnList.add(familyButton);
         btnList.add(retailButton); btnList.add(performingButton); btnList.add(entertainmentButton);
         setupPreferences(btnList);
-        mSlidingLayer.animate().alpha(1.0f);
     }
 
 
@@ -173,7 +178,7 @@ public class MainActivity extends AppCompatActivity {
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         switch (keyCode) {
             case KeyEvent.KEYCODE_BACK:
-                if (mSlidingLayer.isOpened()) {
+                if (expandableLayout.isExpanded()) {
                     mSlidingLayer.closeLayer(true);
                     return true; }
             default:
@@ -215,7 +220,7 @@ public class MainActivity extends AppCompatActivity {
             eventsFrag.setArguments(bundle);
 
             FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-            transaction.setCustomAnimations(R.anim.slide_in_up, R.anim.slide_out_down);
+            transaction.setCustomAnimations(R.anim.fadein, R.anim.fadeout);
             transaction.replace(R.id.fragment_container, eventsFrag, "eventsFrag");
             transaction.commit();
 
@@ -229,11 +234,11 @@ public class MainActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.sliding_panel, menu);
         MenuItem item = menu.findItem(R.id.action_toggle);
-        if (mLayout != null) {
-            if (mLayout.getPanelState() == SlidingUpPanelLayout.PanelState.HIDDEN) {
-                item.setTitle("Toggle Preferences");
-            } else {
-                item.setTitle("Toggle Preferences"); }
+        if (expandButton != null) {
+            if (expandButton.getVisibility()==View.VISIBLE) {
+                item.setTitle("Show/Hide Preferences");
+            } else if(expandButton.getVisibility()==View.GONE) {
+                item.setTitle("Show Preferences"); }
         }
         return true; }
 
@@ -243,8 +248,9 @@ public class MainActivity extends AppCompatActivity {
         if(eventsFrag!=null && swipeEvents!=null) {
             if (eventsFrag.isVisible())
                 item.setIcon(R.drawable.ic_fullscreen_white_48dp);
-            else if (swipeEvents.isVisible())
+            else if (swipeEvents.isVisible()) {
                 item.setIcon(R.drawable.ic_grid_on_white_48dp);
+            }
         }
         return super.onPrepareOptionsMenu(menu); }
 
@@ -255,23 +261,24 @@ public class MainActivity extends AppCompatActivity {
 
         switch (item.getItemId()) {
             case R.id.action_anchor:
-                mSlidingLayer.openLayer(true);
                 break;
             case R.id.action_toggle:
-                if(mSlidingLayer.getVisibility()==View.VISIBLE)
-                    mSlidingLayer.setVisibility(View.INVISIBLE);
+                if(expandButton.getVisibility()==View.VISIBLE)
+                    expandButton.setVisibility(View.GONE);
                 else
-                    mSlidingLayer.setVisibility(View.VISIBLE);
+                    expandButton.setVisibility(View.VISIBLE);
                 break;
              case R.id.action_grid_to_full:
                 if(eventsFrag.isAdded()){
                     fragmentTransaction.replace(R.id.fragment_container, swipeEvents, "swipeFrag");
-                    fragmentTransaction.commit();
+                    fragmentTransaction.commitNowAllowingStateLoss();
+                    getSupportFragmentManager().executePendingTransactions();
 
                 }
                 else if(swipeEvents.isAdded()){
                     fragmentTransaction.replace(R.id.fragment_container, eventsFrag, "eventsFrag");
-                    fragmentTransaction.commit();
+                    fragmentTransaction.commitNowAllowingStateLoss();
+                    getSupportFragmentManager().executePendingTransactions();
                 }
         }
         return super.onOptionsItemSelected(item); }
@@ -289,20 +296,13 @@ public class MainActivity extends AppCompatActivity {
             removed.put("user_id", userId);
             prefList = new QueryEventList(getString(R.string.PULL_USER_PREFERENCES), userId).execute().get();
 
-            if (prefList.size() == 0) {
-                mSlidingLayer.setVisibility(View.VISIBLE);
-                mSlidingLayer.openLayer(true);
-            }
             for (int i = 0; i < prefList.size(); i++) {
                 if (Integer.parseInt(prefList.get(i).getString("preference_id")) > 0) {
                     btnList.get(Integer.parseInt(prefList.get(i).getString("preference_id")) - 1).setBackgroundColor(getColor(R.color.livinPink));
                     btnList.get(Integer.parseInt(prefList.get(i).getString("preference_id")) - 1).setSelected(true);
-                    preferences.put("pref_id" + (Integer.parseInt(prefList.get(i).getString("preference_id"))), 1);}
-            }
+                    preferences.put("pref_id" + (Integer.parseInt(prefList.get(i).getString("preference_id"))), 1);} }
 
-        } catch (JSONException | InterruptedException | ExecutionException e) {
-            e.printStackTrace(); }
-
+        } catch (JSONException | InterruptedException | ExecutionException e) {e.printStackTrace(); }
         for (int i = 0; i < btnList.size(); i++) {
             final int finalI = i;
             btnList.get(i).setOnClickListener(new View.OnClickListener() {
@@ -312,55 +312,40 @@ public class MainActivity extends AppCompatActivity {
                     if (!btnList.get(finalI).isSelected()) {
                         btnList.get(finalI).setBackgroundColor(getColor(R.color.livinPink));
                         btnList.get(finalI).setSelected(true);
-                        try {
-                            preferences.put("pref_id" + (finalI + 1), 1);
-                        } catch (JSONException e) {
-                            e.printStackTrace(); }
-                        new RunQuery(getString(R.string.PUSH_USER_PREFERENCES)).execute(preferences);
-                    } else {
+
+                        try { preferences.put("pref_id" + (finalI + 1), 1); }
+                        catch (JSONException e) { e.printStackTrace(); }
+                        new RunQuery(getString(R.string.PUSH_USER_PREFERENCES)).execute(preferences);}
+
+                    else {
                         btnList.get(finalI).setBackgroundColor(getColor(R.color.translivinPink));
                         btnList.get(finalI).setSelected(false);
-                        try {
-                            preferences.put("pref_id" + (finalI + 1), 0);
-                        } catch (JSONException e) {
-                            e.printStackTrace(); }
+                        try { preferences.put("pref_id" + (finalI + 1), 0);
+                        } catch (JSONException e) { e.printStackTrace(); }
                         new RunQuery(getString(R.string.PUSH_USER_PREFERENCES)).execute(preferences);} } }); }
+
     }
-
-    private void setupSlidingLayer(){
-        downArrow.setImageDrawable(getDrawable(R.drawable.ic_keyboard_arrow_down_white_48dp));
-        mSlidingLayer.setOnInteractListener(new SlidingLayer.OnInteractListener() {
-            @Override
-            public void onOpen() {
-                downArrow.setImageDrawable(getDrawable(R.drawable.ic_keyboard_arrow_up_white_48dp)); }
-
-            @Override
-            public void onShowPreview() { }
-
-            @Override
-            public void onClose() {
-                downArrow.setImageDrawable(getDrawable(R.drawable.ic_keyboard_arrow_down_white_48dp)); }
-
-            @Override
-            public void onOpened() {
-                downArrow.setImageDrawable(getDrawable(R.drawable.ic_keyboard_arrow_up_white_48dp)); }
-
-            @Override
-            public void onPreviewShowed() {
-                downArrow.setImageDrawable(getDrawable(R.drawable.ic_keyboard_arrow_down_white_48dp));
-            }
-
-            @Override
-            public void onClosed() {
-                downArrow.setImageDrawable(getDrawable(R.drawable.ic_keyboard_arrow_down_white_48dp));
-                refresh(); } }); }
 
     private void refresh(){
         if(touched) {
-            this.finish();
-            startActivity(getIntent());
-        }
+            Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
+            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+            ft.detach(fragment); ft.attach(fragment);
+            ft.commit(); }
         touched=false;
     }
+
+    public void setupSpinner(){
+        toolbarSpinner.setItems("Nearest", "Furthest", "Newest", "Oldest", "Preferences");
+        toolbarSpinner.setOnItemSelectedListener(new MaterialSpinner.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(MaterialSpinner materialSpinner, int i, long l, Object o) {
+                switch (i){
+                    case 4:
+                        expandableLayout.expand();
+                        materialSpinner.setSelectedIndex(0);
+                        break;
+                } } }); }
+
 
 }

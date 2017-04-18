@@ -2,37 +2,22 @@ package com.example.codenamebiscuit.eventfragments;
 
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Parcelable;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.preference.PreferenceManager;
-import android.support.v7.widget.CardView;
-import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.Toolbar;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
@@ -42,29 +27,18 @@ import com.bumptech.glide.request.target.Target;
 import com.devspark.progressfragment.ProgressFragment;
 import com.example.codenamebiscuit.Events;
 import com.example.codenamebiscuit.R;
-import com.example.codenamebiscuit.helper.FlipAnimation;
-import com.example.codenamebiscuit.helper.ItemClickSupport;
-import com.example.codenamebiscuit.helper.QueryEventList;
-import com.example.codenamebiscuit.helper.UpdateDbOnSwipe;
-import com.example.codenamebiscuit.rv.EventAdapter;
+import com.example.codenamebiscuit.requests.QueryEventList;
+import com.example.codenamebiscuit.requests.UpdateDbOnSwipe;
 import com.example.codenamebiscuit.swipedeck.SwipeDeck;
-import com.google.android.gms.maps.CameraUpdate;
-import com.google.android.gms.maps.CameraUpdateFactory;
-import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
-import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
-import com.mikepenz.iconics.view.IconicsImageView;
 import com.muddzdev.styleabletoastlibrary.StyleableToast;
-import com.squareup.picasso.NetworkPolicy;
-import com.squareup.picasso.Picasso;
 import com.wunderlist.slidinglayer.SlidingLayer;
+
+import net.cachapa.expandablelayout.ExpandableLayout;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 public class SwipeEvents extends ProgressFragment{
@@ -78,12 +52,14 @@ public class SwipeEvents extends ProgressFragment{
     private ViewPager event_pager;
     private View mContentView;
     private Bundle bundle;
+    private SwipeDeck cardStack;
     MapView mapView;
     private Handler mHandler;
     private Runnable mShowContentRunnable = new Runnable() {
         @Override
         public void run() {
-            setContentShown(true);
+            if(isAdded())
+                setContentShown(true);
         }
     };
 
@@ -99,6 +75,8 @@ public class SwipeEvents extends ProgressFragment{
         userId= getArguments().getString("currentUserId");
         user=new JSONObject();
         data = new ArrayList<>();
+        SlidingLayer slidingLayer = (SlidingLayer)getActivity().findViewById(R.id.slidingLayer1);
+        slidingLayer.closeLayer(true);
         bundle=new Bundle();
     }
 
@@ -126,11 +104,16 @@ public class SwipeEvents extends ProgressFragment{
     private void obtainData(){
         setContentShown(false);
         mHandler = new Handler();
-        mHandler.postDelayed(mShowContentRunnable, 900);
+        mHandler.postDelayed(mShowContentRunnable, 400);
         try {
             data = new QueryEventList(getString(R.string.DATABASE_MAIN_EVENTS_PULLER), userId).execute().get();
             Events.fromJson(data,getContext());
             adapter = new SwipeDeckAdapter(getContext());
+            cardStack = (SwipeDeck) mContentView.findViewById(R.id.swipe_deck);
+            cardStack.setAdapter(adapter);
+
+            event_pager = (ViewPager) mContentView.findViewById(R.id.event_pager);
+            event_pager.setAdapter(new CardPagerAdapter(data, getContext().getApplicationContext()));
         } catch (InterruptedException | ExecutionException e) {
             e.printStackTrace(); }
     }
@@ -157,62 +140,60 @@ public class SwipeEvents extends ProgressFragment{
     private void setupOnCreate() {
         saveEvent = new JSONObject();
         deleteEvent=new JSONObject();
+        if(isAdded()) {
 
-        setContentView(mContentView);
-        obtainData();
-        SwipeDeck cardStack = (SwipeDeck) mContentView.findViewById(R.id.swipe_deck);
-        cardStack.setAdapter(adapter);
+            setContentView(mContentView);
+            obtainData();
 
-        event_pager = (ViewPager)mContentView.findViewById(R.id.event_pager);
-        event_pager.setAdapter(new CardPagerAdapter(data, getContext().getApplicationContext()));
+            cardStack.setCallback(new SwipeDeck.SwipeDeckCallback() {
+                @Override
+                public void cardSwipedLeft(long stableId) {
+                    try {
+                        StyleableToast st = new StyleableToast(getActivity().getApplicationContext(), "EVENT DELETED", Toast.LENGTH_SHORT);
+                        st.setBackgroundColor(Color.parseColor("#ff9dfc"));
+                        st.setTextColor(Color.WHITE);
+                        st.setIcon(R.drawable.ic_delete_white_24dp);
+                        st.setMaxAlpha();
+                        st.show();
+                        deleteEvent.put("event_id", adapter.getItem((int) stableId).get("event_id"));
+                        deleteEvent.put("user_id", adapter.getItem((int) stableId).get("user_id"));
 
-        cardStack.setCallback(new SwipeDeck.SwipeDeckCallback() {
-            @Override
-            public void cardSwipedLeft(long stableId) {
-                try {
-                    StyleableToast st = new StyleableToast(getActivity().getApplicationContext(), "EVENT DELETED", Toast.LENGTH_SHORT);
-                    st.setBackgroundColor(Color.parseColor("#ff9dfc"));
-                    st.setTextColor(Color.WHITE);
-                    st.setIcon(R.drawable.ic_delete_white_24dp);
-                    st.setMaxAlpha();
-                    st.show();
-                    deleteEvent.put("event_id", adapter.getItem((int)stableId).get("event_id"));
-                    deleteEvent.put("user_id", adapter.getItem((int)stableId).get("user_id"));
-
-                } catch (JSONException e) {
-                    e.printStackTrace();
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                    new UpdateDbOnSwipe(getString(R.string.DATABASE_STORE_DELETED_EVENTS)).execute(deleteEvent);
                 }
-                new UpdateDbOnSwipe(getString(R.string.DATABASE_STORE_DELETED_EVENTS)).execute(deleteEvent);
-            }
 
-            @Override
-            public void cardSwipedRight(long stableId) {
-                try {
-                    StyleableToast st = new StyleableToast(getActivity().getApplicationContext(), "EVENT SAVED", Toast.LENGTH_SHORT);
-                    st.setBackgroundColor(Color.parseColor("#ff9dfc"));
-                    st.setTextColor(Color.WHITE);
-                    st.setIcon(R.drawable.ic_check_circle_white_24dp);
-                    st.setMaxAlpha();
-                    st.show();
-                    saveEvent.put("event_id", adapter.getItem((int) stableId).get("event_id"));
-                    saveEvent.put("user_id", adapter.getItem((int) stableId).get("user_id"));
-                } catch (JSONException e) {
-                    e.printStackTrace();
+                @Override
+                public void cardSwipedRight(long stableId) {
+                    try {
+                        StyleableToast st = new StyleableToast(getActivity().getApplicationContext(), "EVENT SAVED", Toast.LENGTH_SHORT);
+                        st.setBackgroundColor(Color.parseColor("#ff9dfc"));
+                        st.setTextColor(Color.WHITE);
+                        st.setIcon(R.drawable.ic_check_circle_white_24dp);
+                        st.setMaxAlpha();
+                        st.show();
+                        saveEvent.put("event_id", adapter.getItem((int) stableId).get("event_id"));
+                        saveEvent.put("user_id", adapter.getItem((int) stableId).get("user_id"));
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                    new UpdateDbOnSwipe(getString(R.string.DATABASE_STORE_SAVED_EVENTS)).execute(saveEvent);
+
                 }
-                new UpdateDbOnSwipe(getString(R.string.DATABASE_STORE_SAVED_EVENTS)).execute(saveEvent);
 
-            }
-
-            @Override
-            public boolean isDragEnabled(long itemId) {
-                return true;
-            }
-        });
-        event_pager.setOnTouchListener(new View.OnTouchListener()
-        {
-            @Override
-            public boolean onTouch(View v, MotionEvent event)
-            {return true;} });
+                @Override
+                public boolean isDragEnabled(long itemId) {
+                    return true;
+                }
+            });
+            event_pager.setOnTouchListener(new View.OnTouchListener() {
+                @Override
+                public boolean onTouch(View v, MotionEvent event) {
+                    return true;
+                }
+            });
+        }
 
     }
 
@@ -272,8 +253,8 @@ public class SwipeEvents extends ProgressFragment{
         @Override
         public View getView(final int position, View convertView, final ViewGroup parent) {
             View v;
-                LayoutInflater inflater = getActivity().getLayoutInflater();
-                v = inflater.inflate(R.layout.cards, parent, false);
+            LayoutInflater inflater = getActivity().getLayoutInflater();
+            v = inflater.inflate(R.layout.cards, parent, false);
             try {
                 image = getImageURL(data.get(position).getString("img_path"));
                 event_pager.setCurrentItem(position-1);
@@ -330,7 +311,9 @@ public class SwipeEvents extends ProgressFragment{
             TextView eventPreference = (TextView)itemView.findViewById(R.id.tv_event_preference);
             TextView eventHoster = (TextView)itemView.findViewById(R.id.tv_event_hoster);
             ImageView eventImage = (ImageView)itemView.findViewById(R.id.pager_event_image);
-            ImageView menuImage = (ImageView)itemView.findViewById(R.id.pager_menu);
+            FloatingActionButton fab = (FloatingActionButton) getActivity().findViewById(R.id.swipeFab);
+            fab.setBackgroundColor(getContext().getColor(R.color.accent));
+
             JSONObject object = data.get(event_pager.getCurrentItem());
 
             try {
@@ -345,7 +328,7 @@ public class SwipeEvents extends ProgressFragment{
                 Glide.with(SwipeEvents.this).load(imagePager).placeholder(R.drawable.progress).into(eventImage); }
             catch (JSONException e) { e.printStackTrace();}
 
-            menuImage.setOnClickListener(new View.OnClickListener() {
+            fab.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     Intent intent = new Intent(getActivity(), DisplayEvent.class);
@@ -391,6 +374,8 @@ public class SwipeEvents extends ProgressFragment{
         bundle.putString("eventWebsite", object.getString("event_website"));
         bundle.putString("eventDistance", object.getString("event_distance"));
     }
+
+
 
     private Bundle getBundle(){
         return bundle;

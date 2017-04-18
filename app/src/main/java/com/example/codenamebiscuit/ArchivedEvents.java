@@ -23,7 +23,7 @@ import android.widget.TextView;
 
 import com.example.codenamebiscuit.eventfragments.DeletedEventsFrag;
 import com.example.codenamebiscuit.eventfragments.SavedEventsFrag;
-import com.example.codenamebiscuit.helper.RunQuery;
+import com.example.codenamebiscuit.requests.RunQuery;
 import com.geniusforapp.fancydialog.FancyAlertDialog;
 
 

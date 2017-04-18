@@ -9,7 +9,7 @@
         <item name="preferenceTheme">@style/PreferenceThemeOverlay</item>
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
-        <item name="android:colorControlHighlight">@color/transparentFB</item>
+        <item name="android:colorControlHighlight">#66000000</item>
 
     </style>
     <style name="MenuItemRippleStyle" parent="Material.Drawable.Ripple.Wave">
@@ -94,6 +94,8 @@
     <style name="ToolbarTheme" parent="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
         <item name="selectableItemBackground">?android:selectableItemBackground</item>
         <item name="selectableItemBackgroundBorderless">?android:selectableItemBackground</item>
+        <item name="android:colorControlHighlight">@color/livinPink</item>
+
     </style>
 
     <style name="LightRaiseWaveColorButtonRippleStyle" parent="Material.Drawable.Ripple.Wave.Light">

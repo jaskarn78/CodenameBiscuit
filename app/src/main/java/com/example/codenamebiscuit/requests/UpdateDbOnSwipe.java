@@ -1,4 +1,4 @@
-package com.example.codenamebiscuit.helper;
+package com.example.codenamebiscuit.requests;
 
 import android.os.AsyncTask;
 import android.util.Log;
@@ -12,24 +12,22 @@ import java.io.OutputStreamWriter;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
-import java.util.ArrayList;
 
 /**
- * Created by Tommy on 1/30/17.
+ * Created by jaskarnjagpal on 2/15/17.
  */
 
-public class RunQuery extends AsyncTask<JSONObject, Void, Void> {
-    private String URL;
-    //private static final String REMOVE_USER_PREFERENCES = "http://athena.ecs.csus.edu/~teamone/php/android/remove_user_preferences.php";
-    private static ArrayList<JSONObject> mEventList;
+public class UpdateDbOnSwipe extends AsyncTask<JSONObject, String, Void> {
+    private static String DATABASE_QUERY_URL;
 
-    public RunQuery(String URL){
-        this.URL = URL;
+    public UpdateDbOnSwipe(String url) {
+        DATABASE_QUERY_URL = url;
+
     }
 
     @Override
-    protected Void doInBackground(JSONObject... objs) {
-        JSONObject userJSON = objs[0];
+    protected Void doInBackground(JSONObject... params) {
+        JSONObject userJSON = params[0];
 
         OutputStreamWriter wr = null;
         BufferedReader reader = null;
@@ -42,7 +40,7 @@ public class RunQuery extends AsyncTask<JSONObject, Void, Void> {
 
 
             // Connect to the URL
-            URL url = new URL(URL);
+            URL url = new URL(DATABASE_QUERY_URL);
             URLConnection conn = url.openConnection();
 
             conn.setDoOutput(true);

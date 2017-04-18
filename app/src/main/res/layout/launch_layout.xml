@@ -1,47 +1,91 @@
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_height="match_parent"
-    android:layout_width="match_parent"
-    android:background="@color/livinBlack"
-    android:orientation="vertical"
-    >
 
 
-
-    <android.support.v7.widget.Toolbar
-        android:id="@+id/toolbar"
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:background="@color/livinBlack"
-        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
-        app:popupTheme="@style/ThemeOverlay.AppCompat.Dark" >
-
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="20dp"
-            android:gravity="center_horizontal"
-            android:textSize="20sp"
-            android:text="Toolbar"
-            android:textColor="@color/livinPink"
-            android:id="@+id/toolbar_title" />
-
-    </android.support.v7.widget.Toolbar>
-    <ProgressBar
-        android:id="@+id/progress_launch"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
-
-
-    <FrameLayout
+    <android.support.design.widget.CoordinatorLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:background="@color/cardview_dark_background"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/fragment_container">
-
-        <include layout="@layout/update_pref"/>
-    </FrameLayout>
+        android:id="@+id/coordLayout">
 
 
-</LinearLayout>
+
+        <android.support.design.widget.AppBarLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:theme="@style/AppTheme.AppBarOverlay"
+            android:fitsSystemWindows="true">
+
+
+            <android.support.v7.widget.Toolbar
+                android:id="@+id/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/livinBlack"
+                android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+                app:layout_scrollFlags="scroll|enterAlways"
+                app:popupTheme="@style/ThemeOverlay.AppCompat.Dark">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="20dp"
+                    android:gravity="center_horizontal"
+                    android:textSize="20sp"
+                    android:text="Toolbar"
+                    android:textColor="@color/livinPink"
+                    android:visibility="gone"
+                    android:id="@+id/toolbar_title" />
+                <com.jaredrummler.materialspinner.MaterialSpinner
+                    android:id="@+id/spinner"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:ms_text_color="@color/livinWhite"
+                    app:ms_background_color="@color/cardview_dark_background"
+                    android:backgroundTint="@color/cardview_dark_background"
+                    />
+
+        </android.support.v7.widget.Toolbar>
+            <include layout="@layout/update_pref"/>
+
+        </android.support.design.widget.AppBarLayout>
+
+        <FrameLayout
+            android:id="@+id/fragment_container"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:fitsSystemWindows="true"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        </FrameLayout>
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="105dp"
+            android:layout_gravity="bottom">
+
+            <com.wunderlist.slidinglayer.SlidingLayer
+                xmlns:slidingLayer="http://schemas.android.com/apk/res-auto"
+                app:layout_behavior="@string/appbar_scrolling_view_behavior"
+                android:id="@+id/slidingLayer1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                slidingLayer:changeStateOnTap="false"
+                slidingLayer:stickTo="bottom">
+
+                <android.support.design.widget.FloatingActionButton
+                    android:id="@+id/fab"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="top|end"
+                    android:src="@drawable/ic_arrow_forward_white_48dp"
+                    android:clickable="true"
+                    app:backgroundTint="@color/accent"
+                    xmlns:app="http://schemas.android.com/apk/res-auto" />
+
+            <include layout="@layout/standard_launch"/>
+            </com.wunderlist.slidinglayer.SlidingLayer>
+        </FrameLayout>
+
+    </android.support.design.widget.CoordinatorLayout>
+

@@ -121,7 +121,6 @@ public class DisplayEvent extends AppCompatActivity{
         navigate = (IconicsImageView)findViewById(R.id.event_directions);
         displayEventImage = (ImageView)findViewById(R.id.display_event_image);
 
-        ratingBar = (RatingBar)findViewById(R.id.ratingBar);
         webView = (WebView)findViewById(R.id.webView);
 
 
@@ -148,7 +147,6 @@ public class DisplayEvent extends AppCompatActivity{
         eventPreferences = bundle.getString("eventPreference");
         eventDescription = bundle.getString("eventDescription");
         eventLocation = bundle.getString("eventLocation");
-        eventDate = bundle.getString("eventDate");
         eventCost = bundle.getString("eventCost");
         eventTime = bundle.getString("eventTime");
         eventId = bundle.getString("eventId");
@@ -313,7 +311,8 @@ public class DisplayEvent extends AppCompatActivity{
                 .load(getImageURL(eventImage))
                 .centerCrop()
                 .placeholder(R.drawable.progress)
-                .error(R.drawable.placeholder);
+                .error(R.drawable.placeholder)
+                .into(displayEventImage);
     }
 
     @Override

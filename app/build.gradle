@@ -100,6 +100,9 @@ dependencies {
     compile 'devlight.io:navigationtabbar:1.2.5'
     compile 'com.github.johnkil.android-progressfragment:progressfragment:1.4.+'
     compile 'com.github.rey5137:material:1.2.4'
+    compile 'net.cachapa.expandablelayout:expandablelayout:2.8'
+    compile 'com.jaredrummler:material-spinner:1.1.0'
+
 
 }
 

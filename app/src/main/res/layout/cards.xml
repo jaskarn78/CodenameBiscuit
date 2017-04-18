@@ -9,544 +9,74 @@
     >
 
 
-<android.support.v7.widget.CardView
-    xmlns:card_view="http://schemas.android.com/apk/res-auto"
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/card_view"
-    android:layout_width="match_parent"
-    android:layout_height="470dp"
-    card_view:cardCornerRadius="15dp"
-    card_view:cardElevation="1dp"
-    card_view:cardUseCompatPadding="true"
-    android:layout_margin="1dp">
-
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/front_view">
-
-            <ProgressBar
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:id="@+id/card_progress"
-                />
-
-
-            <ImageView
-                android:id="@+id/offer_image"
-                android:layout_width="match_parent"
-                android:scaleType="fitXY"
-                android:adjustViewBounds="true"
-                android:background="@drawable/border_black"
-                android:layout_height="match_parent"
-                android:layout_alignParentTop="true"
-                android:layout_alignParentStart="true" />
-
-
-            <com.getbase.floatingactionbutton.FloatingActionsMenu
-                android:id="@+id/multiple_actions_left"
-                xmlns:fab="http://schemas.android.com/apk/res-auto"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignBottom="@+id/offer_image"
-                android:layout_alignEnd="@+id/offer_image"
-                fab:fab_addButtonColorNormal="@color/livinPink"
-                fab:fab_addButtonColorPressed="@color/livinWhite"
-                fab:fab_addButtonPlusIconColor="@color/cardview_light_background"
-                fab:fab_addButtonStrokeVisible="false"
-                fab:fab_expandDirection="up"
-                android:visibility="gone"
-                android:layout_marginTop="16dp"
-                android:layout_marginRight="16dp"
-                android:layout_marginEnd="16dp">
-
-                <com.getbase.floatingactionbutton.FloatingActionButton
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    fab:fab_colorNormal="@color/livinPink"
-                    fab:fab_colorPressed="@color/livinWhite"
-                    fab:fab_size="mini"/>
-
-                <com.getbase.floatingactionbutton.FloatingActionButton
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    fab:fab_colorNormal="@color/livinPink"
-                    fab:fab_colorPressed="@color/livinWhite"
-                    fab:fab_size="normal"/>
-
-            </com.getbase.floatingactionbutton.FloatingActionsMenu>
-
-
-        </RelativeLayout>
-
-
-
-</android.support.v7.widget.CardView>
-
     <android.support.v7.widget.CardView
-        xmlns:card_view="http://schemas.android.com/apk/res-auto"
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-
-        android:id="@+id/card_view_back"
+        android:id="@+id/card_view"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        card_view:cardCornerRadius="1dp"
-        card_view:cardElevation="2dp"
-        android:visibility="gone"
-        android:layout_margin="1dp">
-
-
-        <ScrollView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            >
-
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            >
-
-
-        <ImageView
-            android:layout_width="match_parent"
-            android:layout_height="200dp"
-            android:scaleType="fitXY"
-            android:id="@+id/back_image"
-             />
-
-
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@color/livinBlack"
-            android:id="@+id/back_view"
-            android:isScrollContainer="false"
-            >
-
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Event Name"
-                android:textSize="25sp"
-                android:textColor="@color/livinWhite"
-                android:layout_marginStart="10dp"
-                android:id="@+id/event_name_back"
-                />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Event Hoster"
-                android:layout_toEndOf="@id/event_name_back"
-                android:layout_marginEnd="5dp"
-                android:textSize="15sp"
-                android:layout_alignBaseline="@id/event_name_back"
-                android:textColor="@color/livinWhite"
-                android:id="@+id/event_hoster"
-                />
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="16sp"
-                android:layout_marginStart="15dp"
-                android:layout_toRightOf="@id/event_hoster"
-                android:layout_alignBaseline="@id/event_name_back"
-                android:textColor="@color/livinWhite"
-                android:text="0.5 mi"
-                android:id="@+id/display_event_distance"
-                />
-            <io.techery.properratingbar.ProperRatingBar
-                android:id="@+id/upperRatingBar"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_toRightOf="@id/display_event_distance"
-                android:layout_above="@+id/display_event_preference"
-                android:layout_marginBottom="2dp"
-                android:layout_marginStart="10dp"
-                android:textSize="18sp"
-                android:textStyle="bold"
-                app:prb_defaultRating="1"
-                app:prb_symbolicTick="$"
-                app:prb_symbolicTickNormalColor="@android:color/darker_gray"
-                app:prb_symbolicTickSelectedColor="@android:color/holo_green_dark"
-                app:prb_totalTicks="1"
-                />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="15sp"
-                android:layout_marginStart="10dp"
-                android:layout_marginBottom="5dp"
-                android:layout_below="@id/event_name_back"
-                android:text="Family Friendly"
-                android:textColor="@color/livinPink"
-                android:id="@+id/event_preference_back"
-                />
-
-        </RelativeLayout>
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_below="@+id/eventName_layout">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:background="@color/cardview_light_background"
-                android:id="@+id/icons"
-                android:gravity="center"
-                >
-
-                <com.mikepenz.iconics.view.IconicsImageView
-                    android:layout_width="35dp"
-                    android:layout_height="35dp"
-                    android:src="@drawable/ic_phone_black_48dp"
-                    android:layout_marginTop="10dp"
-                    android:layout_marginStart="10dp"
-                    android:layout_marginBottom="10dp"
-                    android:layout_marginEnd="25dp"
-                    android:tint="@color/livinPink"
-                    android:id="@+id/event_call"
-                    android:clickable="true"
-                    />
-
-                <com.mikepenz.iconics.view.IconicsImageView
-                    android:layout_width="35dp"
-                    android:layout_height="35dp"
-                    android:src="@drawable/ic_directions_black_48dp"
-                    android:layout_marginStart="30dp"
-                    android:layout_marginEnd="25dp"
-                    android:layout_marginTop="10dp"
-                    android:layout_marginBottom="10dp"
-                    android:tint="@color/livinPink"
-                    android:id="@+id/event_directions"
-                    android:clickable="true"
-                    />
-                <com.mikepenz.iconics.view.IconicsImageView
-                    android:layout_width="35dp"
-                    android:layout_height="35dp"
-                    android:src="@drawable/ic_share_black_48dp"
-                    android:layout_marginStart="30dp"
-                    android:layout_marginEnd="25dp"
-                    android:layout_marginTop="10dp"
-                    android:layout_marginBottom="10dp"
-                    android:tint="@color/livinPink"
-                    android:id="@+id/event_share"
-                    android:clickable="true"
-                    />
-                <com.mikepenz.iconics.view.IconicsImageView
-                    android:layout_width="35dp"
-                    android:layout_height="35dp"
-                    android:src="@drawable/ic_language_black_48dp"
-                    android:layout_marginTop="10dp"
-                    android:layout_marginBottom="10dp"
-                    android:layout_marginStart="25dp"
-                    android:layout_marginEnd="10dp"
-                    android:tint="@color/livinPink"
-                    android:id="@+id/event_website"
-                    android:clickable="true"
-                    />
-            </LinearLayout>
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="0.2dp"
-                android:layout_below="@+id/icons"
-                android:id="@+id/view"
-                android:background="@color/black_overlay"/>
-            <WebView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:id="@+id/webView"
-                android:layout_below="@+id/icons"
-                android:visibility="gone"/>
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="0.2dp"
-                android:layout_below="@+id/webView"
-                android:id="@+id/view8"
-                android:background="@color/black_overlay"/>
+        android:layout_height="wrap_content"
+        android:layout_margin="1dp"
+        card_view:cardCornerRadius="15dp"
+        card_view:cardElevation="1dp"
+        card_view:cardUseCompatPadding="true">
 
             <RelativeLayout
+                android:id="@+id/front_view"
                 android:layout_width="match_parent"
-                android:layout_height="100dp"
-                android:layout_below="@+id/webView"
-                android:background="@color/livinWhite"
-                android:id="@+id/description_layout"
-                >
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="0.2dp"
-                    android:background="@color/black_overlay"/>
+                android:layout_height="wrap_content">
 
-                <ScrollView
-                    xmlns:android="http://schemas.android.com/apk/res/android"
-                    xmlns:app="http://schemas.android.com/apk/res-auto"
+                <ProgressBar
+                    android:id="@+id/card_progress"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent">
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="15dp"
-                        android:layout_marginEnd="15dp"
-                        android:id="@+id/display_event_description"
-                        android:layout_marginTop="10dp"
-                        android:layout_marginBottom="10dp"
-                        android:text="Event Description goes here"
-                        android:textSize="15sp"
-                        />
-                </ScrollView>
+                    android:layout_height="match_parent" />
 
-            </RelativeLayout>
-                <RelativeLayout
+
+                <ImageView
+                    android:id="@+id/offer_image"
                     android:layout_width="match_parent"
+                    android:layout_height="465dp"
+                    android:layout_alignParentStart="true"
+                    android:layout_alignParentTop="true"
+                    android:adjustViewBounds="true"
+                    android:background="@drawable/border_black"
+                    android:scaleType="fitXY" />
+
+
+                <com.getbase.floatingactionbutton.FloatingActionsMenu xmlns:fab="http://schemas.android.com/apk/res-auto"
+                    android:id="@+id/multiple_actions_left"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_below="@id/description_layout"
-                    android:background="@color/livinWhite"
-                    android:id="@+id/location_layout">
+                    android:layout_alignBottom="@+id/offer_image"
+                    android:layout_alignEnd="@+id/offer_image"
+                    android:layout_marginEnd="16dp"
+                    android:layout_marginRight="16dp"
+                    android:layout_marginTop="16dp"
+                    android:visibility="gone"
+                    fab:fab_addButtonColorNormal="@color/livinPink"
+                    fab:fab_addButtonColorPressed="@color/livinWhite"
+                    fab:fab_addButtonPlusIconColor="@color/cardview_light_background"
+                    fab:fab_addButtonStrokeVisible="false"
+                    fab:fab_expandDirection="up">
 
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="0.2dp"
-                        android:id="@+id/view2"
-                        android:background="@color/black_overlay"/>
-
-
-                    <com.mikepenz.iconics.view.IconicsImageView
-                        android:layout_width="25dp"
-                        android:layout_height="25dp"
-                        android:layout_marginStart="10dp"
-                        android:layout_marginTop="15dp"
-                        android:layout_marginBottom="15dp"
-                        android:src="@drawable/ic_location_on_black_24dp"
-                        android:tint="@color/livinPink"
-                        android:id="@+id/location_icon"
-                        />
-                    <TextView
+                    <com.getbase.floatingactionbutton.FloatingActionButton
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:id="@+id/display_event_location"
-                        android:layout_toEndOf="@+id/location_icon"
-                        android:layout_marginStart="20dp"
-                        android:layout_marginTop="20dp"
-                        android:layout_marginBottom="15dp"
-                        android:text="Event address goes here"
-                        />
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="0.2dp"
-                        android:id="@+id/view3"
-                        android:layout_marginTop="10dp"
-                        android:layout_below="@+id/display_event_location"
-                        android:background="@color/black_overlay"/>
+                        fab:fab_colorNormal="@color/livinPink"
+                        fab:fab_colorPressed="@color/livinWhite"
+                        fab:fab_size="mini" />
 
-                </RelativeLayout>
-                <RelativeLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@id/location_layout"
-                    android:background="@color/livinWhite"
-                    android:id="@+id/date_layout">
-
-
-                    <com.mikepenz.iconics.view.IconicsImageView
-                        android:layout_width="25dp"
-                        android:layout_height="25dp"
-                        android:layout_marginStart="10dp"
-                        android:layout_marginTop="15dp"
-                        android:layout_marginBottom="15dp"
-                        android:src="@drawable/ic_access_time_black_24dp"
-                        android:tint="@color/livinPink"
-                        android:id="@+id/date_icon"
-                        />
-                    <TextView
+                    <com.getbase.floatingactionbutton.FloatingActionButton
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:id="@+id/display_event_date"
-                        android:layout_toEndOf="@+id/date_icon"
-                        android:layout_marginStart="20dp"
-                        android:layout_marginTop="12dp"
-                        android:layout_marginBottom="5dp"
-                        android:text="Event date goes here"
-                        />
-                    <TextView
-                        android:id="@+id/display_event_time"
-                        android:layout_below="@+id/display_event_date"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_toEndOf="@+id/date_icon"
-                        android:layout_marginStart="20dp"
-                        android:text="Event time goes here" />
+                        fab:fab_colorNormal="@color/livinPink"
+                        fab:fab_colorPressed="@color/livinWhite"
+                        fab:fab_size="normal" />
 
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="0.2dp"
-                        android:id="@+id/view4"
-                        android:layout_marginTop="10dp"
-                        android:layout_below="@+id/display_event_time"
-                        android:background="@color/black_overlay"/>
-                </RelativeLayout>
-
-                <RelativeLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@id/date_layout"
-                    android:background="@color/livinWhite"
-                    android:id="@+id/cost_layout">
-
-
-                    <com.mikepenz.iconics.view.IconicsImageView
-                        android:layout_width="25dp"
-                        android:layout_height="25dp"
-                        android:layout_marginStart="10dp"
-                        android:layout_marginTop="15dp"
-                        android:layout_marginBottom="15dp"
-                        android:src="@drawable/ic_attach_money_black_24dp"
-                        android:tint="@color/livinPink"
-                        android:id="@+id/cost_icon"
-                        />
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:id="@+id/display_event_cost"
-                        android:layout_toEndOf="@+id/cost_icon"
-                        android:layout_marginStart="20dp"
-                        android:layout_marginTop="20dp"
-                        android:layout_marginBottom="15dp"
-                        android:text="Event entry fee goes here"
-                        />
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="0.2dp"
-                        android:id="@+id/view5"
-                        android:layout_marginTop="10dp"
-                        android:layout_below="@+id/display_event_cost"
-                        android:background="@color/black_overlay"/>
-                </RelativeLayout>
-
-                <RelativeLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@id/cost_layout"
-                    android:background="@color/livinWhite"
-                    android:id="@+id/phone_layout">
-
-
-                    <com.mikepenz.iconics.view.IconicsImageView
-                        android:layout_width="25dp"
-                        android:layout_height="25dp"
-                        android:layout_marginStart="10dp"
-                        android:layout_marginTop="15dp"
-                        android:layout_marginBottom="15dp"
-                        android:src="@drawable/ic_phone_black_48dp"
-                        android:tint="@color/livinPink"
-                        android:id="@+id/phone_icon"
-                        />
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:id="@+id/display_event_phone"
-                        android:layout_toEndOf="@+id/phone_icon"
-                        android:layout_marginStart="20dp"
-                        android:layout_marginTop="20dp"
-                        android:layout_marginBottom="15dp"
-                        android:textColor="@color/accent"
-                        android:text="(916) 777-7777"
-                        />
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="0.2dp"
-                        android:id="@+id/view7"
-                        android:layout_marginTop="10dp"
-                        android:layout_below="@+id/display_event_phone"
-                        android:background="@color/black_overlay"/>
-                </RelativeLayout>
-
-                <RelativeLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@id/phone_layout"
-                    android:background="@color/livinWhite"
-                    android:id="@+id/rate_layout">
-
-
-                    <TextView
-                        android:layout_marginStart="10dp"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="10dp"
-                        android:layout_marginBottom="5dp"
-                        android:id="@+id/rate"
-                        android:text="Leave a rating"
-                        />
-
-                    <RatingBar
-                        android:id="@+id/ratingBar"
-                        android:layout_width="wrap_content"
-                        android:layout_height="40dp"
-                        android:layout_gravity="center_horizontal"
-                        android:layout_below="@+id/rate"
-                        android:layout_marginBottom="10dp"
-                        android:layout_marginStart="40dp"
-                        android:layout_marginEnd="10dp"
-                        android:progressTint="@color/livinPink" />
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:id="@+id/currentRating"
-                        android:layout_below="@id/ratingBar"
-                        android:layout_marginStart="50dp"
-                        android:text="Current Rating"
-                        />
-
-
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="0.2dp"
-                        android:id="@+id/view6"
-                        android:layout_marginTop="10dp"
-                        android:layout_below="@+id/currentRating"
-                        android:background="@color/black_overlay"/>
-
-                </RelativeLayout>
-
-                <RelativeLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@id/rate_layout"
-                    android:background="@color/livinWhite"
-                    android:id="@+id/map_layout">
-
-                    <com.google.android.gms.maps.MapView
-                        android:id="@+id/mapView"
-                        android:layout_width="match_parent"
-                        android:layout_height="200dp"
-                        android:layout_marginStart="20dp"
-                        android:layout_marginEnd="20dp"
-                        android:layout_marginTop="10dp"
-                        android:layout_marginBottom="15dp"
-                        />
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="0.2dp"
-                        android:id="@+id/view9"
-                        android:layout_marginTop="10dp"
-                        android:layout_below="@+id/mapView"
-                        android:background="@color/black_overlay"/>
-                </RelativeLayout>
+                </com.getbase.floatingactionbutton.FloatingActionsMenu>
 
 
             </RelativeLayout>
 
-        </LinearLayout>
-
-        </ScrollView>
 
     </android.support.v7.widget.CardView>
+
 
 </LinearLayout>

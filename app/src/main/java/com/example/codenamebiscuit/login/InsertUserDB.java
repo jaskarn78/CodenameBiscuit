@@ -19,7 +19,7 @@ import java.net.URLConnection;
 
 public class InsertUserDB extends AsyncTask<JSONObject, Void, Boolean> {
     private static final String DATABASE_CONNECTION_LINK =
-            "http://athena.ecs.csus.edu/~teamone/php/user_insert2.php";
+            "http://athena.ecs.csus.edu/~teamone/php/android/user_insert2.php";
 
     @Override
     protected Boolean doInBackground(JSONObject... objs) {

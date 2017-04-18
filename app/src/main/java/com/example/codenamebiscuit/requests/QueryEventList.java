@@ -1,4 +1,4 @@
-package com.example.codenamebiscuit.helper;
+package com.example.codenamebiscuit.requests;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
@@ -10,6 +10,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ListView;
 
+import com.example.codenamebiscuit.Events;
 import com.example.codenamebiscuit.MainActivity;
 import com.example.codenamebiscuit.rv.EventAdapter;
 

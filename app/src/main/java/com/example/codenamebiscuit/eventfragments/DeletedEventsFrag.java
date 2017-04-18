@@ -1,40 +1,24 @@
 package com.example.codenamebiscuit.eventfragments;
 
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.preference.PreferenceManager;
-import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import com.devspark.progressfragment.ProgressFragment;
 import com.example.codenamebiscuit.R;
-import com.example.codenamebiscuit.helper.QueryEventList;
-import com.example.codenamebiscuit.helper.UpdateDbOnSwipe;
-import com.example.codenamebiscuit.rv.ClickListener;
+import com.example.codenamebiscuit.requests.QueryEventList;
 import com.example.codenamebiscuit.rv.EventAdapter;
-import com.github.brnunes.swipeablerecyclerview.SwipeableRecyclerViewTouchListener;
-import com.muddzdev.styleabletoastlibrary.StyleableToast;
 import com.rohit.recycleritemclicksupport.RecyclerItemClickSupport;
 
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;

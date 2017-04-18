@@ -4,9 +4,7 @@ package com.example.codenamebiscuit.eventfragments;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.preference.PreferenceManager;
 import android.support.v7.widget.LinearLayoutManager;
 
@@ -17,13 +15,16 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.os.Handler;
+import android.widget.ImageView;
+import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.devspark.progressfragment.ProgressFragment;
-import com.example.codenamebiscuit.MapActivity;
 import com.example.codenamebiscuit.R;
-import com.example.codenamebiscuit.helper.QueryEventList;
+import com.example.codenamebiscuit.requests.QueryEventList;
 import com.example.codenamebiscuit.rv.ClickListener;
 import com.example.codenamebiscuit.rv.EventAdapter;
+import com.rohit.recycleritemclicksupport.RecyclerItemClickSupport;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -177,7 +178,6 @@ public class SavedEventsFrag extends ProgressFragment implements ClickListener{
     public void onDetach(){
         super.onDetach();
     }
-
 
 
     @Override

@@ -1,58 +1,70 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.constraint.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/cardview_dark_background">
 
     <com.example.codenamebiscuit.swipedeck.layouts.SwipeFrameLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/swipeLayout"
         xmlns:swipedeck="http://schemas.android.com/apk/res-auto"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:background="@color/cardview_dark_background"
-        android:id="@+id/swipeLayout"
-        android:orientation="vertical"
-        tools:layout_constraintTop_creator="1"
-        tools:layout_constraintRight_creator="1"
-        tools:layout_constraintBottom_creator="1"
-        android:layout_marginStart="1dp"
-        swipedeck:layout_constraintBottom_toBottomOf="parent"
-        android:layout_marginEnd="1dp"
-        swipedeck:layout_constraintRight_toRightOf="parent"
-        android:layout_marginTop="1dp"
-        tools:layout_constraintLeft_creator="1"
         android:layout_marginBottom="1dp"
-        swipedeck:layout_constraintLeft_toLeftOf="parent"
-        swipedeck:layout_constraintTop_toTopOf="parent">
+        android:layout_marginEnd="1dp"
+        android:layout_marginStart="1dp"
+        android:layout_marginTop="1dp"
+        android:background="@color/cardview_dark_background"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0"
+        tools:layout_constraintBottom_creator="1"
+        tools:layout_constraintLeft_creator="1"
+        tools:layout_constraintRight_creator="1"
+        tools:layout_constraintTop_creator="1">
 
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             >
 
-        <com.example.codenamebiscuit.swipedeck.SwipeDeck
+            <com.example.codenamebiscuit.swipedeck.SwipeDeck
                 android:id="@+id/swipe_deck"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_below="@+id/event_pager"
                 swipedeck:max_visible="2"
                 swipedeck:render_above="false"
                 android:layout_alignParentTop="true"
                 swipedeck:card_spacing="6dp"/>
 
+            <android.support.design.widget.FloatingActionButton
+                android:id="@+id/swipeFab"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_alignTop="@+id/event_pager"
+                android:src="@drawable/ic_arrow_forward_white_48dp"
+                android:backgroundTint="@color/accent" />
+
 
             <android.support.v4.view.ViewPager
                 android:id="@+id/event_pager"
                 android:background="@color/livinBlack"
-                android:layout_above="@+id/swipe_deck"
                 android:layout_width="match_parent"
-                android:layout_height="102dp"
+                android:layout_height="140dp"
+                android:layout_alignParentBottom="true"
                 android:layout_marginTop="1dp"
                 android:layout_marginBottom="1dp"
-                android:layout_alignParentBottom="true"
-                 />
+                />
+
         </RelativeLayout>
+
     </com.example.codenamebiscuit.swipedeck.layouts.SwipeFrameLayout>
 
 

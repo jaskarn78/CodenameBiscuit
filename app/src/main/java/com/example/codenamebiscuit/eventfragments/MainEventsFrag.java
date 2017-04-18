@@ -14,22 +14,18 @@ import android.support.v7.widget.LinearLayoutManager;
 
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.codenamebiscuit.R;
-import com.example.codenamebiscuit.helper.QueryEventList;
-import com.example.codenamebiscuit.helper.UpdateDbOnSwipe;
-import com.example.codenamebiscuit.rv.ClickListener;
+import com.example.codenamebiscuit.requests.QueryEventList;
+import com.example.codenamebiscuit.requests.UpdateDbOnSwipe;
 import com.example.codenamebiscuit.rv.EventAdapter;
 
 import com.github.brnunes.swipeablerecyclerview.SwipeableRecyclerViewTouchListener;
-import com.google.android.gms.maps.model.LatLng;
 import com.muddzdev.styleabletoastlibrary.StyleableToast;
 
 

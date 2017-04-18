@@ -100,7 +100,6 @@ public class EmbeddedFragment {
 
         //create the drawer and remember the `Drawer` result object
         result = new DrawerBuilder(activity)
-                .withRootView(R.id.slidingLayer1)
                 .withSliderBackgroundColor(activity.getColor(R.color.black_overlay))
                 .withAccountHeader(headerResult)
                 .addDrawerItems(
