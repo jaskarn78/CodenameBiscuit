@@ -13,9 +13,12 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.Serializable;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.concurrent.ExecutionException;
 
 /**
@@ -169,6 +172,32 @@ public class Events implements Serializable{
         });
     }
 
+    public static void toEarliest(ArrayList<JSONObject> eventList){
+        Collections.sort(eventList, new Comparator<JSONObject>() {
+            @Override
+            public int compare(JSONObject o1, JSONObject o2) {
+                if(getDate(getDate(o1))==getDate((getDate(o2))))
+                    return 0;
+                else if(getDate(getDate(o1)).after(getDate((getDate(o2)))))
+                    return 1;
+                else return -1;
+            }
+        });
+    }
+
+    public static void toLatest(ArrayList<JSONObject>eventList){
+        Collections.sort(eventList, new Comparator<JSONObject>() {
+            @Override
+            public int compare(JSONObject o1, JSONObject o2) {
+                if(getDate(getDate(o1))==getDate((getDate(o2))))
+                    return 0;
+                else if(getDate(getDate(o1)).before(getDate((getDate(o2)))))
+                    return 1;
+                else return -1;
+            }
+        });
+    }
+
 
     public static int calculateDistance(Location location2, double eventLat, double eventLng) {
         double distance;
@@ -190,13 +219,24 @@ public class Events implements Serializable{
         }
         return curLocation;
     }
+
+    public static String getDate(JSONObject object){
+        try { return object.getString("start_date");
+        }catch(JSONException e){e.printStackTrace();}
+        return null;
+    }
     public static int getDistance(JSONObject object){
         try {
             return object.getInt("event_distance");
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+        } catch (JSONException e) { e.printStackTrace(); }
         return 0;
     }
+
+    public static Date getDate(String dateString) {
+        Date date = null;
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        try { date = sdf.parse(dateString);
+        } catch (ParseException e) { e.printStackTrace(); }
+        return date; }
 
 }

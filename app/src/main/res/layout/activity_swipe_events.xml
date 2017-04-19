@@ -43,14 +43,6 @@
                 android:layout_alignParentTop="true"
                 swipedeck:card_spacing="6dp"/>
 
-            <android.support.design.widget.FloatingActionButton
-                android:id="@+id/swipeFab"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentEnd="true"
-                android:layout_alignTop="@+id/event_pager"
-                android:src="@drawable/ic_arrow_forward_white_48dp"
-                android:backgroundTint="@color/accent" />
 
 
             <android.support.v4.view.ViewPager
@@ -60,6 +52,7 @@
                 android:layout_height="140dp"
                 android:layout_alignParentBottom="true"
                 android:layout_marginTop="1dp"
+                android:visibility="gone"
                 android:layout_marginBottom="1dp"
                 />
 

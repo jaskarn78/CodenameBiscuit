@@ -39,6 +39,7 @@ import com.example.codenamebiscuit.requests.UpdateDbOnSwipe;
 import com.example.codenamebiscuit.rv.EventAdapter;
 import com.github.brnunes.swipeablerecyclerview.SwipeableRecyclerViewTouchListener;
 import com.google.android.gms.maps.MapView;
+import com.jaredrummler.materialspinner.MaterialSpinner;
 import com.muddzdev.styleabletoastlibrary.StyleableToast;
 import com.rohit.recycleritemclicksupport.RecyclerItemClickSupport;
 import com.wunderlist.slidinglayer.SlidingLayer;
@@ -64,40 +65,31 @@ public class GridMainEventsFrag extends ProgressFragment {
     private String userId;
     private View mContentView;
     private SlidingLayer slidingLayer;
-    private Toolbar toolbar;
+    private MaterialSpinner toolbarSpinner;
     private Bundle eventBundle;
     private Handler mHandler;
+    private TextView eventName, eventLoc, eventHoster;
+    private TextView eventPref;
+    private ImageView eventImage;
     private ArrayList<Bundle> bundleList;
     private Runnable mShowContentRunnable = new Runnable() {
         @Override
-        public void run() {
-            if (isAdded()) {
-                setContentShown(true);}} };
+        public void run() {if (isAdded()) { setContentShown(true);}} };
 
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         saveEvent = new JSONObject();
         deleteEvent = new JSONObject();
-
         userId = getArguments().getString("currentUserId");
-
-        toolbar = (Toolbar)getActivity().findViewById(R.id.toolbar);
+        toolbarSpinner = (MaterialSpinner)getActivity().findViewById(R.id.spinner);
         slidingLayer = (SlidingLayer)getActivity().findViewById(R.id.slidingLayer1);
-
-        setHasOptionsMenu(true);
-    }
-
-    public static GridMainEventsFrag newInstance() {
-        return new GridMainEventsFrag();
-    }
-    public ArrayList<JSONObject> getData(){
-        return data;
-    }
+        setHasOptionsMenu(true);}
 
 
+    public static GridMainEventsFrag newInstance() { return new GridMainEventsFrag(); }
+    public ArrayList<JSONObject> getData(){ return data; }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -109,20 +101,19 @@ public class GridMainEventsFrag extends ProgressFragment {
             public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
                 super.onScrollStateChanged(recyclerView, newState);
                 slidingLayer.closeLayer(true);} });
-        return super.onCreateView(inflater, container, savedInstanceState);
-    }
+        return super.onCreateView(inflater, container, savedInstanceState); }
+
 
     private void obtainData() {
         try {
             setContentShown(false);
             mHandler = new Handler();
-            mHandler.postDelayed(mShowContentRunnable, 600);
+            mHandler.postDelayed(mShowContentRunnable, 900);
             data = new QueryEventList(getString(R.string.DATABASE_MAIN_EVENTS_PULLER), userId).execute().get();
             Events.fromJson(data,getContext());
             mAdapter = new EventAdapter(getContext().getApplicationContext(), 2, "", getActivity());
-        } catch (InterruptedException | ExecutionException e) {
-            e.printStackTrace(); }
-    }
+            mAdapter.setEventData(data);
+        } catch (InterruptedException | ExecutionException e) { e.printStackTrace(); } }
 
 
 
@@ -137,25 +128,20 @@ public class GridMainEventsFrag extends ProgressFragment {
 
         setContentView(mContentView);
         if (isAdded()) {
-
             obtainData();
-            mAdapter.setEventData(data);
             mRecyclerView.setAdapter(mAdapter);
             bundleList = mAdapter.getBundleList();
-
             StaggeredGridLayoutManager staggeredGridLayoutManager = new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL);
-
             mRecyclerView.setLayoutManager(staggeredGridLayoutManager);
             mRecyclerView.setHasFixedSize(false);
-            mRecyclerView.setItemViewCacheSize(500);
+            mRecyclerView.setItemViewCacheSize(200);
             mRecyclerView.setDrawingCacheEnabled(true);
             mRecyclerView.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_AUTO);
 
             handleRecyclerItemClick();
             fabClick();
             enableCardSwiping();
-        }
-    }
+            setupSpinner();} }
 
 
     public String getImageURL(String path) {
@@ -167,25 +153,21 @@ public class GridMainEventsFrag extends ProgressFragment {
                 new RecyclerItemClickSupport.OnItemClickListener() {
                     @Override
                     public void onItemClicked(RecyclerView recyclerView, int position, final View view) {
-                        TextView eventName = (TextView)getActivity().findViewById(R.id.slidename);
-                        TextView eventHoster = (TextView)getActivity().findViewById(R.id.slideHoster);
-                        TextView eventPref = (TextView)getActivity().findViewById(R.id.slidePref);
-                        TextView eventLoc = (TextView)getActivity().findViewById(R.id.slideLocation);
-                        ImageView eventImage = (ImageView)getActivity().findViewById(R.id.slideImage);
-                        try {
-                            eventName.setText(data.get(position).getString("event_name"));
-                            eventHoster.setText("Presented By:"+data.get(position).getString("event_sponsor"));
-                            eventPref.setText(data.get(position).getString("preference_name"));
-                            eventLoc.setText(data.get(position).getString("event_location"));
-                            Glide.with(GridMainEventsFrag.this).load(getImageURL(data.get(position)
-                                    .getString("img_path"))).into(eventImage);
-                            eventBundle = getBundle(position);
+                        eventName = (TextView)getActivity().findViewById(R.id.slidename);
+                        eventHoster = (TextView)getActivity().findViewById(R.id.slideHoster);
+                        eventPref = (TextView)getActivity().findViewById(R.id.slidePref);
+                        eventLoc = (TextView)getActivity().findViewById(R.id.slideLocation);
+                        eventImage = (ImageView)getActivity().findViewById(R.id.slideImage);
 
-                        }
-                        catch (JSONException e) { e.printStackTrace();}
-                        slidingLayer.openLayer(true);
-                    }
-            }); }
+                            try {eventName.setText(data.get(position).getString("event_name"));
+                                eventHoster.setText("Presented By:"+data.get(position).getString("event_sponsor"));
+                                eventPref.setText(data.get(position).getString("preference_name"));
+                                eventLoc.setText(data.get(position).getString("event_location"));
+                                Glide.with(GridMainEventsFrag.this).load(getImageURL(data.get(position)
+                                        .getString("img_path"))).into(eventImage);
+                                eventBundle = getBundle(position); }
+                            catch (JSONException e) { e.printStackTrace();}
+                            slidingLayer.openLayer(true); } }); }
 
 
     private void fabClick(){
@@ -194,39 +176,28 @@ public class GridMainEventsFrag extends ProgressFragment {
         fab.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(getActivity(), DisplayEvent.class);
+                Intent intent = new Intent(getActivity().getApplicationContext(), DisplayEvent.class);
                 if(eventBundle!=null) {
                     intent.putExtras(eventBundle);
-                    getActivity().startActivity(intent); } } });
+                    getActivity().getApplicationContext().startActivity(intent); } } });
         mRecyclerView.addOnScrollListener(new OnScrollListener() {
             @Override
             public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
                 super.onScrollStateChanged(recyclerView, newState);
-                slidingLayer.closeLayer(true);
-            }
-        });
-    }
-
-
+                slidingLayer.closeLayer(true); } }); }
 
 
     private void enableCardSwiping() {
         SwipeableRecyclerViewTouchListener swipeTouchListener = new SwipeableRecyclerViewTouchListener(mRecyclerView,
                 new SwipeableRecyclerViewTouchListener.SwipeListener() {
                     @Override
-                    public boolean canSwipeLeft(int i) {
-                        return true;
-                    }
+                    public boolean canSwipeLeft(int i) { return true; }
 
                     @Override
-                    public boolean canSwipeRight(int i) {
-                        return true;
-                    }
+                    public boolean canSwipeRight(int i) { return true; }
 
                     @Override
                     public void onDismissedBySwipeLeft(RecyclerView recyclerView, int[] ints) {
-                        StyleableToast st = new StyleableToast(getContext(), "Removing...", Toast.LENGTH_SHORT);
-
                         for (int position : ints) {
                             try {
                                 mAdapter.notifyItemRemoved(position);
@@ -235,15 +206,10 @@ public class GridMainEventsFrag extends ProgressFragment {
                                 data.remove(position);
                                 new UpdateDbOnSwipe(getString(R.string.DATABASE_STORE_DELETED_EVENTS)).execute(deleteEvent);
                             } catch (JSONException e) {
-                                e.printStackTrace();}
-
-                        }
-                    }
+                                e.printStackTrace();} } }
 
                     @Override
                     public void onDismissedBySwipeRight(RecyclerView recyclerView, int[] ints) {
-                        StyleableToast st = new StyleableToast(getContext(), "Saving...", Toast.LENGTH_SHORT);
-
                         for (int position : ints) {
                             try {mAdapter.notifyItemRemoved(position);
                                 saveEvent.put("user_id", mAdapter.getObject().get(position).getString("user_id"));
@@ -251,23 +217,23 @@ public class GridMainEventsFrag extends ProgressFragment {
                                 data.remove(position);
                                 mAdapter.removeBundleAtPosition(position);
                                 new UpdateDbOnSwipe(getString(R.string.DATABASE_STORE_SAVED_EVENTS)).execute(saveEvent);
-                            } catch (JSONException e) {e.printStackTrace();}
+                            } catch (JSONException e) {e.printStackTrace();} } }
+                }); mRecyclerView.addOnItemTouchListener(swipeTouchListener); }
 
-                        }
-                    }
+    private void setupSpinner(){
+        toolbarSpinner.setOnItemSelectedListener(new MaterialSpinner.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(MaterialSpinner materialSpinner, int i, long l, Object o) {
+                switch (i){
+                    case 0: Events.fromJson(data, getContext());break;
+                    case 1: Events.toFurthest(data); break;
+                    case 2: Events.toEarliest(data); break;
+                    case 3: Events.toLatest(data); break;
+                    default: Events.fromJson(data, getContext());break;}
+                mAdapter.setEventData(data); mAdapter.notifyDataSetChanged();
 
-                }); mRecyclerView.addOnItemTouchListener(swipeTouchListener);
-    }
+            } }); }
 
-
-    @Override
-    public void onResume() {  // After a pause OR at startup
-        super.onResume();
-    }
-
-    @Override
-    public void onStart()
-    {super.onStart(); }
 
     private Bundle getBundle(int position) throws JSONException {
         Bundle bundle = new Bundle();

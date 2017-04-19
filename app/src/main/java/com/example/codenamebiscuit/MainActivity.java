@@ -94,6 +94,7 @@ public class MainActivity extends AppCompatActivity {
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
         setContentView(R.layout.launch_layout);
         gps = new GPSTracker(this);
+        mSlidingLayer = (SlidingLayer)findViewById(R.id.slidingLayer1);
 
 
         pref = PreferenceManager.getDefaultSharedPreferences(this);
@@ -263,32 +264,25 @@ public class MainActivity extends AppCompatActivity {
             case R.id.action_anchor:
                 break;
             case R.id.action_toggle:
-                if(expandButton.getVisibility()==View.VISIBLE)
-                    expandButton.setVisibility(View.GONE);
-                else
-                    expandButton.setVisibility(View.VISIBLE);
+                if(expandButton.getVisibility()==View.VISIBLE) expandButton.setVisibility(View.GONE);
+                else expandButton.setVisibility(View.VISIBLE);
                 break;
              case R.id.action_grid_to_full:
                 if(eventsFrag.isAdded()){
                     fragmentTransaction.replace(R.id.fragment_container, swipeEvents, "swipeFrag");
-                    fragmentTransaction.commitNowAllowingStateLoss();
-                    getSupportFragmentManager().executePendingTransactions();
+                    fragmentTransaction.commitNowAllowingStateLoss();}
 
-                }
                 else if(swipeEvents.isAdded()){
                     fragmentTransaction.replace(R.id.fragment_container, eventsFrag, "eventsFrag");
-                    fragmentTransaction.commitNowAllowingStateLoss();
-                    getSupportFragmentManager().executePendingTransactions();
-                }
+                    fragmentTransaction.commitNowAllowingStateLoss(); }
+
         }
         return super.onOptionsItemSelected(item); }
 
 
     private void loadDrawer(Bundle savedState) {
-
         createDrawer = new CreateDrawer(savedState, toolbar, this, userId);
-        createDrawer.loadDrawer();
-    }
+        createDrawer.loadDrawer(); }
 
     public void setupPreferences(final List<FancyButton> btnList) {
         try {
@@ -335,17 +329,18 @@ public class MainActivity extends AppCompatActivity {
         touched=false;
     }
 
-    public void setupSpinner(){
-        toolbarSpinner.setItems("Nearest", "Furthest", "Newest", "Oldest", "Preferences");
+    public void setupSpinner() {
+        toolbarSpinner.setItems("Distance: Nearest", "Distance: Furthest", "Date: Earliest", "Date: Latest", "Update Preferences");
         toolbarSpinner.setOnItemSelectedListener(new MaterialSpinner.OnItemSelectedListener() {
             @Override
             public void onItemSelected(MaterialSpinner materialSpinner, int i, long l, Object o) {
                 switch (i){
-                    case 4:
-                        expandableLayout.expand();
-                        materialSpinner.setSelectedIndex(0);
-                        break;
-                } } }); }
-
+                    case 4: expandableLayout.expand();
+                        materialSpinner.collapse();
+                        materialSpinner.setSelected(false);
+                }
+            }
+        });
+    }
 
 }

@@ -80,7 +80,7 @@
                     android:layout_gravity="top|end"
                     android:src="@drawable/ic_arrow_forward_white_48dp"
                     android:clickable="true"
-                    app:backgroundTint="@color/accent"
+                    app:backgroundTint="@color/livinPink"
                     xmlns:app="http://schemas.android.com/apk/res-auto" />
 
             <include layout="@layout/standard_launch"/>
