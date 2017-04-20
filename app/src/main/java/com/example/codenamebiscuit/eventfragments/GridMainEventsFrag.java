@@ -15,6 +15,7 @@ import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.Fragment;
 import android.support.v4.view.animation.FastOutSlowInInterpolator;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
@@ -44,6 +45,8 @@ import com.muddzdev.styleabletoastlibrary.StyleableToast;
 import com.rohit.recycleritemclicksupport.RecyclerItemClickSupport;
 import com.wunderlist.slidinglayer.SlidingLayer;
 
+import net.cachapa.expandablelayout.ExpandableLayout;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -71,6 +74,7 @@ public class GridMainEventsFrag extends ProgressFragment {
     private TextView eventName, eventLoc, eventHoster;
     private TextView eventPref;
     private ImageView eventImage;
+    private ExpandableLayout expandableLayout;
     private ArrayList<Bundle> bundleList;
     private Runnable mShowContentRunnable = new Runnable() {
         @Override
@@ -83,7 +87,6 @@ public class GridMainEventsFrag extends ProgressFragment {
         saveEvent = new JSONObject();
         deleteEvent = new JSONObject();
         userId = getArguments().getString("currentUserId");
-        toolbarSpinner = (MaterialSpinner)getActivity().findViewById(R.id.spinner);
         slidingLayer = (SlidingLayer)getActivity().findViewById(R.id.slidingLayer1);
         setHasOptionsMenu(true);}
 
@@ -109,8 +112,10 @@ public class GridMainEventsFrag extends ProgressFragment {
             setContentShown(false);
             mHandler = new Handler();
             mHandler.postDelayed(mShowContentRunnable, 900);
-            data = new QueryEventList(getString(R.string.DATABASE_MAIN_EVENTS_PULLER), userId).execute().get();
-            Events.fromJson(data,getContext());
+            SwipeEvents frag = (SwipeEvents)getFragmentManager().findFragmentByTag("swipeFrag");
+            if(frag!=null && frag.getData().size()!=data.size()) data = frag.getData();
+            else data = new QueryEventList(getString(R.string.DATABASE_MAIN_EVENTS_PULLER), userId).execute().get();
+            Events.fromJson(data, getActivity());
             mAdapter = new EventAdapter(getContext().getApplicationContext(), 2, "", getActivity());
             mAdapter.setEventData(data);
         } catch (InterruptedException | ExecutionException e) { e.printStackTrace(); } }
@@ -125,6 +130,10 @@ public class GridMainEventsFrag extends ProgressFragment {
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+        expandableLayout = (ExpandableLayout)getActivity().findViewById(R.id.expandable_layout);
+        toolbarSpinner = (MaterialSpinner)getActivity().findViewById(R.id.spinner);
+        toolbarSpinner.setSelectedIndex(toolbarSpinner.getSelectedIndex());
+
 
         setContentView(mContentView);
         if (isAdded()) {
@@ -224,15 +233,33 @@ public class GridMainEventsFrag extends ProgressFragment {
         toolbarSpinner.setOnItemSelectedListener(new MaterialSpinner.OnItemSelectedListener() {
             @Override
             public void onItemSelected(MaterialSpinner materialSpinner, int i, long l, Object o) {
-                switch (i){
-                    case 0: Events.fromJson(data, getContext());break;
-                    case 1: Events.toFurthest(data); break;
-                    case 2: Events.toEarliest(data); break;
-                    case 3: Events.toLatest(data); break;
-                    default: Events.fromJson(data, getContext());break;}
-                mAdapter.setEventData(data); mAdapter.notifyDataSetChanged();
-
-            } }); }
+                switch (i) {
+                    case 0:
+                        Events.fromJson(data, getActivity());
+                        materialSpinner.setSelectedIndex(i);
+                        mAdapter.setEventData(data);mAdapter.notifyDataSetChanged();break;
+                    case 1:
+                        Events.toFurthest(data);
+                        materialSpinner.setSelectedIndex(i);
+                        mAdapter.setEventData(data);mAdapter.notifyDataSetChanged();break;
+                    case 2:
+                        Events.toEarliest(data);
+                        materialSpinner.setSelectedIndex(i);
+                        mAdapter.setEventData(data);mAdapter.notifyDataSetChanged();break;
+                    case 3:
+                        Events.toLatest(data);
+                        materialSpinner.setSelectedIndex(i);
+                        mAdapter.setEventData(data); mAdapter.notifyDataSetChanged(); break;
+                    case 4:
+                        expandableLayout.expand();materialSpinner.setSelectedIndex(0); break;
+                }}});
+        toolbarSpinner.setOnNothingSelectedListener(new MaterialSpinner.OnNothingSelectedListener() {
+            @Override
+            public void onNothingSelected(MaterialSpinner materialSpinner) {
+                materialSpinner.setSelectedIndex(materialSpinner.getSelectedIndex());
+            }
+        });
+    }
 
 
     private Bundle getBundle(int position) throws JSONException {

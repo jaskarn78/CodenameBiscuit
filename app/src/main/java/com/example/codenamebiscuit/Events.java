@@ -1,5 +1,6 @@
 package com.example.codenamebiscuit;
 
+import android.app.Activity;
 import android.content.Context;
 import android.location.Location;
 import android.os.Parcel;
@@ -131,9 +132,9 @@ public class Events implements Serializable{
 
 
 
-    public static ArrayList<Events> fromJson(ArrayList<JSONObject> jsonArray, Context context){
+    public static ArrayList<Events> fromJson(ArrayList<JSONObject> jsonArray, Activity activity){
         JSONObject event;
-        Location currLocation = currentLocation(context);
+        Location currLocation = currentLocation(activity);
         ArrayList<Events> eventsList = new ArrayList<>(jsonArray.size());
         for(int i=0; i<jsonArray.size(); i++){
             try{
@@ -210,8 +211,8 @@ public class Events implements Serializable{
     }
 
 
-    public static Location currentLocation(Context context){
-        GPSTracker gps = new GPSTracker(context.getApplicationContext());
+    public static Location currentLocation(Activity activity){
+        GPSTracker gps = new GPSTracker(activity.getApplicationContext());
         Location curLocation = new Location("");
         if(gps.canGetLocation()){
             curLocation.setLatitude(gps.getLatitude());

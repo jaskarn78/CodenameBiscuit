@@ -16,7 +16,6 @@
         android:layout_marginEnd="1dp"
         android:layout_marginStart="1dp"
         android:layout_marginTop="1dp"
-        android:background="@color/cardview_dark_background"
         android:orientation="vertical"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
@@ -38,22 +37,22 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/event_pager"
+                android:background="@android:color/transparent"
                 swipedeck:max_visible="2"
                 swipedeck:render_above="false"
                 android:layout_alignParentTop="true"
-                swipedeck:card_spacing="6dp"/>
+                swipedeck:card_spacing="4dp"/>
 
 
 
             <android.support.v4.view.ViewPager
                 android:id="@+id/event_pager"
-                android:background="@color/livinBlack"
                 android:layout_width="match_parent"
-                android:layout_height="140dp"
+                android:layout_height="150dp"
                 android:layout_alignParentBottom="true"
-                android:layout_marginTop="1dp"
-                android:visibility="gone"
                 android:layout_marginBottom="1dp"
+                android:foreground="?android:attr/selectableItemBackground"
+                android:clickable="true"
                 />
 
         </RelativeLayout>

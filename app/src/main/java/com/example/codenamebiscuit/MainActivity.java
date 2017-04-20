@@ -247,10 +247,14 @@ public class MainActivity extends AppCompatActivity {
     public boolean onPrepareOptionsMenu(Menu menu) {
         MenuItem item =menu.findItem(R.id.action_grid_to_full).setVisible(true);
         if(eventsFrag!=null && swipeEvents!=null) {
-            if (eventsFrag.isVisible())
+            if (eventsFrag.isVisible()) {
                 item.setIcon(R.drawable.ic_fullscreen_white_48dp);
+                mSlidingLayer.setVisibility(View.VISIBLE);
+            }
+
             else if (swipeEvents.isVisible()) {
                 item.setIcon(R.drawable.ic_grid_on_white_48dp);
+                mSlidingLayer.setVisibility(View.GONE);
             }
         }
         return super.onPrepareOptionsMenu(menu); }
@@ -270,11 +274,13 @@ public class MainActivity extends AppCompatActivity {
              case R.id.action_grid_to_full:
                 if(eventsFrag.isAdded()){
                     fragmentTransaction.replace(R.id.fragment_container, swipeEvents, "swipeFrag");
-                    fragmentTransaction.commitNowAllowingStateLoss();}
+                    fragmentTransaction.commitNowAllowingStateLoss();
+                    getSupportFragmentManager().executePendingTransactions();}
 
                 else if(swipeEvents.isAdded()){
                     fragmentTransaction.replace(R.id.fragment_container, eventsFrag, "eventsFrag");
-                    fragmentTransaction.commitNowAllowingStateLoss(); }
+                    fragmentTransaction.commitNowAllowingStateLoss();
+                    getSupportFragmentManager().executePendingTransactions();}
 
         }
         return super.onOptionsItemSelected(item); }
@@ -331,16 +337,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void setupSpinner() {
         toolbarSpinner.setItems("Distance: Nearest", "Distance: Furthest", "Date: Earliest", "Date: Latest", "Update Preferences");
-        toolbarSpinner.setOnItemSelectedListener(new MaterialSpinner.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(MaterialSpinner materialSpinner, int i, long l, Object o) {
-                switch (i){
-                    case 4: expandableLayout.expand();
-                        materialSpinner.collapse();
-                        materialSpinner.setSelected(false);
-                }
-            }
-        });
+
     }
 
 }

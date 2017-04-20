@@ -30,10 +30,12 @@ import com.bumptech.glide.request.target.Target;
 import com.devspark.progressfragment.ProgressFragment;
 import com.example.codenamebiscuit.Events;
 import com.example.codenamebiscuit.R;
+import com.example.codenamebiscuit.SwipePagerAdapter;
 import com.example.codenamebiscuit.requests.QueryEventList;
 import com.example.codenamebiscuit.requests.UpdateDbOnSwipe;
 import com.example.codenamebiscuit.swipedeck.SwipeDeck;
 import com.google.android.gms.maps.MapView;
+import com.jaredrummler.materialspinner.MaterialSpinner;
 import com.muddzdev.styleabletoastlibrary.StyleableToast;
 import com.wunderlist.slidinglayer.SlidingLayer;
 
@@ -48,7 +50,6 @@ public class SwipeEvents extends ProgressFragment{
 
     private SwipeDeckAdapter adapter;
     private JSONObject saveEvent, deleteEvent;
-    private TextView eventName, eventLoc; private TextView eventPref, eventHoster;
     private String image; private String userId;
     private JSONObject user;
     private ArrayList<JSONObject> data;
@@ -56,8 +57,11 @@ public class SwipeEvents extends ProgressFragment{
     private View mContentView;
     private ImageView eventImageBottom;
     private SwipeDeck cardStack;
-    private SlidingLayer slidingLayer;
+    private MaterialSpinner toolbarSpinner;
+    private ExpandableLayout expandableLayout;
     private Handler mHandler;
+    private ViewPager viewPager;
+    private SwipePagerAdapter swipePagerAdapter;
     private Runnable mShowContentRunnable = new Runnable() {
         @Override
         public void run() { if(isAdded()) { setContentShown(true); } } };
@@ -78,33 +82,36 @@ public class SwipeEvents extends ProgressFragment{
                              Bundle savedInstanceState){
         setHasOptionsMenu(true);
         mContentView = inflater.inflate(R.layout.activity_swipe_events, container, false);
-        eventName = (TextView)getActivity().findViewById(R.id.slidename);
-        eventHoster = (TextView)getActivity().findViewById(R.id.slideHoster);
-        eventPref = (TextView)getActivity().findViewById(R.id.slidePref);
-        eventLoc = (TextView)getActivity().findViewById(R.id.slideLocation);
-        eventImageBottom = (ImageView)getActivity().findViewById(R.id.slideImage);
-        slidingLayer = (SlidingLayer)getActivity().findViewById(R.id.slidingLayer1);
-        slidingLayer.openLayer(true);
-        return super.onCreateView(inflater, container, savedInstanceState);
-    }
+        return super.onCreateView(inflater, container, savedInstanceState); }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        setupOnCreate(); }
+        viewPager = (ViewPager)mContentView.findViewById(R.id.event_pager);
+        swipePagerAdapter = new SwipePagerAdapter(getContext());
+        eventImageBottom = (ImageView)getActivity().findViewById(R.id.slideImage);
+        toolbarSpinner = (MaterialSpinner)getActivity().findViewById(R.id.spinner);
+        expandableLayout = (ExpandableLayout)getActivity().findViewById(R.id.expandable_layout);
+        setupOnCreate();
+        setupSpinner();}
 
 
     private void obtainData(){
         setContentShown(false);
         mHandler = new Handler();
-        mHandler.postDelayed(mShowContentRunnable, 400);
-        try {
+        mHandler.postDelayed(mShowContentRunnable, 100);
+        GridMainEventsFrag frag = (GridMainEventsFrag)getFragmentManager().findFragmentByTag("eventsFrag");
+        if(frag!=null) data = frag.getData();
+        else try {
             data = new QueryEventList(getString(R.string.DATABASE_MAIN_EVENTS_PULLER), userId).execute().get();
-            Events.fromJson(data,getContext());
-            adapter = new SwipeDeckAdapter(getContext());
-            cardStack = (SwipeDeck) mContentView.findViewById(R.id.swipe_deck);
-            cardStack.setAdapter(adapter);
+            Events.fromJson(data, getActivity());
         } catch (InterruptedException | ExecutionException e) { e.printStackTrace(); }
+
+
+        adapter = new SwipeDeckAdapter(getContext());
+        cardStack = (SwipeDeck) mContentView.findViewById(R.id.swipe_deck);
+        cardStack.setAdapter(adapter); swipePagerAdapter.setPagerData(data);
+        viewPager.setAdapter(swipePagerAdapter);
     }
 
 
@@ -125,7 +132,6 @@ public class SwipeEvents extends ProgressFragment{
                     try {
                         deleteEvent.put("event_id", adapter.getItem((int) stableId).get("event_id"));
                         deleteEvent.put("user_id", adapter.getItem((int) stableId).get("user_id"));
-                        slidingLayer.closeLayer(true);
                     } catch (JSONException e) { e.printStackTrace(); }
                     new UpdateDbOnSwipe(getString(R.string.DATABASE_STORE_DELETED_EVENTS)).execute(deleteEvent); }
 
@@ -134,13 +140,17 @@ public class SwipeEvents extends ProgressFragment{
                     try {
                         saveEvent.put("event_id", adapter.getItem((int) stableId).get("event_id"));
                         saveEvent.put("user_id", adapter.getItem((int) stableId).get("user_id"));
-                        slidingLayer.closeLayer(true);
                     } catch (JSONException e) { e.printStackTrace(); }
                     new UpdateDbOnSwipe(getString(R.string.DATABASE_STORE_SAVED_EVENTS)).execute(saveEvent); }
 
                 @Override
-                public boolean isDragEnabled(long itemId) { slidingLayer.openLayer(true); return true;}
-            }); } }
+                public boolean isDragEnabled(long itemId) { return true;}
+            });
+            viewPager.setOnTouchListener(new View.OnTouchListener() {
+                @Override
+                public boolean onTouch(View v, MotionEvent event) {
+                    return true; } });
+        } }
 
 
     /**
@@ -170,30 +180,8 @@ public class SwipeEvents extends ProgressFragment{
             View v;
             LayoutInflater inflater = getActivity().getLayoutInflater();
             v = inflater.inflate(R.layout.cards, parent, false);
+            viewPager.setCurrentItem(position-1);
             try {image = getImageURL(data.get(position).getString("img_path")); } catch (JSONException e) { e.printStackTrace();}
-            CardView cardView = (CardView)v.findViewById(R.id.card_swipe);
-            cardView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    slidingLayer.openLayer(true);
-                    try{
-                        eventName.setText(data.get((int)getItemId(position)).getString("event_name"));
-                        eventHoster.setText("Presented By:" + data.get((int)getItemId(position)).getString("event_sponsor"));
-                        eventPref.setText(data.get((int)getItemId(position)).getString("preference_name"));
-                        eventLoc.setText(data.get((int)getItemId(position)).getString("event_location"));
-                        Glide.with(getActivity())
-                                .load(getImageURL(data.get((int)getItemId(position)).getString("img_path")))
-                                .diskCacheStrategy(DiskCacheStrategy.ALL)
-                                .into(eventImageBottom);
-                    }   catch (JSONException e) { e.printStackTrace();} } });
-            fab = (FloatingActionButton)getActivity().findViewById(R.id.fab);
-            fab.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Intent intent = new Intent(getActivity(), DisplayEvent.class);
-                    intent.putExtras(getBundle(position-1));
-                    getActivity().startActivity(intent); } });
-
             /**
              * initialize all views on the back side of the card
              * assign values to all views
@@ -242,5 +230,35 @@ public class SwipeEvents extends ProgressFragment{
             bundle.putString("eventWebsite", data.get(position).getString("event_website"));
         } catch (JSONException e) { e.printStackTrace(); }
         return bundle; }
+    public ArrayList<JSONObject> getData(){
+        return data;
+    }
+    private void setupSpinner(){
+        toolbarSpinner.setOnItemSelectedListener(new MaterialSpinner.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(MaterialSpinner materialSpinner, int i, long l, Object o) {
+                switch (i) {
+                    case 0:
+                        Events.fromJson(data, getActivity());
+                        materialSpinner.setSelectedIndex(i);break;
+                    case 1:
+                        Events.toFurthest(data);
+                        materialSpinner.setSelectedIndex(i);break;
+                    case 2:
+                        Events.toEarliest(data);
+                        materialSpinner.setSelectedIndex(i);break;
+                    case 3:
+                        Events.toLatest(data);
+                        materialSpinner.setSelectedIndex(i);break;
+                    case 4: expandableLayout.expand();
+                        materialSpinner.setSelectedIndex(0);break;
+                }}});
+        toolbarSpinner.setOnNothingSelectedListener(new MaterialSpinner.OnNothingSelectedListener() {
+            @Override
+            public void onNothingSelected(MaterialSpinner materialSpinner) {
+                materialSpinner.setSelectedIndex(materialSpinner.getSelectedIndex());
+            }
+        });
+    }
 
 }
