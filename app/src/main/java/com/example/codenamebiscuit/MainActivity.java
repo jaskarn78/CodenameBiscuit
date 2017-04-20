@@ -58,8 +58,6 @@ public class MainActivity extends AppCompatActivity {
     private SharedPreferences pref;
     private Toolbar toolbar;
     private SlidingLayer mSlidingLayer;
-    private SlidingUpPanelLayout mLayout;
-    private IconicsImageView closeLayout;
     private JSONObject preferences, removed;
     private GridMainEventsFrag eventsFrag;
     private SwipeEvents swipeEvents;
@@ -67,9 +65,8 @@ public class MainActivity extends AppCompatActivity {
     CreateDrawer createDrawer;
     List<JSONObject> prefList;
     private MaterialSpinner toolbarSpinner;
+    Bundle bundle = new Bundle();
     private String userId;
-    private static int RESULT_LOAD_IMAGE = 1;
-    private AccountHeader header;
     private ExpandableLayout expandableLayout;
     private IconicsImageView expandButton;
 
@@ -147,7 +144,6 @@ public class MainActivity extends AppCompatActivity {
         expandableLayout = (ExpandableLayout)findViewById(R.id.expandable_layout);
         expandButton = (IconicsImageView)findViewById(R.id.closeLayout);
 
-
         FancyButton musicFancyButton = (FancyButton) findViewById(R.id.btn_music);
         FancyButton sportsButton = (FancyButton) findViewById(R.id.btn_sports);
         FancyButton foodButton = (FancyButton) findViewById(R.id.btn_food);
@@ -160,11 +156,8 @@ public class MainActivity extends AppCompatActivity {
         expandButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(expandableLayout.isExpanded()) {
-                    expandableLayout.collapse();
-                    refresh(); }
-                else
-                    expandableLayout.expand();}});
+                if(expandableLayout.isExpanded()) { expandableLayout.collapse(); refresh(); }
+                else expandableLayout.expand();}});
 
 
         List<FancyButton> btnList = new ArrayList();
@@ -207,11 +200,10 @@ public class MainActivity extends AppCompatActivity {
             try {
                 userId=pref.getString("user_id", null);
                 currentUserId.put("user_id", userId);
-            } catch (JSONException e) {
-                e.printStackTrace(); }
-            loadDrawer(savedstate);
+            } catch (JSONException e) { e.printStackTrace(); }
+            createDrawer = new CreateDrawer(savedstate, toolbar, this, userId);
+            createDrawer.loadDrawer();;
             bindViews();
-            Bundle bundle = new Bundle();
             bundle.putString("currentUserId", userId);
 
             swipeEvents = new SwipeEvents();
@@ -278,6 +270,7 @@ public class MainActivity extends AppCompatActivity {
                     getSupportFragmentManager().executePendingTransactions();}
 
                 else if(swipeEvents.isAdded()){
+                    if(mSlidingLayer.isOpened()) mSlidingLayer.closeLayer(true);
                     fragmentTransaction.replace(R.id.fragment_container, eventsFrag, "eventsFrag");
                     fragmentTransaction.commitNowAllowingStateLoss();
                     getSupportFragmentManager().executePendingTransactions();}
@@ -312,11 +305,9 @@ public class MainActivity extends AppCompatActivity {
                     if (!btnList.get(finalI).isSelected()) {
                         btnList.get(finalI).setBackgroundColor(getColor(R.color.livinPink));
                         btnList.get(finalI).setSelected(true);
-
                         try { preferences.put("pref_id" + (finalI + 1), 1); }
                         catch (JSONException e) { e.printStackTrace(); }
                         new RunQuery(getString(R.string.PUSH_USER_PREFERENCES)).execute(preferences);}
-
                     else {
                         btnList.get(finalI).setBackgroundColor(getColor(R.color.translivinPink));
                         btnList.get(finalI).setSelected(false);

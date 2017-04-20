@@ -111,11 +111,11 @@ public class GridMainEventsFrag extends ProgressFragment {
         try {
             setContentShown(false);
             mHandler = new Handler();
-            mHandler.postDelayed(mShowContentRunnable, 900);
+            mHandler.postDelayed(mShowContentRunnable, 800);
             SwipeEvents frag = (SwipeEvents)getFragmentManager().findFragmentByTag("swipeFrag");
             if(frag!=null && frag.getData().size()!=data.size()) data = frag.getData();
-            else data = new QueryEventList(getString(R.string.DATABASE_MAIN_EVENTS_PULLER), userId).execute().get();
-            Events.fromJson(data, getActivity());
+            else {data = new QueryEventList(getString(R.string.DATABASE_MAIN_EVENTS_PULLER), userId).execute().get();
+            Events.fromJson(data, getActivity());}
             mAdapter = new EventAdapter(getContext().getApplicationContext(), 2, "", getActivity());
             mAdapter.setEventData(data);
         } catch (InterruptedException | ExecutionException e) { e.printStackTrace(); } }
@@ -228,6 +228,7 @@ public class GridMainEventsFrag extends ProgressFragment {
                                 new UpdateDbOnSwipe(getString(R.string.DATABASE_STORE_SAVED_EVENTS)).execute(saveEvent);
                             } catch (JSONException e) {e.printStackTrace();} } }
                 }); mRecyclerView.addOnItemTouchListener(swipeTouchListener); }
+
 
     private void setupSpinner(){
         toolbarSpinner.setOnItemSelectedListener(new MaterialSpinner.OnItemSelectedListener() {

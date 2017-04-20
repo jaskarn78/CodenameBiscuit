@@ -4,19 +4,13 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-
-import android.support.design.widget.FloatingActionButton;
 import android.support.v7.preference.PreferenceManager;
 import android.support.v7.widget.CardView;
-import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
-
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebView;
@@ -26,7 +20,6 @@ import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.load.resource.drawable.GlideDrawable;
@@ -36,12 +29,7 @@ import com.daimajia.androidanimations.library.YoYo;
 import com.daimajia.swipe.SimpleSwipeListener;
 import com.daimajia.swipe.SwipeLayout;
 import com.example.codenamebiscuit.R;
-import com.example.codenamebiscuit.eventfragments.DisplayEvent;
-import com.example.codenamebiscuit.eventfragments.GridMainEventsFrag;
 import com.example.codenamebiscuit.requests.UpdateDbOnSwipe;
-import com.mikepenz.iconics.view.IconicsImageView;
-import com.wunderlist.slidinglayer.SlidingLayer;
-
 import org.json.JSONException;
 import org.json.JSONObject;
 import java.util.ArrayList;
@@ -373,6 +361,7 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
         if (type == 2) {
             final ProgressBar progressBar2 = (ProgressBar) rootView.findViewById(R.id.grid_progress);
             loadImage(eventAdapterViewHolder.mEventImage, getImageURL(eventPath), progressBar2);
+
         } }
 
 }
