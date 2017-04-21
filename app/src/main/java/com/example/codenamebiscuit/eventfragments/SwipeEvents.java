@@ -36,7 +36,6 @@ import com.example.codenamebiscuit.requests.UpdateDbOnSwipe;
 import com.example.codenamebiscuit.swipedeck.SwipeDeck;
 import com.google.android.gms.maps.MapView;
 import com.jaredrummler.materialspinner.MaterialSpinner;
-import com.muddzdev.styleabletoastlibrary.StyleableToast;
 import com.wunderlist.slidinglayer.SlidingLayer;
 
 import net.cachapa.expandablelayout.ExpandableLayout;
@@ -108,7 +107,7 @@ public class SwipeEvents extends ProgressFragment{
         } catch (InterruptedException | ExecutionException e) { e.printStackTrace(); }
 
 
-        adapter = new SwipeDeckAdapter(getContext());
+        adapter = new SwipeDeckAdapter(getContext()); adapter.setData(data);
         cardStack = (SwipeDeck) mContentView.findViewById(R.id.swipe_deck);
         cardStack.setAdapter(adapter); swipePagerAdapter.setPagerData(data);
         viewPager.setAdapter(swipePagerAdapter);
@@ -160,9 +159,14 @@ public class SwipeEvents extends ProgressFragment{
      */
     public class SwipeDeckAdapter extends BaseAdapter {
         private Context context;
+        private ArrayList<JSONObject> data;
 
         public SwipeDeckAdapter(Context context)
         { this.context = context; }
+
+        public void setData(ArrayList<JSONObject> data){
+            this.data=data;
+        }
 
         @Override
         public int getCount() { return data.size(); }
@@ -211,25 +215,7 @@ public class SwipeEvents extends ProgressFragment{
                             return false;} }) .into(imageView); }
     }
 
-    private Bundle getBundle(int position) {
-        Bundle bundle = new Bundle();
-        try {
-            bundle.putString("eventName", data.get(position).getString("event_name"));
-            bundle.putString("eventImage", data.get(position).getString("img_path"));
-            bundle.putString("eventDate", data.get(position).getString("start_date"));
-            bundle.putString("eventHoster", data.get(position).getString("event_sponsor"));
-            bundle.putString("eventDistance", data.get(position).getString("event_distance"));
-            bundle.putString("eventPreference", data.get(position).getString("preference_name"));
-            bundle.putString("eventDescription", data.get(position).getString("event_description"));
-            bundle.putString("eventLocation", data.get(position).getString("event_location"));
-            bundle.putString("eventCost", data.get(position).getString("event_cost"));
-            bundle.putString("eventTime", data.get(position).getString("start_time"));
-            bundle.putString("eventId", data.get(position).getString("event_id"));
-            bundle.putDouble("eventLat", data.get(position).getDouble("lat"));
-            bundle.putDouble("eventLng", data.get(position).getDouble("lng"));
-            bundle.putString("eventWebsite", data.get(position).getString("event_website"));
-        } catch (JSONException e) { e.printStackTrace(); }
-        return bundle; }
+
     public ArrayList<JSONObject> getData(){
         return data;
     }
@@ -240,19 +226,39 @@ public class SwipeEvents extends ProgressFragment{
                 switch (i) {
                     case 0:
                         Events.fromJson(data, getActivity());
-                        materialSpinner.setSelectedIndex(i);break;
+                        adapter.setData(data); swipePagerAdapter.setPagerData(data);
+                        cardStack.setAdapter(adapter); viewPager.setAdapter(swipePagerAdapter);
+                        adapter.notifyDataSetChanged();
+                        swipePagerAdapter.notifyDataSetChanged();break;
                     case 1:
                         Events.toFurthest(data);
-                        materialSpinner.setSelectedIndex(i);break;
+                        adapter.setData(data); swipePagerAdapter.setPagerData(data);
+                        cardStack.setAdapter(adapter); viewPager.setAdapter(swipePagerAdapter);
+
+                        adapter.notifyDataSetChanged();
+                        swipePagerAdapter.notifyDataSetChanged();;break;
                     case 2:
                         Events.toEarliest(data);
-                        materialSpinner.setSelectedIndex(i);break;
+                        adapter.setData(data); swipePagerAdapter.setPagerData(data);
+                        cardStack.setAdapter(adapter); viewPager.setAdapter(swipePagerAdapter);
+
+                        adapter.notifyDataSetChanged();
+                        swipePagerAdapter.notifyDataSetChanged();;break;
                     case 3:
                         Events.toLatest(data);
-                        materialSpinner.setSelectedIndex(i);break;
-                    case 4: expandableLayout.expand();
-                        materialSpinner.setSelectedIndex(0);break;
-                }}});
+                        adapter.setData(data); swipePagerAdapter.setPagerData(data);
+                        cardStack.setAdapter(adapter); viewPager.setAdapter(swipePagerAdapter);
+
+                        adapter.notifyDataSetChanged();
+                        swipePagerAdapter.notifyDataSetChanged();;break;
+                    default:Events.fromJson(data, getActivity());
+                        adapter.setData(data); swipePagerAdapter.setPagerData(data);
+                        cardStack.setAdapter(adapter); viewPager.setAdapter(swipePagerAdapter);
+                        adapter.notifyDataSetChanged();
+                        swipePagerAdapter.notifyDataSetChanged();
+                        break;
+                }
+            }});
         toolbarSpinner.setOnNothingSelectedListener(new MaterialSpinner.OnNothingSelectedListener() {
             @Override
             public void onNothingSelected(MaterialSpinner materialSpinner) {

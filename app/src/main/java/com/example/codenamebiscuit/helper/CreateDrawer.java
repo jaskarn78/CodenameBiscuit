@@ -5,15 +5,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
-import android.graphics.Color;
 import android.graphics.drawable.Drawable;
-import android.location.Address;
-import android.location.Geocoder;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v7.preference.PreferenceManager;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -21,50 +16,30 @@ import android.view.View;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.example.codenamebiscuit.ArchivedEvents;
-import com.example.codenamebiscuit.EmbeddedFragment;
 import com.example.codenamebiscuit.MainActivity;
-import com.example.codenamebiscuit.MainEvents;
 import com.example.codenamebiscuit.MapActivity;
 import com.example.codenamebiscuit.R;
-import com.example.codenamebiscuit.eventfragments.DeletedEventsFrag;
-import com.example.codenamebiscuit.eventfragments.GridMainEventsFrag;
-import com.example.codenamebiscuit.eventfragments.SavedEventsFrag;
-import com.example.codenamebiscuit.eventfragments.SwipeEvents;
 import com.example.codenamebiscuit.login.ChooseLogin;
 import com.example.codenamebiscuit.settings.UserSettingsActivity;
 import com.google.android.gms.maps.model.LatLng;
-import com.mikepenz.fontawesome_typeface_library.FontAwesome;
-import com.mikepenz.google_material_typeface_library.GoogleMaterial;
 import com.mikepenz.materialdrawer.AccountHeader;
 import com.mikepenz.materialdrawer.AccountHeaderBuilder;
 import com.mikepenz.materialdrawer.Drawer;
 import com.mikepenz.materialdrawer.DrawerBuilder;
-import com.mikepenz.materialdrawer.MiniDrawer;
 import com.mikepenz.materialdrawer.interfaces.OnCheckedChangeListener;
 import com.mikepenz.materialdrawer.model.DividerDrawerItem;
 import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
 import com.mikepenz.materialdrawer.model.ProfileDrawerItem;
-import com.mikepenz.materialdrawer.model.SwitchDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IProfile;
 import com.mikepenz.materialdrawer.model.interfaces.Nameable;
 import com.mikepenz.materialdrawer.util.AbstractDrawerImageLoader;
 import com.mikepenz.materialdrawer.util.DrawerImageLoader;
-import com.mikepenz.materialize.Materialize;
-import com.muddzdev.styleabletoastlibrary.StyleableToast;
-import com.squareup.picasso.Picasso;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
-import java.util.concurrent.ExecutionException;
 
 
 /**
@@ -123,8 +98,8 @@ public class CreateDrawer {
         DrawerImageLoader.init(new AbstractDrawerImageLoader() {
             @Override
             public void set(ImageView imageView, Uri uri, Drawable placeholder) {
-                Picasso.with(imageView.getContext()).load(uri).placeholder(placeholder)
-                        .fit().centerCrop().into(imageView);
+                Glide.with(imageView.getContext()).load(uri).placeholder(placeholder)
+                        .fitCenter().centerCrop().into(imageView);
             }
         });
 
@@ -188,7 +163,7 @@ public class CreateDrawer {
                         new DividerDrawerItem(),
                         logOut
                                 .withName("Log Out")
-                                .withIcon(FontAwesome.Icon.faw_sign_out)
+                                .withIcon(R.drawable.ic_exit_to_app_white_48dp)
                                 .withIdentifier(5)
                                 .withTextColor(livinWhite)
                                 .withIconColor(livinWhite)

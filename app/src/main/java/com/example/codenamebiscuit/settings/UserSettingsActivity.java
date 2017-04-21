@@ -17,13 +17,13 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.example.codenamebiscuit.R;
 import com.example.codenamebiscuit.helper.App;
 import com.example.codenamebiscuit.login.ChooseLogin;
 import com.facebook.AccessToken;
 import com.facebook.FacebookSdk;
 import com.facebook.Profile;
-import com.squareup.picasso.Picasso;
 
 
 import org.json.JSONException;
@@ -108,14 +108,14 @@ public class UserSettingsActivity
         String imageUrl = profile.getProfilePictureUri(200, 200).toString();
 
         //        this.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        Picasso.with(this).load(imageUrl).centerCrop().fit().into((ImageView)findViewById(R.id.pref_user_image));
+        Glide.with(this).load(imageUrl).centerCrop().fitCenter().into((ImageView)findViewById(R.id.pref_user_image));
 
         mNameView = (TextView) findViewById(R.id.pref_user_name);
         mNameView.setText(name + " " + surname);
     }
 
     private void initializeGoogleProfileInfo(String fName, String lName, Uri url){
-        Picasso.with(this).load(url).centerCrop().fit().into((ImageView)findViewById(R.id.pref_user_image));
+        Glide.with(this).load(url).centerCrop().fitCenter().into((ImageView)findViewById(R.id.pref_user_image));
         mNameView = (TextView) findViewById(R.id.pref_user_name);
         mNameView.setText(fName + " " + lName);
     }

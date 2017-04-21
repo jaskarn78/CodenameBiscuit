@@ -35,7 +35,6 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.like.LikeButton;
 import com.mikepenz.iconics.view.IconicsImageView;
-import com.squareup.picasso.Picasso;
 
 import java.text.ParseException;
 import java.util.Date;
@@ -87,8 +86,6 @@ public class DisplayEvent extends AppCompatActivity{
         upArrow.setColorFilter(getResources().getColor(R.color.livinWhite), PorterDuff.Mode.SRC_ATOP);
         this.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         this.getSupportActionBar().setHomeAsUpIndicator(upArrow);
-
-        typeface= Typeface.createFromAsset(this.getAssets(), "fonts/Raleway-Black.ttf");
         bindViews(savedInstanceState);
 
         setupMap();

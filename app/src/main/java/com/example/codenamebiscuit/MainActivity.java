@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.DataSetObserver;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
@@ -13,17 +14,10 @@ import android.support.v7.preference.PreferenceManager;
 import android.support.v7.widget.Toolbar;
 import android.view.KeyEvent;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.WindowManager;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.ProgressBar;
-import android.widget.Spinner;
-import android.widget.SpinnerAdapter;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import com.example.codenamebiscuit.eventfragments.GridMainEventsFrag;
 import com.example.codenamebiscuit.eventfragments.SwipeEvents;
@@ -34,13 +28,10 @@ import com.example.codenamebiscuit.helper.GPSTracker;
 import com.example.codenamebiscuit.requests.QueryEventList;
 import com.example.codenamebiscuit.login.ChooseLogin;
 import com.facebook.FacebookSdk;
+import com.hlab.fabrevealmenu.view.FABRevealMenu;
 import com.jaredrummler.materialspinner.MaterialSpinner;
-import com.mikepenz.iconics.typeface.GenericFont;
 import com.mikepenz.iconics.view.IconicsImageView;
-import com.mikepenz.materialdrawer.AccountHeader;
-import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 import com.wunderlist.slidinglayer.SlidingLayer;
-import com.wunderlist.slidinglayer.transformer.AlphaTransformer;
 
 import net.cachapa.expandablelayout.ExpandableLayout;
 
@@ -64,11 +55,13 @@ public class MainActivity extends AppCompatActivity {
     private boolean touched;
     CreateDrawer createDrawer;
     List<JSONObject> prefList;
+    FABRevealMenu fabMenu;
+    private View fabMenuView;
     private MaterialSpinner toolbarSpinner;
     Bundle bundle = new Bundle();
     private String userId;
     private ExpandableLayout expandableLayout;
-    private IconicsImageView expandButton;
+    private IconicsImageView closeButton;
 
     GPSTracker gps;
 
@@ -106,7 +99,17 @@ public class MainActivity extends AppCompatActivity {
         setupSpinner();
 
         FacebookSdk.sdkInitialize(getApplicationContext());
+        final FloatingActionButton fabReveal = (FloatingActionButton)findViewById(R.id.fab_reveal);
+        fabMenu = (FABRevealMenu) findViewById(R.id.reveal);
+            if(fabReveal!=null && fabMenu!=null){
+                View customView = View.inflate(this, R.layout.preferences_layout,null);
+                fabMenuView = customView;
+                fabMenu.setCustomView(customView);
+                fabMenu.bindAncherView(fabReveal); }
+
         checkIfFbOrGoogleLogin(savedInstanceState);
+
+
 
     }
 
@@ -115,7 +118,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
     }
-
     @Override
     public void onPause() {
         super.onPause();
@@ -133,8 +135,9 @@ public class MainActivity extends AppCompatActivity {
             ft.setCustomAnimations(R.anim.slide_in_up, R.anim.slide_out_down);
             ft.addToBackStack("swipeEvents");
             ft.replace(R.id.fragment_container, eventsFrag, "eventsFrag");
-            ft.commit();
-        }
+            ft.commit(); }
+
+        if(fabMenu!=null) fabMenu.closeMenu();
     }
 
     /**********************************************************************************
@@ -142,42 +145,33 @@ public class MainActivity extends AppCompatActivity {
      **********************************************************************************/
     private void bindViews() {
         expandableLayout = (ExpandableLayout)findViewById(R.id.expandable_layout);
-        expandButton = (IconicsImageView)findViewById(R.id.closeLayout);
+        closeButton = (IconicsImageView)findViewById(R.id.exit_icon);
 
-        FancyButton musicFancyButton = (FancyButton) findViewById(R.id.btn_music);
-        FancyButton sportsButton = (FancyButton) findViewById(R.id.btn_sports);
-        FancyButton foodButton = (FancyButton) findViewById(R.id.btn_food);
-        FancyButton outdoorButton = (FancyButton) findViewById(R.id.btn_outdoors);
-        FancyButton healthButton = (FancyButton) findViewById(R.id.btn_health);
-        FancyButton entertainmentButton = (FancyButton) findViewById(R.id.btn_entertainment);
-        FancyButton performingButton = (FancyButton) findViewById(R.id.btn_performing);
-        FancyButton retailButton = (FancyButton) findViewById(R.id.btn_retail);
-        FancyButton familyButton = (FancyButton) findViewById(R.id.btn_family);
-        expandButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(expandableLayout.isExpanded()) { expandableLayout.collapse(); refresh(); }
-                else expandableLayout.expand();}});
-
+        FancyButton musicFancyButton = (FancyButton) fabMenuView.findViewById(R.id.btn_music);
+        FancyButton sportsButton = (FancyButton) fabMenuView.findViewById(R.id.btn_sports);
+        FancyButton foodButton = (FancyButton) fabMenuView.findViewById(R.id.btn_food);
+        FancyButton outdoorButton = (FancyButton) fabMenuView.findViewById(R.id.btn_outdoors);
+        FancyButton healthButton = (FancyButton) fabMenuView.findViewById(R.id.btn_health);
+        FancyButton entertainmentButton = (FancyButton) fabMenuView.findViewById(R.id.btn_entertainment);
+        FancyButton performingButton = (FancyButton) fabMenuView.findViewById(R.id.btn_performing);
+        FancyButton retailButton = (FancyButton) fabMenuView.findViewById(R.id.btn_retail);
+        FancyButton familyButton = (FancyButton) fabMenuView.findViewById(R.id.btn_family);
 
         List<FancyButton> btnList = new ArrayList();
         btnList.add(musicFancyButton);btnList.add(foodButton); btnList.add(sportsButton);
         btnList.add(outdoorButton); btnList.add(healthButton); btnList.add(familyButton);
         btnList.add(retailButton); btnList.add(performingButton); btnList.add(entertainmentButton);
         setupPreferences(btnList);
+
+        closeButton.setOnClickListener(new View.OnClickListener() {
+            @Override public void onClick(View v) { fabMenu.closeMenu(); refresh(); } });
     }
 
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
-        switch (keyCode) {
-            case KeyEvent.KEYCODE_BACK:
-                if (expandableLayout.isExpanded()) {
-                    mSlidingLayer.closeLayer(true);
-                    return true; }
-            default:
-                return super.onKeyDown(keyCode, event);
-        }
+        return super.onKeyDown(keyCode, event);
+
     }
 
     @Override
@@ -227,12 +221,6 @@ public class MainActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.sliding_panel, menu);
         MenuItem item = menu.findItem(R.id.action_toggle);
-        if (expandButton != null) {
-            if (expandButton.getVisibility()==View.VISIBLE) {
-                item.setTitle("Show/Hide Preferences");
-            } else if(expandButton.getVisibility()==View.GONE) {
-                item.setTitle("Show Preferences"); }
-        }
         return true; }
 
     @Override
@@ -257,31 +245,20 @@ public class MainActivity extends AppCompatActivity {
         fragmentTransaction.setCustomAnimations(R.anim.slide_in_up, R.anim.slide_out_down);
 
         switch (item.getItemId()) {
-            case R.id.action_anchor:
-                break;
-            case R.id.action_toggle:
-                if(expandButton.getVisibility()==View.VISIBLE) expandButton.setVisibility(View.GONE);
-                else expandButton.setVisibility(View.VISIBLE);
-                break;
              case R.id.action_grid_to_full:
                 if(eventsFrag.isAdded()){
                     fragmentTransaction.replace(R.id.fragment_container, swipeEvents, "swipeFrag");
-                    fragmentTransaction.commitNowAllowingStateLoss();
+                    fragmentTransaction.commitNow();
                     getSupportFragmentManager().executePendingTransactions();}
 
                 else if(swipeEvents.isAdded()){
-                    if(mSlidingLayer.isOpened()) mSlidingLayer.closeLayer(true);
                     fragmentTransaction.replace(R.id.fragment_container, eventsFrag, "eventsFrag");
-                    fragmentTransaction.commitNowAllowingStateLoss();
+                    fragmentTransaction.commitNow();
                     getSupportFragmentManager().executePendingTransactions();}
 
         }
         return super.onOptionsItemSelected(item); }
 
-
-    private void loadDrawer(Bundle savedState) {
-        createDrawer = new CreateDrawer(savedState, toolbar, this, userId);
-        createDrawer.loadDrawer(); }
 
     public void setupPreferences(final List<FancyButton> btnList) {
         try {
@@ -322,12 +299,13 @@ public class MainActivity extends AppCompatActivity {
             Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
             ft.detach(fragment); ft.attach(fragment);
-            ft.commit(); }
+            ft.commit();
+        }
         touched=false;
     }
 
     public void setupSpinner() {
-        toolbarSpinner.setItems("Distance: Nearest", "Distance: Furthest", "Date: Earliest", "Date: Latest", "Update Preferences");
+        toolbarSpinner.setItems("Distance: Nearest", "Distance: Furthest", "Date: Earliest", "Date: Latest");
 
     }
 

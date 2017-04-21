@@ -4,44 +4,29 @@ package com.example.codenamebiscuit.eventfragments;
  * Created by jaskarnjagpal on 3/1/17.
  */
 
-import android.animation.ValueAnimator;
-import android.content.Context;
 
 import android.content.Intent;
-import android.content.res.Configuration;
-import android.graphics.Color;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v4.app.Fragment;
-import android.support.v4.view.animation.FastOutSlowInInterpolator;
-import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
-import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.AccelerateInterpolator;
 import android.widget.ImageView;
-import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.devspark.progressfragment.ProgressFragment;
 import com.example.codenamebiscuit.Events;
 import com.example.codenamebiscuit.R;
-import com.example.codenamebiscuit.helper.FlipAnimation;
+import com.example.codenamebiscuit.helper.EventBundle;
 import com.example.codenamebiscuit.requests.QueryEventList;
 import com.example.codenamebiscuit.requests.UpdateDbOnSwipe;
 import com.example.codenamebiscuit.rv.EventAdapter;
 import com.github.brnunes.swipeablerecyclerview.SwipeableRecyclerViewTouchListener;
-import com.google.android.gms.maps.MapView;
 import com.jaredrummler.materialspinner.MaterialSpinner;
-import com.muddzdev.styleabletoastlibrary.StyleableToast;
 import com.rohit.recycleritemclicksupport.RecyclerItemClickSupport;
 import com.wunderlist.slidinglayer.SlidingLayer;
 
@@ -88,6 +73,7 @@ public class GridMainEventsFrag extends ProgressFragment {
         deleteEvent = new JSONObject();
         userId = getArguments().getString("currentUserId");
         slidingLayer = (SlidingLayer)getActivity().findViewById(R.id.slidingLayer1);
+        data = new ArrayList<>();
         setHasOptionsMenu(true);}
 
 
@@ -111,11 +97,10 @@ public class GridMainEventsFrag extends ProgressFragment {
         try {
             setContentShown(false);
             mHandler = new Handler();
-            mHandler.postDelayed(mShowContentRunnable, 800);
+            mHandler.postDelayed(mShowContentRunnable, 1000);
             SwipeEvents frag = (SwipeEvents)getFragmentManager().findFragmentByTag("swipeFrag");
-            if(frag!=null && frag.getData().size()!=data.size()) data = frag.getData();
-            else {data = new QueryEventList(getString(R.string.DATABASE_MAIN_EVENTS_PULLER), userId).execute().get();
-            Events.fromJson(data, getActivity());}
+            data = new QueryEventList(getString(R.string.DATABASE_MAIN_EVENTS_PULLER), userId).execute().get();
+            Events.fromJson(data, getActivity());
             mAdapter = new EventAdapter(getContext().getApplicationContext(), 2, "", getActivity());
             mAdapter.setEventData(data);
         } catch (InterruptedException | ExecutionException e) { e.printStackTrace(); } }
@@ -132,7 +117,6 @@ public class GridMainEventsFrag extends ProgressFragment {
         super.onActivityCreated(savedInstanceState);
         expandableLayout = (ExpandableLayout)getActivity().findViewById(R.id.expandable_layout);
         toolbarSpinner = (MaterialSpinner)getActivity().findViewById(R.id.spinner);
-        toolbarSpinner.setSelectedIndex(toolbarSpinner.getSelectedIndex());
 
 
         setContentView(mContentView);
@@ -174,7 +158,7 @@ public class GridMainEventsFrag extends ProgressFragment {
                                 eventLoc.setText(data.get(position).getString("event_location"));
                                 Glide.with(GridMainEventsFrag.this).load(getImageURL(data.get(position)
                                         .getString("img_path"))).into(eventImage);
-                                eventBundle = getBundle(position); }
+                                eventBundle = EventBundle.getBundle(data, position); }
                             catch (JSONException e) { e.printStackTrace();}
                             slidingLayer.openLayer(true); } }); }
 
@@ -237,50 +221,20 @@ public class GridMainEventsFrag extends ProgressFragment {
                 switch (i) {
                     case 0:
                         Events.fromJson(data, getActivity());
-                        materialSpinner.setSelectedIndex(i);
                         mAdapter.setEventData(data);mAdapter.notifyDataSetChanged();break;
                     case 1:
                         Events.toFurthest(data);
-                        materialSpinner.setSelectedIndex(i);
                         mAdapter.setEventData(data);mAdapter.notifyDataSetChanged();break;
                     case 2:
                         Events.toEarliest(data);
-                        materialSpinner.setSelectedIndex(i);
                         mAdapter.setEventData(data);mAdapter.notifyDataSetChanged();break;
                     case 3:
                         Events.toLatest(data);
-                        materialSpinner.setSelectedIndex(i);
                         mAdapter.setEventData(data); mAdapter.notifyDataSetChanged(); break;
-                    case 4:
-                        expandableLayout.expand();materialSpinner.setSelectedIndex(0); break;
+                    default: materialSpinner.setSelectedIndex(0);break;
+
+
                 }}});
-        toolbarSpinner.setOnNothingSelectedListener(new MaterialSpinner.OnNothingSelectedListener() {
-            @Override
-            public void onNothingSelected(MaterialSpinner materialSpinner) {
-                materialSpinner.setSelectedIndex(materialSpinner.getSelectedIndex());
-            }
-        });
+
     }
-
-
-    private Bundle getBundle(int position) throws JSONException {
-        Bundle bundle = new Bundle();
-        bundle.putString("eventName", data.get(position).getString("event_name"));
-        bundle.putString("eventImage", data.get(position).getString("img_path"));
-        bundle.putString("eventDate", data.get(position).getString("start_date"));
-        bundle.putString("eventHoster", data.get(position).getString("event_sponsor"));
-        bundle.putString("eventDistance", data.get(position).getString("event_distance"));
-        bundle.putString("eventPreference", data.get(position).getString("preference_name"));
-        bundle.putString("eventDescription", data.get(position).getString("event_description"));
-        bundle.putString("eventLocation", data.get(position).getString("event_location"));
-        bundle.putString("eventCost", data.get(position).getString("event_cost"));
-        bundle.putString("eventTime", data.get(position).getString("start_time"));
-        bundle.putString("eventId", data.get(position).getString("event_id"));
-        bundle.putDouble("eventLat", data.get(position).getDouble("lat"));
-        bundle.putDouble("eventLng", data.get(position).getDouble("lng"));
-        bundle.putString("eventWebsite", data.get(position).getString("event_website"));
-        return bundle;
-    }
-
-
 }

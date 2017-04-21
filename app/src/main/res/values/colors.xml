@@ -10,8 +10,11 @@
     <color name="translivinPink">#55ff9dfc</color>
     <color name="transparentPink">#30ff9dfc</color>
     <color name="transparentFB">#30415dae</color>
-    <color name="transparentBlack">#50000000</color>
     <color name="transLivinBlack">#99000000</color>
+    <color name="transparentLivinBlack">#da000000</color>
+    <color name="transparentBlack">#50000000</color>
+    <color name="transparentLivinPink">#87ff9dfc</color>
+
 
 
     <string-array name="livColors">

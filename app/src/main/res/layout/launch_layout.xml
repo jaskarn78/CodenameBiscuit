@@ -1,13 +1,12 @@
 
-
     <android.support.design.widget.CoordinatorLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
+
         xmlns:app="http://schemas.android.com/apk/res-auto"
         android:background="@android:color/transparent"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:id="@+id/coordLayout">
-
 
 
         <android.support.design.widget.AppBarLayout
@@ -38,7 +37,7 @@
                     android:id="@+id/toolbar_title" />
                 <com.jaredrummler.materialspinner.MaterialSpinner
                     android:id="@+id/spinner"
-                    android:layout_width="match_parent"
+                    android:layout_width="190dp"
                     android:layout_height="wrap_content"
                     app:ms_text_color="@color/livinWhite"
                     app:ms_background_color="@color/cardview_dark_background"
@@ -46,9 +45,9 @@
                     />
 
         </android.support.v7.widget.Toolbar>
-            <include layout="@layout/update_pref"/>
 
         </android.support.design.widget.AppBarLayout>
+
 
         <FrameLayout
             android:id="@+id/fragment_container"
@@ -62,7 +61,37 @@
 
         <FrameLayout
             android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="55dp">
+
+            <android.support.design.widget.FloatingActionButton
+                android:id="@+id/fab_reveal"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end|bottom"
+                android:src="@drawable/ic_filter_list_black_36dp"
+                app:elevation="10dp"
+                app:rippleColor="@color/accent"
+                app:useCompatPadding="true"
+                app:fabSize="normal" />
+
+            <com.hlab.fabrevealmenu.view.FABRevealMenu
+                android:id="@+id/reveal"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                app:animateItems="true"
+                app:menuBackgroundColor="@android:color/transparent"
+                app:menuTitleTextColor="@color/livinWhite"
+                app:showOverlay="true"
+                app:overlayBackground="@color/black_overlay"
+                app:showTitle="true"/>
+
+        </FrameLayout>
+
+        <FrameLayout
+            android:layout_width="match_parent"
             android:layout_height="105dp"
+            android:visibility="gone"
             android:layout_gravity="bottom">
 
             <com.wunderlist.slidinglayer.SlidingLayer

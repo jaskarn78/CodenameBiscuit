@@ -26,7 +26,6 @@ import com.example.codenamebiscuit.requests.UpdateDbOnSwipe;
 import com.example.codenamebiscuit.rv.EventAdapter;
 
 import com.github.brnunes.swipeablerecyclerview.SwipeableRecyclerViewTouchListener;
-import com.muddzdev.styleabletoastlibrary.StyleableToast;
 
 
 import org.json.JSONException;
@@ -130,19 +129,6 @@ public class MainEventsFrag extends Fragment {
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-
-        StyleableToast st = new StyleableToast(getContext(), "Network not detected!", Toast.LENGTH_LONG);
-        //Custom stylable toast*
-        st.setBackgroundColor(Color.RED);
-        st.setTextColor(Color.WHITE);
-        st.spinIcon();
-        st.setMaxAlpha();
-
-        if(!isNetworkAvailable())
-            st.show();
-
-
-
         enableCardSwiping();}
 
 
@@ -231,71 +217,32 @@ public class MainEventsFrag extends Fragment {
 
                             @Override
                             public void onDismissedBySwipeLeft(RecyclerView recyclerView, int[] ints) {
-                                StyleableToast st = new StyleableToast(getContext(), "Removing...", Toast.LENGTH_SHORT);
-
                                 for (int position : ints) {
                                     //eventData.remove(position);
                                     mAdapter.notifyItemRemoved(position);
                                     try {
                                         deleteEvent.put("user_id", mAdapter.getObject().get(position).getString("user_id"));
                                         deleteEvent.put("event_id", mAdapter.getObject().get(position).getString("event_id"));
-                                        //Custom stylable toast*
-                                        st.setBackgroundColor(Color.RED);
-                                        st.setTextColor(Color.WHITE);
-                                        st.setIcon(R.drawable.ic_delete_black_24dp);
-                                        st.spinIcon();
-                                        st.setMaxAlpha();
-                                        st.show();
                                         data.remove(position);
                                         if(data!=null)
                                             mAdapter.setEventData(data);
-
-
-                                    } catch (JSONException e) {
-                                        e.printStackTrace();
-                                    }
+                                    } catch (JSONException e) {e.printStackTrace(); }
                                     mAdapter.notifyDataSetChanged();
-
-
-                                }
-                                new UpdateDbOnSwipe(getString(R.string.DATABASE_STORE_DELETED_EVENTS)).execute(deleteEvent);
-
-                            }
+                                }new UpdateDbOnSwipe(getString(R.string.DATABASE_STORE_DELETED_EVENTS)).execute(deleteEvent); }
 
                             @Override
                             public void onDismissedBySwipeRight(RecyclerView recyclerView, int[] ints) {
-                                StyleableToast st = new StyleableToast(getContext(), "Saving...", Toast.LENGTH_SHORT);
 
                                 for (int position : ints) {
-                                    //eventData.remove(position);
                                     mAdapter.notifyItemRemoved(position);
-
                                     try {
                                         saveEvent.put("user_id", mAdapter.getObject().get(position).getString("user_id"));
                                         saveEvent.put("event_id", mAdapter.getObject().get(position).getString("event_id"));
-                                        //Custom stylable toast*
-                                        st.setBackgroundColor(Color.parseColor("#ff9dfc"));
-                                        st.setTextColor(Color.WHITE);
-                                        st.setIcon(R.drawable.ic_save_black_24dp);
-                                        st.spinIcon();
-                                        st.setMaxAlpha();
-                                        st.show();
                                         data.remove(position);
-                                        if(data!=null)
-                                            mAdapter.setEventData(data);
-                                        //Toast.makeText(getContext(), mAdapter.getObject().get(position).getString("event_id"), Toast.LENGTH_SHORT).show();
-
-
-                                    } catch (JSONException e) {
-                                        e.printStackTrace();
-                                    }
+                                        if (data != null) mAdapter.setEventData(data);
+                                    } catch (JSONException e) { e.printStackTrace(); }
                                     mAdapter.notifyDataSetChanged();
-
-                                }
-
-                                new UpdateDbOnSwipe(getString(R.string.DATABASE_STORE_SAVED_EVENTS)).execute(saveEvent);
-
-                            }
+                                }new UpdateDbOnSwipe(getString(R.string.DATABASE_STORE_SAVED_EVENTS)).execute(saveEvent); }
                         });
         mRecyclerView.addOnItemTouchListener(swipeTouchListener);
     }

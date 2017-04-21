@@ -32,7 +32,8 @@
                     android:scaleType="fitXY" />
 
 
-                <com.getbase.floatingactionbutton.FloatingActionsMenu xmlns:fab="http://schemas.android.com/apk/res-auto"
+                <com.getbase.floatingactionbutton.FloatingActionsMenu
+                    xmlns:fab="http://schemas.android.com/apk/res-auto"
                     android:id="@+id/multiple_actions_left"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
