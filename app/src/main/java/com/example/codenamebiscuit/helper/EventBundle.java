@@ -2,6 +2,8 @@ package com.example.codenamebiscuit.helper;
 
 import android.os.Bundle;
 
+import com.example.codenamebiscuit.Event;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -12,8 +14,12 @@ import java.util.ArrayList;
  */
 
 public class EventBundle {
+    private ArrayList<JSONObject> data;
+    public EventBundle(ArrayList<JSONObject> data){
+        this.data=data;
+    }
 
-    public static Bundle getBundle(ArrayList<JSONObject> data, int position){
+    public Bundle getBundle(int position){
         Bundle bundle = new Bundle();
         try {
             bundle.putString("eventName", data.get(position).getString("event_name"));

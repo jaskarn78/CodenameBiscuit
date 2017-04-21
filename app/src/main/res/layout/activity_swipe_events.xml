@@ -1,63 +1,124 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout
+
+<com.example.codenamebiscuit.swipedeck.layouts.SwipeFrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/swipeLayout"
+    xmlns:swipedeck="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/cardview_dark_background">
+    android:orientation="vertical">
 
-    <com.example.codenamebiscuit.swipedeck.layouts.SwipeFrameLayout
-        android:id="@+id/swipeLayout"
-        xmlns:swipedeck="http://schemas.android.com/apk/res-auto"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_marginBottom="1dp"
-        android:layout_marginEnd="1dp"
-        android:layout_marginStart="1dp"
-        android:layout_marginTop="1dp"
-        android:orientation="vertical"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.0"
-        tools:layout_constraintBottom_creator="1"
-        tools:layout_constraintLeft_creator="1"
-        tools:layout_constraintRight_creator="1"
-        tools:layout_constraintTop_creator="1">
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/swipeBackground"
+        android:scaleType="fitXY"
+      />
+    <com.example.codenamebiscuit.swipedeck.SwipeDeck
+        android:id="@+id/swipe_deck"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        swipedeck:max_visible="2"
+        swipedeck:card_spacing="4dp"
+        swipedeck:render_above="true"
+        swipedeck:rotation_degrees="15"
+        swipedeck:opacity_end="0.8"
+        />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="55dp"
+        android:layout_gravity="bottom|center"
+        android:orientation="horizontal"
+        android:background="@color/transparentLivinBlack">
 
         <RelativeLayout
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            >
-
-            <com.example.codenamebiscuit.swipedeck.SwipeDeck
-                android:id="@+id/swipe_deck"
-                android:layout_width="match_parent"
-                android:layout_height="470dp"
-                android:layout_below="@+id/event_pager"
-                android:background="@android:color/transparent"
-                swipedeck:max_visible="2"
-                swipedeck:render_above="false"
-                android:layout_alignParentTop="true"
-                swipedeck:card_spacing="4dp"/>
-
-
-
-            <android.support.v4.view.ViewPager
-                android:id="@+id/event_pager"
-                android:layout_width="match_parent"
-                android:layout_height="150dp"
-                android:layout_alignParentBottom="true"
-                android:layout_marginBottom="1dp"
-                android:foreground="?android:attr/selectableItemBackground"
-                android:clickable="true"
+            android:gravity="center"
+            android:layout_weight="1">
+            <ImageView
+                android:layout_width="45dp"
+                android:layout_height="45dp"
+                android:layout_gravity="center"
+                android:id="@+id/removed"
+                android:src="@drawable/ic_delete_white_48dp"
+                android:tint="@color/livinWhite"
                 />
+            <TextView
+                android:id="@+id/numRemoved"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignTop="@id/removed"
+                android:layout_alignRight="@id/removed"
+                android:padding="2sp"
+                android:text="10"
+                android:textColor="#FFF"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:background="@drawable/badge"/>
+
+            
 
         </RelativeLayout>
+        <RelativeLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:background="@color/transparentPink"
+            android:layout_weight="1">
 
-    </com.example.codenamebiscuit.swipedeck.layouts.SwipeFrameLayout>
+            <ImageView
+                android:layout_width="45dp"
+                android:layout_height="45dp"
+                android:layout_gravity="center"
+                android:src="@drawable/ic_home_white_48dp"
+                android:id="@+id/home"
+                />
+            <TextView
+                android:id="@+id/numOfUpcoming"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="2sp"
+                android:layout_alignTop="@id/home"
+                android:layout_alignRight="@id/home"
+                android:text="10"
+                android:textColor="#FFF"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:background="@drawable/badge"/>
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:layout_weight="1">
+            <ImageView
+                android:layout_width="45dp"
+                android:layout_height="45dp"
+                android:layout_gravity="center"
+                android:src="@drawable/ic_save_white_48dp"
+                android:tint="@color/livinWhite"
+                android:id="@+id/saved"/>
+            <TextView
+                android:id="@+id/numSaved"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignTop="@id/saved"
+                android:layout_alignRight="@id/saved"
+                android:padding="2sp"
+                android:text="10"
+                android:textColor="#FFF"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:background="@drawable/badge"/>
+        </RelativeLayout>
+
+    </LinearLayout>
 
 
-</android.support.constraint.ConstraintLayout>
+</com.example.codenamebiscuit.swipedeck.layouts.SwipeFrameLayout>
+
+

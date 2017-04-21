@@ -6,30 +6,41 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="1dp"
-        card_view:cardCornerRadius="15dp"
+        android:background="@drawable/border_black"
+        card_view:cardCornerRadius="5dp"
         card_view:cardElevation="1dp"
         card_view:cardUseCompatPadding="true">
 
-            <RelativeLayout
+
+        <android.support.design.widget.CoordinatorLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/card_border">
+
+            <LinearLayout
                 android:id="@+id/front_view"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
-                <ProgressBar
-                    android:id="@+id/card_progress"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
 
 
                 <ImageView
                     android:id="@+id/offer_image"
                     android:layout_width="match_parent"
-                    android:layout_height="470dp"
-                    android:layout_alignParentStart="true"
-                    android:layout_alignParentTop="true"
-                    android:adjustViewBounds="true"
-                    android:background="@drawable/border_black"
+                    android:layout_height="300dp"
                     android:scaleType="fitXY" />
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@color/livinWhite"/>
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="5dp"
+                    android:background="@color/livinBlack">
+                <include layout="@layout/card_content" />
+                </FrameLayout>
+
 
 
                 <com.getbase.floatingactionbutton.FloatingActionsMenu
@@ -65,8 +76,21 @@
 
                 </com.getbase.floatingactionbutton.FloatingActionsMenu>
 
+            </LinearLayout>
 
-            </RelativeLayout>
+            <android.support.design.widget.FloatingActionButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                xmlns:app="http://schemas.android.com/apk/res-auto"
+                app:layout_anchor="@id/offer_image"
+                app:layout_anchorGravity="bottom|end"
+                app:useCompatPadding="true"
+                app:elevation="5dp"
+                app:rippleColor="@color/black_overlay"
+                android:src="@drawable/ic_arrow_forward_black_48dp"
+                android:clickable="true"
+                />
 
+        </android.support.design.widget.CoordinatorLayout>
 
     </android.support.v7.widget.CardView>

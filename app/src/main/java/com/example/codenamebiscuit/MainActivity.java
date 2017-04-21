@@ -18,6 +18,8 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.FrameLayout;
+import android.widget.TextView;
 
 import com.example.codenamebiscuit.eventfragments.GridMainEventsFrag;
 import com.example.codenamebiscuit.eventfragments.SwipeEvents;
@@ -52,6 +54,7 @@ public class MainActivity extends AppCompatActivity {
     private JSONObject preferences, removed;
     private GridMainEventsFrag eventsFrag;
     private SwipeEvents swipeEvents;
+    private FrameLayout revealFrame;
     private boolean touched;
     CreateDrawer createDrawer;
     List<JSONObject> prefList;
@@ -96,6 +99,7 @@ public class MainActivity extends AppCompatActivity {
         this.getSupportActionBar().setDisplayShowTitleEnabled(false);
 
         toolbarSpinner = (MaterialSpinner) findViewById(R.id.spinner);
+        revealFrame = (FrameLayout)findViewById(R.id.revealFrame);
         setupSpinner();
 
         FacebookSdk.sdkInitialize(getApplicationContext());
@@ -162,7 +166,6 @@ public class MainActivity extends AppCompatActivity {
         btnList.add(outdoorButton); btnList.add(healthButton); btnList.add(familyButton);
         btnList.add(retailButton); btnList.add(performingButton); btnList.add(entertainmentButton);
         setupPreferences(btnList);
-
         closeButton.setOnClickListener(new View.OnClickListener() {
             @Override public void onClick(View v) { fabMenu.closeMenu(); refresh(); } });
     }
@@ -210,7 +213,6 @@ public class MainActivity extends AppCompatActivity {
             transaction.setCustomAnimations(R.anim.fadein, R.anim.fadeout);
             transaction.replace(R.id.fragment_container, eventsFrag, "eventsFrag");
             transaction.commit();
-
         }
     }
 
@@ -220,22 +222,25 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.sliding_panel, menu);
-        MenuItem item = menu.findItem(R.id.action_toggle);
         return true; }
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
         MenuItem item =menu.findItem(R.id.action_grid_to_full).setVisible(true);
+        TextView textView = (TextView)findViewById(R.id.toolbar_title);
         if(eventsFrag!=null && swipeEvents!=null) {
-            if (eventsFrag.isVisible()) {
+            if (eventsFrag.isAdded()) {
+                textView.setVisibility(View.GONE);
+                revealFrame.setVisibility(View.VISIBLE);
+                toolbarSpinner.setVisibility(View.VISIBLE);
                 item.setIcon(R.drawable.ic_fullscreen_white_48dp);
-                mSlidingLayer.setVisibility(View.VISIBLE);
-            }
-
-            else if (swipeEvents.isVisible()) {
+                mSlidingLayer.setVisibility(View.VISIBLE);}
+            else if (swipeEvents.isAdded()) {
+                textView.setVisibility(View.VISIBLE);
+                toolbarSpinner.setVisibility(View.GONE);
+                revealFrame.setVisibility(View.GONE);
                 item.setIcon(R.drawable.ic_grid_on_white_48dp);
-                mSlidingLayer.setVisibility(View.GONE);
-            }
+                mSlidingLayer.setVisibility(View.GONE); }
         }
         return super.onPrepareOptionsMenu(menu); }
 
@@ -248,14 +253,13 @@ public class MainActivity extends AppCompatActivity {
              case R.id.action_grid_to_full:
                 if(eventsFrag.isAdded()){
                     fragmentTransaction.replace(R.id.fragment_container, swipeEvents, "swipeFrag");
-                    fragmentTransaction.commitNow();
+                    fragmentTransaction.commitNowAllowingStateLoss();
                     getSupportFragmentManager().executePendingTransactions();}
 
                 else if(swipeEvents.isAdded()){
                     fragmentTransaction.replace(R.id.fragment_container, eventsFrag, "eventsFrag");
-                    fragmentTransaction.commitNow();
+                    fragmentTransaction.commitNowAllowingStateLoss();
                     getSupportFragmentManager().executePendingTransactions();}
-
         }
         return super.onOptionsItemSelected(item); }
 
@@ -298,15 +302,11 @@ public class MainActivity extends AppCompatActivity {
         if(touched) {
             Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-            ft.detach(fragment); ft.attach(fragment);
-            ft.commit();
-        }
-        touched=false;
+            ft.detach(fragment); ft.attach(fragment); ft.commitNowAllowingStateLoss();
+        }touched=false;
     }
 
     public void setupSpinner() {
-        toolbarSpinner.setItems("Distance: Nearest", "Distance: Furthest", "Date: Earliest", "Date: Latest");
-
-    }
+        toolbarSpinner.setItems("Distance: Nearest", "Distance: Furthest", "Date: Earliest", "Date: Latest"); }
 
 }

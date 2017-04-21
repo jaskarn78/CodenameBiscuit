@@ -1,0 +1,118 @@
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:ellipsize="marquee"
+            android:focusableInTouchMode="true"
+            android:focusable="true"
+            android:marqueeRepeatLimit="marquee_forever"
+            android:scrollHorizontally="true"
+            android:maxLines="2"
+            android:id="@+id/slidename"
+            android:text="Event Name"
+            android:textSize="22sp"
+            android:textColor="@color/livinWhite"
+            />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:ellipsize="marquee"
+                android:focusableInTouchMode="true"
+                android:focusable="true"
+                android:marqueeRepeatLimit="marquee_forever"
+                android:scrollHorizontally="true"
+                android:maxLines="2"
+                android:id="@+id/slideDate"
+                android:text="4/30"
+                android:textSize="15sp"
+                android:textColor="@color/livinWhite"
+                />
+        </LinearLayout>
+
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:id="@+id/slideHoster"
+            android:ellipsize="marquee"
+            android:focusableInTouchMode="true"
+            android:focusable="true"
+            android:marqueeRepeatLimit="marquee_forever"
+            android:scrollHorizontally="true"
+            android:maxLines="1"
+            android:textColor="@color/livinWhite"
+            android:text="Event Hoster"
+            android:textSize="12sp"
+            />
+
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:id="@+id/slideLocation"
+            android:ellipsize="marquee"
+            android:focusableInTouchMode="true"
+            android:focusable="true"
+            android:marqueeRepeatLimit="marquee_forever"
+            android:scrollHorizontally="true"
+            android:maxLines="1"
+            android:text="Event Location"
+            android:textColor="@color/livinWhite"
+            />
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_marginStart="10dp"
+            android:orientation="horizontal">
+
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/slidePref"
+                android:textSize="12sp"
+                android:text="Preference1"
+                android:textColor="@color/livinPink"
+                />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/slidepref2"
+                android:textSize="12sp"
+                android:text="Preference2"
+                android:layout_marginStart="5dp"
+                android:textColor="@color/livinPink"
+                />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/slidePref3"
+                android:textSize="12sp"
+                android:text="Preference3"
+                android:layout_marginStart="5dp"
+                android:textColor="@color/livinPink"
+                />
+        </LinearLayout>
+    </LinearLayout>
+
+</LinearLayout>

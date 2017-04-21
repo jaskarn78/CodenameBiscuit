@@ -41,7 +41,6 @@ public class ArchivedEvents extends AppCompatActivity {
     private String userId;
     private SharedPreferences sharedPreferences;
     private JSONObject currentUserId;
-    private Bundle bundle;
     private SavedEventsFrag savedEventsFrag;
     private DeletedEventsFrag deletedEventsFrag;
 
@@ -65,7 +64,6 @@ public class ArchivedEvents extends AppCompatActivity {
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         toolbarTitle = (TextView)findViewById(R.id.toolbar_title);
         toolbarTitle.setText("Saved Events");
-        bundle = new Bundle();
 
 
         setSupportActionBar(toolbar);

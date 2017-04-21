@@ -123,17 +123,17 @@ public class MainEvents extends Fragment {
         public MyPagerAdapter(FragmentManager fm) {
             super(fm);
         }
-
+        private Bundle bundle;
         @Override
         public Fragment getItem(int pos) {
             switch(pos) {
 
                 case 0:
-                    return GridMainEventsFrag.newInstance();
+                    return GridMainEventsFrag.newInstance(bundle);
                 case 1:
-                    return SwipeEvents.newInstance();
+                    return SwipeEvents.newInstance(bundle);
                 default:
-                    return GridMainEventsFrag.newInstance();
+                    return GridMainEventsFrag.newInstance(bundle);
             }
         }
 

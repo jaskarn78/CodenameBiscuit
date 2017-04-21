@@ -30,8 +30,6 @@ import com.jaredrummler.materialspinner.MaterialSpinner;
 import com.rohit.recycleritemclicksupport.RecyclerItemClickSupport;
 import com.wunderlist.slidinglayer.SlidingLayer;
 
-import net.cachapa.expandablelayout.ExpandableLayout;
-
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -54,13 +52,12 @@ public class GridMainEventsFrag extends ProgressFragment {
     private View mContentView;
     private SlidingLayer slidingLayer;
     private MaterialSpinner toolbarSpinner;
+    private EventBundle events;
     private Bundle eventBundle;
     private Handler mHandler;
     private TextView eventName, eventLoc, eventHoster;
     private TextView eventPref;
     private ImageView eventImage;
-    private ExpandableLayout expandableLayout;
-    private ArrayList<Bundle> bundleList;
     private Runnable mShowContentRunnable = new Runnable() {
         @Override
         public void run() {if (isAdded()) { setContentShown(true);}} };
@@ -77,7 +74,11 @@ public class GridMainEventsFrag extends ProgressFragment {
         setHasOptionsMenu(true);}
 
 
-    public static GridMainEventsFrag newInstance() { return new GridMainEventsFrag(); }
+    public static GridMainEventsFrag newInstance(Bundle bundle) {
+        GridMainEventsFrag gridMainEventsFrag = new GridMainEventsFrag();
+        gridMainEventsFrag.setArguments(bundle);
+        return gridMainEventsFrag;
+    }
     public ArrayList<JSONObject> getData(){ return data; }
 
     @Override
@@ -101,6 +102,7 @@ public class GridMainEventsFrag extends ProgressFragment {
             SwipeEvents frag = (SwipeEvents)getFragmentManager().findFragmentByTag("swipeFrag");
             data = new QueryEventList(getString(R.string.DATABASE_MAIN_EVENTS_PULLER), userId).execute().get();
             Events.fromJson(data, getActivity());
+            events = new EventBundle(data);
             mAdapter = new EventAdapter(getContext().getApplicationContext(), 2, "", getActivity());
             mAdapter.setEventData(data);
         } catch (InterruptedException | ExecutionException e) { e.printStackTrace(); } }
@@ -115,7 +117,6 @@ public class GridMainEventsFrag extends ProgressFragment {
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        expandableLayout = (ExpandableLayout)getActivity().findViewById(R.id.expandable_layout);
         toolbarSpinner = (MaterialSpinner)getActivity().findViewById(R.id.spinner);
 
 
@@ -123,7 +124,6 @@ public class GridMainEventsFrag extends ProgressFragment {
         if (isAdded()) {
             obtainData();
             mRecyclerView.setAdapter(mAdapter);
-            bundleList = mAdapter.getBundleList();
             StaggeredGridLayoutManager staggeredGridLayoutManager = new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL);
             mRecyclerView.setLayoutManager(staggeredGridLayoutManager);
             mRecyclerView.setHasFixedSize(false);
@@ -158,7 +158,7 @@ public class GridMainEventsFrag extends ProgressFragment {
                                 eventLoc.setText(data.get(position).getString("event_location"));
                                 Glide.with(GridMainEventsFrag.this).load(getImageURL(data.get(position)
                                         .getString("img_path"))).into(eventImage);
-                                eventBundle = EventBundle.getBundle(data, position); }
+                                eventBundle = events.getBundle(position); }
                             catch (JSONException e) { e.printStackTrace();}
                             slidingLayer.openLayer(true); } }); }
 
@@ -198,8 +198,7 @@ public class GridMainEventsFrag extends ProgressFragment {
                                 deleteEvent.put("event_id", mAdapter.getObject().get(position).getString("event_id"));
                                 data.remove(position);
                                 new UpdateDbOnSwipe(getString(R.string.DATABASE_STORE_DELETED_EVENTS)).execute(deleteEvent);
-                            } catch (JSONException e) {
-                                e.printStackTrace();} } }
+                            } catch (JSONException e) { e.printStackTrace();} } }
 
                     @Override
                     public void onDismissedBySwipeRight(RecyclerView recyclerView, int[] ints) {
@@ -232,7 +231,6 @@ public class GridMainEventsFrag extends ProgressFragment {
                         Events.toLatest(data);
                         mAdapter.setEventData(data); mAdapter.notifyDataSetChanged(); break;
                     default: materialSpinner.setSelectedIndex(0);break;
-
 
                 }}});
 
