@@ -18,7 +18,10 @@
     <com.example.codenamebiscuit.swipedeck.SwipeDeck
         android:id="@+id/swipe_deck"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="480dp"
+        android:layout_marginTop="80dp"
+        android:paddingStart="3dp"
+        android:paddingEnd="3dp"
         swipedeck:max_visible="2"
         swipedeck:card_spacing="4dp"
         swipedeck:render_above="true"

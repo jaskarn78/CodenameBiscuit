@@ -6,7 +6,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="1dp"
-        android:background="@drawable/border_black"
         card_view:cardCornerRadius="5dp"
         card_view:cardElevation="1dp"
         card_view:cardUseCompatPadding="true">
@@ -27,7 +26,7 @@
                 <ImageView
                     android:id="@+id/offer_image"
                     android:layout_width="match_parent"
-                    android:layout_height="300dp"
+                    android:layout_height="360dp"
                     android:scaleType="fitXY" />
                 <View
                     android:layout_width="match_parent"
