@@ -4,9 +4,11 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.preference.PreferenceManager;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
@@ -17,7 +19,9 @@ import android.webkit.WebView;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import com.bumptech.glide.Glide;
@@ -29,10 +33,21 @@ import com.daimajia.androidanimations.library.YoYo;
 import com.daimajia.swipe.SimpleSwipeListener;
 import com.daimajia.swipe.SwipeLayout;
 import com.example.codenamebiscuit.R;
+import com.example.codenamebiscuit.eventfragments.DisplayEvent;
+import com.example.codenamebiscuit.helper.EventBundle;
 import com.example.codenamebiscuit.requests.UpdateDbOnSwipe;
+import com.hlab.fabrevealmenu.view.FABRevealMenu;
+import com.mikepenz.iconics.view.IconicsImageView;
+
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.w3c.dom.Text;
+
 import java.util.ArrayList;
+import java.util.zip.Inflater;
+
+import me.toptas.fancyshowcase.FancyShowCaseView;
+import me.toptas.fancyshowcase.OnViewInflateListener;
 
 
 public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapterViewHolder> {
@@ -77,7 +92,6 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
 
 
 
-
     public void setBundle(Bundle bundle){
         this.bundle=bundle;
         bundleList.add(this.bundle); }
@@ -88,14 +102,8 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
     }
 
 
-    public Bundle getBundleAtposition(int position){
-        return bundleList.get(position); }
-
     public void removeBundleAtPosition(int position){
         bundleList.remove(position);}
-    public ArrayList<Bundle> getBundleList(){
-        return bundleList;
-    }
 
 
     @Override
@@ -196,10 +204,8 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
 
     public ArrayList<JSONObject> getObject() { return mEventData;}
 
-    public Drawable getEventImage(){ return eventImageDrawable;}
 
-    public class EventAdapterViewHolder extends RecyclerView.ViewHolder implements
-            View.OnClickListener, View.OnLongClickListener {
+    public class EventAdapterViewHolder extends RecyclerView.ViewHolder {
 
         public final TextView mEventPreferenceTV, mEventLocationTV;
         public final TextView mEventName, mEventAge;
@@ -209,6 +215,8 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
         public final ImageView mEventImage;
         public final CardView cardView;
         public final WebView mWebView;
+        public final CardView gridCards;
+
 
         SwipeLayout mSwipeLayout;
         Button buttonDelete;
@@ -239,20 +247,11 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
 
             cardView = (CardView) view.findViewById(R.id.cardview);
             mWebView = (WebView)view.findViewById(R.id.webView);
+            gridCards = (CardView)view.findViewById(R.id.cardview_grid);
 
-            view.setOnClickListener(this);
-            view.setOnLongClickListener(this);
-        }
-
-        @Override
-        public void onClick(final View v) {
-        }
-
-
-        @Override
-        public boolean onLongClick(View v) {
-            return true;
         }}
+
+
 
 
     @Override
@@ -274,7 +273,7 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
         Double lng = 0.0;
 
         final JSONObject restoreEvent = new JSONObject();
-        JSONObject eventObject = mEventData.get(position);
+        final JSONObject eventObject = mEventData.get(position);
 
         try {
             eventLocation = eventObject.getString("event_location");
@@ -361,7 +360,41 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
         if (type == 2) {
             final ProgressBar progressBar2 = (ProgressBar) rootView.findViewById(R.id.grid_progress);
             loadImage(eventAdapterViewHolder.mEventImage, getImageURL(eventPath), progressBar2);
+            final EventBundle eventBundle = new EventBundle(mEventData);
+            eventAdapterViewHolder.gridCards.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    new FancyShowCaseView.Builder(activity)
+                            .customView(R.layout.reveal_layout, new OnViewInflateListener() {
+                                @Override
+                                public void onViewInflated(View view) {
+                                    final Bundle eventInfo = eventBundle.getBundle(eventAdapterViewHolder.getAdapterPosition());
+                                    final ImageView revealImage = (ImageView) view.findViewById(R.id.reveal_event_image);
+                                    final TextView eventName = (TextView)view.findViewById(R.id.slidename);
+                                    final TextView eventLocation = (TextView)view.findViewById(R.id.slideLocation);
+                                    final TextView eventPreferences = (TextView)view.findViewById(R.id.slidePref);
+                                    final TextView eventDate = (TextView)view.findViewById(R.id.slideDate);
+                                    final TextView eventHoster = (TextView)view.findViewById(R.id.slideHoster);
+                                    final FloatingActionButton fab = (FloatingActionButton)view.findViewById(R.id.revealFab);
 
-        } }
+                                    eventName.setText(eventInfo.getString("eventName"));
+                                    eventLocation.setText(eventInfo.getString("eventLocation"));
+                                    eventPreferences.setText(eventInfo.getString("eventPreference"));
+                                    eventDate.setText(parseDate(eventInfo.getString("eventDate")));
+                                    eventHoster.setText("Presented By: "+eventInfo.getString("eventHoster"));
+
+                                    Glide.with(activity).load(getImageURL(eventBundle.getBundle(eventAdapterViewHolder.getAdapterPosition())
+                                            .getString("eventImage"))).placeholder(R.drawable.progress).fitCenter().into(revealImage);
+                                    fab.setOnClickListener(new View.OnClickListener() {
+                                        @Override
+                                        public void onClick(View v) {
+                                            Intent intent = new Intent(activity, DisplayEvent.class);
+                                            intent.putExtras(eventInfo); activity.startActivity(intent); } });
+                                } }).build().show(); } }); } }
+
+    private String parseDate(String dateString){
+        dateString = dateString.replace('-', '/');
+        return dateString.substring(5, 10);
+    }
 
 }

@@ -39,6 +39,7 @@
                     android:layout_height="wrap_content"
                     app:ms_text_color="@color/livinWhite"
                     app:ms_background_color="@color/cardview_dark_background"
+                    android:padding="2dp"
                     android:backgroundTint="@color/cardview_dark_background"
                     />
 
@@ -61,8 +62,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:id="@+id/revealFrame"
-            android:visibility="gone"
-            android:layout_marginTop="55dp">
+            android:visibility="gone">
 
             <android.support.design.widget.FloatingActionButton
                 android:id="@+id/fab_reveal"
@@ -71,7 +71,7 @@
                 android:layout_gravity="end|bottom"
                 android:src="@drawable/ic_filter_list_black_36dp"
                 app:elevation="10dp"
-                app:rippleColor="@color/accent"
+                app:rippleColor="@color/livinBlack"
                 app:useCompatPadding="true"
                 app:fabSize="normal" />
 
@@ -86,35 +86,6 @@
                 app:overlayBackground="@color/black_overlay"
                 app:showTitle="true"/>
 
-        </FrameLayout>
-
-        <FrameLayout
-            android:layout_width="match_parent"
-            android:layout_height="105dp"
-            android:visibility="gone"
-            android:layout_gravity="bottom">
-
-            <com.wunderlist.slidinglayer.SlidingLayer
-                xmlns:slidingLayer="http://schemas.android.com/apk/res-auto"
-                app:layout_behavior="@string/appbar_scrolling_view_behavior"
-                android:id="@+id/slidingLayer1"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                slidingLayer:changeStateOnTap="false"
-                slidingLayer:stickTo="bottom">
-
-                <android.support.design.widget.FloatingActionButton
-                    android:id="@+id/fab"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="top|end"
-                    android:src="@drawable/ic_arrow_forward_white_48dp"
-                    android:clickable="true"
-                    app:backgroundTint="@color/livinPink"
-                    xmlns:app="http://schemas.android.com/apk/res-auto" />
-
-            <include layout="@layout/standard_launch"/>
-            </com.wunderlist.slidinglayer.SlidingLayer>
         </FrameLayout>
 
     </android.support.design.widget.CoordinatorLayout>

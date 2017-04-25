@@ -192,18 +192,17 @@ public class ChooseLogin extends AppCompatActivity implements GoogleApiClient.On
             App.getGoogleApiHelper().setSignInResult(result);
             GoogleSignInAccount acct = App.getGoogleApiHelper().getSignInAccount();
 
-            pref.edit().putString("user_id", acct.getId()).apply();
-            pref.edit().putString("user_image", String.valueOf(acct.getPhotoUrl())).apply();
-            pref.edit().putString("fName", acct.getGivenName()).apply();
-            pref.edit().putString("lName", acct.getFamilyName()).apply();
-            pref.edit().putString("email", acct.getEmail()).apply();
 
             JSONObject obj = new JSONObject();
             obj.put("user_id", acct.getId());
             obj.put("first_name", acct.getGivenName());
             obj.put("last_name", acct.getFamilyName());
             obj.put("user_email", acct.getEmail());
-            obj.put("gender", "M/F");
+            pref.edit().putString("user_id", acct.getId()).apply();
+            pref.edit().putString("user_image", String.valueOf(acct.getPhotoUrl())).apply();
+            pref.edit().putString("fName", acct.getGivenName()).apply();
+            pref.edit().putString("lName", acct.getFamilyName()).apply();
+            pref.edit().putString("email", acct.getEmail()).apply();
 
             first_name = acct.getGivenName();
             last_name = acct.getFamilyName();

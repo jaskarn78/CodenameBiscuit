@@ -50,7 +50,6 @@ public class MainActivity extends AppCompatActivity {
     private JSONObject currentUserId = new JSONObject();
     private SharedPreferences pref;
     private Toolbar toolbar;
-    private SlidingLayer mSlidingLayer;
     private JSONObject preferences, removed;
     private GridMainEventsFrag eventsFrag;
     private SwipeEvents swipeEvents;
@@ -63,8 +62,6 @@ public class MainActivity extends AppCompatActivity {
     private MaterialSpinner toolbarSpinner;
     Bundle bundle = new Bundle();
     private String userId;
-    private ExpandableLayout expandableLayout;
-    private IconicsImageView closeButton;
 
     GPSTracker gps;
 
@@ -87,8 +84,6 @@ public class MainActivity extends AppCompatActivity {
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
         setContentView(R.layout.launch_layout);
         gps = new GPSTracker(this);
-        mSlidingLayer = (SlidingLayer)findViewById(R.id.slidingLayer1);
-
 
         pref = PreferenceManager.getDefaultSharedPreferences(this);
         preferences = new JSONObject(); removed = new JSONObject();
@@ -112,8 +107,6 @@ public class MainActivity extends AppCompatActivity {
                 fabMenu.bindAncherView(fabReveal); }
 
         checkIfFbOrGoogleLogin(savedInstanceState);
-
-
 
     }
 
@@ -148,8 +141,7 @@ public class MainActivity extends AppCompatActivity {
      * View binding
      **********************************************************************************/
     private void bindViews() {
-        expandableLayout = (ExpandableLayout)findViewById(R.id.expandable_layout);
-        closeButton = (IconicsImageView)findViewById(R.id.exit_icon);
+        IconicsImageView closeButton = (IconicsImageView) findViewById(R.id.exit_icon);
 
         FancyButton musicFancyButton = (FancyButton) fabMenuView.findViewById(R.id.btn_music);
         FancyButton sportsButton = (FancyButton) fabMenuView.findViewById(R.id.btn_sports);
@@ -233,15 +225,12 @@ public class MainActivity extends AppCompatActivity {
                 textView.setVisibility(View.GONE);
                 revealFrame.setVisibility(View.VISIBLE);
                 toolbarSpinner.setVisibility(View.VISIBLE);
-                item.setIcon(R.drawable.ic_fullscreen_white_48dp);
-                mSlidingLayer.setVisibility(View.VISIBLE);}
+                item.setIcon(R.drawable.ic_fullscreen_white_48dp);}
             else if (swipeEvents.isAdded()) {
                 textView.setVisibility(View.VISIBLE);
                 toolbarSpinner.setVisibility(View.GONE);
                 revealFrame.setVisibility(View.GONE);
-                item.setIcon(R.drawable.ic_grid_on_white_48dp);
-                mSlidingLayer.setVisibility(View.GONE); }
-        }
+                item.setIcon(R.drawable.ic_grid_on_white_48dp);} }
         return super.onPrepareOptionsMenu(menu); }
 
     @Override

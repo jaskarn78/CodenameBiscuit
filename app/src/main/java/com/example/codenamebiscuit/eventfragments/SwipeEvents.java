@@ -1,34 +1,22 @@
 package com.example.codenamebiscuit.eventfragments;
 
 import android.content.Context;
-import android.graphics.PorterDuff;
-import android.graphics.drawable.Drawable;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v4.view.ViewPager;
-import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
-import com.bumptech.glide.load.resource.drawable.GlideDrawable;
-import com.bumptech.glide.request.RequestListener;
-import com.bumptech.glide.request.target.Target;
 import com.devspark.progressfragment.ProgressFragment;
 import com.example.codenamebiscuit.Events;
 import com.example.codenamebiscuit.R;
-import com.example.codenamebiscuit.SwipePagerAdapter;
 import com.example.codenamebiscuit.helper.EventBundle;
 import com.example.codenamebiscuit.requests.QueryEventList;
 import com.example.codenamebiscuit.requests.UpdateDbOnSwipe;
@@ -36,10 +24,9 @@ import com.example.codenamebiscuit.swipedeck.SwipeDeck;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.concurrent.ExecutionException;
+
 
 public class SwipeEvents extends ProgressFragment{
 
@@ -213,6 +200,7 @@ public class SwipeEvents extends ProgressFragment{
              */
             eventBundle = events.getBundle((int)getItemId(position));
             ImageView frontCardImage = (ImageView) v.findViewById(R.id.offer_image);
+            FloatingActionButton swipeButton = (FloatingActionButton)v.findViewById(R.id.swipeButton);
             loadImage(frontCardImage, image);
 
             TextView eventName = (TextView)v.findViewById(R.id.slidename);
@@ -225,6 +213,13 @@ public class SwipeEvents extends ProgressFragment{
             eventPreference.setText(eventBundle.getString("eventPreference"));
             TextView eventDate = (TextView)v.findViewById(R.id.slideDate);
             eventDate.setText(parseDate(eventBundle.getString("eventDate")));
+            swipeButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(getActivity(), DisplayEvent.class);
+                    intent.putExtras(events.getBundle((int)getItemId(position))); getContext().startActivity(intent);
+                }
+            });
             return v;
         }
 
@@ -241,7 +236,7 @@ public class SwipeEvents extends ProgressFragment{
     private void loadImage(final ImageView imageView, String image) {
         Glide.with(SwipeEvents.this)
                 .load(image).diskCacheStrategy(DiskCacheStrategy.ALL)
-                .centerCrop().placeholder(R.drawable.progress).into(imageView);
+                .centerCrop().fitCenter().placeholder(R.drawable.progress).into(imageView);
     }
 
     public ArrayList<JSONObject> getData(){ return data; }

@@ -8,6 +8,7 @@
         android:layout_margin="1dp"
         card_view:cardCornerRadius="5dp"
         card_view:cardElevation="1dp"
+        android:layout_gravity="center"
         card_view:cardUseCompatPadding="true">
 
 
@@ -26,7 +27,7 @@
                 <ImageView
                     android:id="@+id/offer_image"
                     android:layout_width="match_parent"
-                    android:layout_height="360dp"
+                    android:layout_height="400dp"
                     android:scaleType="fitXY" />
                 <View
                     android:layout_width="match_parent"
@@ -78,6 +79,7 @@
             </LinearLayout>
 
             <android.support.design.widget.FloatingActionButton
+                android:id="@+id/swipeButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 xmlns:app="http://schemas.android.com/apk/res-auto"

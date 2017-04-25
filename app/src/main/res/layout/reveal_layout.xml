@@ -1,0 +1,46 @@
+<android.support.design.widget.CoordinatorLayout
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/card_border"
+    android:layout_gravity="center">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+
+        <ImageView
+            android:id="@+id/reveal_event_image"
+            android:layout_width="match_parent"
+            android:layout_height="380dp"
+            android:scaleType="fitXY" />
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/livinWhite"/>
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="5dp"
+            android:background="@color/livinBlack">
+            <include layout="@layout/card_content" />
+        </FrameLayout>
+        </LinearLayout>
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/revealFab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        app:layout_anchor="@id/reveal_event_image"
+        app:layout_anchorGravity="bottom|end"
+        app:useCompatPadding="true"
+        app:elevation="5dp"
+        app:rippleColor="@color/black_overlay"
+        android:src="@drawable/ic_arrow_forward_black_48dp"
+        android:clickable="true"
+        />
+    </android.support.design.widget.CoordinatorLayout>

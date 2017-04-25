@@ -82,6 +82,8 @@ dependencies {
     compile 'net.cachapa.expandablelayout:expandablelayout:2.8'
     compile 'com.jaredrummler:material-spinner:1.1.0'
     compile 'com.hlab.fabrevealmenu:fab-reveal-menu:1.0.2'
+    compile 'com.github.faruktoptas:FancyShowCaseView:0.0.6'
+
 
 }
 

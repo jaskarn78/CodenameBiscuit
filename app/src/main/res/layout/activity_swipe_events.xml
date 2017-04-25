@@ -18,108 +18,18 @@
     <com.example.codenamebiscuit.swipedeck.SwipeDeck
         android:id="@+id/swipe_deck"
         android:layout_width="match_parent"
-        android:layout_height="480dp"
+        android:layout_height="match_parent"
         android:layout_marginTop="80dp"
         android:paddingStart="3dp"
         android:paddingEnd="3dp"
         swipedeck:max_visible="2"
-        swipedeck:card_spacing="4dp"
+        swipedeck:card_spacing="15dp"
         swipedeck:render_above="true"
         swipedeck:rotation_degrees="15"
         swipedeck:opacity_end="0.8"
         />
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="55dp"
-        android:layout_gravity="bottom|center"
-        android:orientation="horizontal"
-        android:background="@color/transparentLivinBlack">
 
-        <RelativeLayout
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:layout_weight="1">
-            <ImageView
-                android:layout_width="45dp"
-                android:layout_height="45dp"
-                android:layout_gravity="center"
-                android:id="@+id/removed"
-                android:src="@drawable/ic_delete_white_48dp"
-                android:tint="@color/livinWhite"
-                />
-            <TextView
-                android:id="@+id/numRemoved"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignTop="@id/removed"
-                android:layout_alignRight="@id/removed"
-                android:padding="2sp"
-                android:text="10"
-                android:textColor="#FFF"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                android:background="@drawable/badge"/>
 
-            
-
-        </RelativeLayout>
-        <RelativeLayout
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:background="@color/transparentPink"
-            android:layout_weight="1">
-
-            <ImageView
-                android:layout_width="45dp"
-                android:layout_height="45dp"
-                android:layout_gravity="center"
-                android:src="@drawable/ic_home_white_48dp"
-                android:id="@+id/home"
-                />
-            <TextView
-                android:id="@+id/numOfUpcoming"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:padding="2sp"
-                android:layout_alignTop="@id/home"
-                android:layout_alignRight="@id/home"
-                android:text="10"
-                android:textColor="#FFF"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                android:background="@drawable/badge"/>
-        </RelativeLayout>
-
-        <RelativeLayout
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:layout_weight="1">
-            <ImageView
-                android:layout_width="45dp"
-                android:layout_height="45dp"
-                android:layout_gravity="center"
-                android:src="@drawable/ic_save_white_48dp"
-                android:tint="@color/livinWhite"
-                android:id="@+id/saved"/>
-            <TextView
-                android:id="@+id/numSaved"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignTop="@id/saved"
-                android:layout_alignRight="@id/saved"
-                android:padding="2sp"
-                android:text="10"
-                android:textColor="#FFF"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                android:background="@drawable/badge"/>
-        </RelativeLayout>
-
-    </LinearLayout>
 
 
 </com.example.codenamebiscuit.swipedeck.layouts.SwipeFrameLayout>

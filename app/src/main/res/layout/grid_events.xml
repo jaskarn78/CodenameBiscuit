@@ -15,6 +15,7 @@
         android:layout_margin="1dp"
         card_view:cardElevation="1dp"
         android:paddingBottom="1dp"
+        android:clickable="true"
         android:foreground="?android:attr/selectableItemBackground">
      <RelativeLayout
             android:layout_width="match_parent"
@@ -32,69 +33,6 @@
              android:layout_width="match_parent"
              android:layout_height="match_parent" />
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/tv_event_name"
-                android:ellipsize="marquee"
-                android:focusableInTouchMode="true"
-                android:focusable="true"
-                android:fadingEdge="horizontal"
-                android:marqueeRepeatLimit="marquee_forever"
-                android:scrollHorizontally="true"
-                android:lines="1"
-                android:layout_above="@+id/iv_event_image"
-                android:textSize="20sp" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/tv_event_location"
-                android:ellipsize="marquee"
-                android:focusableInTouchMode="true"
-                android:focusable="true"
-                android:marqueeRepeatLimit="marquee_forever"
-                android:scrollHorizontally="true"
-                android:lines="1"
-                android:fadingEdge="horizontal"
-                android:layout_toEndOf="@+id/iv_event_image"
-                android:layout_below="@+id/tv_event_preference"
-                android:visibility="gone"  />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/tv_event_preference"
-                android:ellipsize="marquee"
-                android:focusableInTouchMode="true"
-                android:focusable="true"
-                android:marqueeRepeatLimit="marquee_forever"
-                android:scrollHorizontally="true"
-                android:lines="1"
-                android:fadingEdge="horizontal"
-                android:layout_toRightOf="@+id/iv_event_image"
-                android:layout_below="@+id/tv_event_name"
-                android:visibility="gone" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/age"
-                android:layout_below="@id/tv_event_location"
-                android:layout_toEndOf="@+id/iv_event_image"
-                android:visibility="gone"
-                android:text="Age: 21+"/>
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/tv_event_location"
-                android:id="@+id/gird_cost"
-                android:layout_toEndOf="@id/age"
-                android:paddingLeft="5dp"
-                android:text="Cost: $$$"
-                android:paddingBottom="5dp"
-                android:visibility="gone" />
         </RelativeLayout>
 
     </android.support.v7.widget.CardView>
