@@ -38,9 +38,8 @@
                     android:layout_width="190dp"
                     android:layout_height="wrap_content"
                     app:ms_text_color="@color/livinWhite"
-                    app:ms_background_color="@color/cardview_dark_background"
+                    app:ms_background_color="@color/livinBlack"
                     android:padding="2dp"
-                    android:backgroundTint="@color/cardview_dark_background"
                     />
 
         </android.support.v7.widget.Toolbar>

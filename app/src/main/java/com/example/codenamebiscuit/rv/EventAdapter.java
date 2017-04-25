@@ -47,6 +47,7 @@ import java.util.ArrayList;
 import java.util.zip.Inflater;
 
 import me.toptas.fancyshowcase.FancyShowCaseView;
+import me.toptas.fancyshowcase.FocusShape;
 import me.toptas.fancyshowcase.OnViewInflateListener;
 
 
@@ -55,11 +56,9 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
     private Context context;
     private String message;
     private int type;
-    private ImageView rowMenu;
     private Activity activity;
     private Bundle bundle;
     private View rootView;
-    private Drawable eventImageDrawable;
     private SharedPreferences sharedPreferences;
     ArrayList<Bundle> bundleList = new ArrayList<>();
 
@@ -108,16 +107,13 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
 
     @Override
     public int getItemCount() {
-        if(mEventData==null)
-            return 0;
-        else
-            return mEventData.size();}
+        if(mEventData==null)  return 0;
+        else  return mEventData.size();}
 
 
     public void setEventData(ArrayList<JSONObject> eventData) {
         mEventData = eventData;
-        notifyDataSetChanged();
-    }
+        notifyDataSetChanged(); }
 
     public void setupDeleteButton(final JSONObject restoreEvent, final int position, final Drawable image, final String text){
         final AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(activity);
@@ -189,7 +185,6 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
                                                    com.bumptech.glide.request.target.Target<GlideDrawable> target,
                                                    boolean isFromMemoryCache, boolean isFirstResource) { progressBar.setVisibility(View.GONE);
                         return false; } }).into(imageView);
-        eventImageDrawable = imageView.getDrawable();
     }
 
     public void clear() {
@@ -225,7 +220,6 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
         public EventAdapterViewHolder(View view) {
             super(view);
             rootView = view;
-            rowMenu = (ImageView)view.findViewById(R.id.row_menu);
 
             mEventDistance = (TextView)view.findViewById(R.id.event_distance);
             mSwipeLayout = (SwipeLayout) itemView.findViewById(R.id.swipe);
@@ -256,61 +250,34 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
 
     @Override
     public void onBindViewHolder(final EventAdapterViewHolder eventAdapterViewHolder, final int position) {
-        String eventLocation = null;
-        String eventPref = null;
-        String eventPath = null;
-        String event = null;
-        String eventInfo = "";
-        String startDate = null;
-        String startTime = null;
-        String eventid = null;
-        String userId = null;
-        String eventHoster = null;
-        String cost = null;
-        Double lat = 0.0;
-        String eventWebsite = null;
-        int eventDistance = 0;
-        Double lng = 0.0;
+        String eventLocation = null;    String eventPref = null;    String eventPath = null;        String event = null;
+        String eventInfo = "";          String startDate = null;    String startTime = null;        String eventid = null;
+        String userId = null;           String eventHoster = null;  String cost = null;             Double lat = 0.0;
+        String eventWebsite = null;     int eventDistance = 0;      Double lng = 0.0;
 
         final JSONObject restoreEvent = new JSONObject();
         final JSONObject eventObject = mEventData.get(position);
 
         try {
-            eventLocation = eventObject.getString("event_location");
-            eventPref = eventObject.getString("preference_name");
-            eventPath = eventObject.getString("img_path");
-            event = eventObject.getString("event_name");
-            eventHoster = eventObject.getString("event_sponsor");
-            cost = eventObject.getString("event_cost");
-            startDate = eventObject.getString("start_date");
-            startTime = eventObject.getString("start_time");
-            eventid = eventObject.getString("event_id");
-            userId = eventObject.getString("event_id");
-            lat = eventObject.getDouble("lat");
-            lng = eventObject.getDouble("lng");
-            eventInfo = eventObject.getString("event_description");
-            eventWebsite = eventObject.getString("event_website");
+            eventLocation = eventObject.getString("event_location");    eventPref = eventObject.getString("preference_name");
+            eventPath = eventObject.getString("img_path");              event = eventObject.getString("event_name");
+            eventHoster = eventObject.getString("event_sponsor");       cost = eventObject.getString("event_cost");
+            startDate = eventObject.getString("start_date");            startTime = eventObject.getString("start_time");
+            eventid = eventObject.getString("event_id");                userId = eventObject.getString("event_id");
+            lat = eventObject.getDouble("lat");                         lng = eventObject.getDouble("lng");
+            eventInfo = eventObject.getString("event_description");     eventWebsite = eventObject.getString("event_website");
             eventDistance = eventObject.getInt("event_distance");
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+        } catch (JSONException e) { e.printStackTrace(); }
 
 
         final Bundle bundle = new Bundle();
-        bundle.putString("eventName", event);
-        bundle.putString("eventImage", eventPath);
-        bundle.putString("eventDate", startDate);
-        bundle.putString("eventTime", startTime);
-        bundle.putString("eventLocation", eventLocation);
-        bundle.putString("eventPreference", eventPref);
-        bundle.putString("eventDescription", eventInfo);
-        bundle.putString("eventHoster", eventHoster);
-        bundle.putString("eventDistance", eventDistance + "");
-        bundle.putString("eventCost", cost);
-        bundle.putString("eventId", eventid);
-        bundle.putDouble("eventLat", lat);
-        bundle.putDouble("eventLng", lng);
-        bundle.putString("eventWebsite", eventWebsite);
+        bundle.putString("eventName", event);                   bundle.putString("eventImage", eventPath);
+        bundle.putString("eventDate", startDate);               bundle.putString("eventTime", startTime);
+        bundle.putString("eventLocation", eventLocation);       bundle.putString("eventPreference", eventPref);
+        bundle.putString("eventDescription", eventInfo);        bundle.putString("eventHoster", eventHoster);
+        bundle.putString("eventDistance", eventDistance + "");  bundle.putString("eventCost", cost);
+        bundle.putString("eventId", eventid);                   bundle.putDouble("eventLat", lat);
+        bundle.putDouble("eventLng", lng);                      bundle.putString("eventWebsite", eventWebsite);
         setBundle(bundle);
 
         if (type == 1) {
@@ -352,6 +319,18 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
                             eventAdapterViewHolder.mEventName.getText().toString());
                 }
             });
+
+            /*****************************************************************************************
+             * Clicking on a saved or deleted event will start DisplayEvent activity
+             * which displays additonal event information
+             ****************************************************************************************/
+            eventAdapterViewHolder.cardView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    EventBundle eventBundle = new EventBundle(mEventData);
+                    Intent intent = new Intent(activity, DisplayEvent.class);
+                    intent.putExtras(bundle);
+                    activity.startActivity(intent);}});
         }
 
         /*****************************************************************************************
@@ -384,13 +363,13 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
                                     eventHoster.setText("Presented By: "+eventInfo.getString("eventHoster"));
 
                                     Glide.with(activity).load(getImageURL(eventBundle.getBundle(eventAdapterViewHolder.getAdapterPosition())
-                                            .getString("eventImage"))).placeholder(R.drawable.progress).fitCenter().into(revealImage);
+                                            .getString("eventImage"))).placeholder(R.drawable.progress).centerCrop().fitCenter().into(revealImage);
                                     fab.setOnClickListener(new View.OnClickListener() {
                                         @Override
                                         public void onClick(View v) {
                                             Intent intent = new Intent(activity, DisplayEvent.class);
                                             intent.putExtras(eventInfo); activity.startActivity(intent); } });
-                                } }).build().show(); } }); } }
+                                } }).focusOn(v).focusShape(FocusShape.ROUNDED_RECTANGLE).roundRectRadius(v.getWidth()).build().show(); } }); } }
 
     private String parseDate(String dateString){
         dateString = dateString.replace('-', '/');

@@ -145,7 +145,7 @@ public class DisplayEvent extends AppCompatActivity{
         eventDescription = bundle.getString("eventDescription");
         eventLocation = bundle.getString("eventLocation");
         eventCost = bundle.getString("eventCost");
-        eventTime = bundle.getString("eventTime");
+        eventTime = bundle.getString("eventTime", null);
         eventId = bundle.getString("eventId");
         eventLat = bundle.getDouble("eventLat");
         eventLng = bundle.getDouble("eventLng");
@@ -296,11 +296,15 @@ public class DisplayEvent extends AppCompatActivity{
         SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
         Date dateObj = null;
         try {
-            dateObj = dateFormat.parse(time);
+            if(time!=null)
+                dateObj = dateFormat.parse(time);
         } catch (ParseException e) {
             e.printStackTrace();
         }
-        return new SimpleDateFormat("HH:mm").format(dateObj);
+        if(dateObj!=null)
+            return new SimpleDateFormat("HH:mm").format(dateObj);
+        else
+            return "12:00";
     }
 
     private void loadImage(){
