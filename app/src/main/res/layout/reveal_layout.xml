@@ -19,7 +19,7 @@
         <ImageView
             android:id="@+id/reveal_event_image"
             android:layout_width="match_parent"
-            android:layout_height="380dp"
+            android:layout_height="480dp"
             android:scaleType="fitXY" />
         <ProgressBar
             android:id="@+id/reveal_progress"

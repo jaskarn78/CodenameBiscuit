@@ -4,9 +4,8 @@
         xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/card_swipe"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:layout_margin="1dp"
-        android:layout_gravity="center"
         card_view:cardCornerRadius="5dp"
         card_view:cardElevation="1dp"
         card_view:cardUseCompatPadding="true">
@@ -15,17 +14,20 @@
         <android.support.design.widget.CoordinatorLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_gravity="center"
             android:background="@drawable/card_border">
 
             <LinearLayout
                 android:id="@+id/front_view"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
                 android:orientation="vertical">
 
                 <FrameLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center">
 
                 <ProgressBar
                     android:layout_width="match_parent"
@@ -36,8 +38,10 @@
                 <ImageView
                     android:id="@+id/offer_image"
                     android:layout_width="match_parent"
-                    android:layout_height="380dp"
-                    android:scaleType="fitXY" />
+                    android:layout_height="420dp"
+                    android:scaleType="fitXY"
+                    android:adjustViewBounds="true"
+                    />
                 </FrameLayout>
 
                 <View

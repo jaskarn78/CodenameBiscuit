@@ -107,7 +107,6 @@ public class GridMainEventsFrag extends ProgressFragment {
         super.onActivityCreated(savedInstanceState);
         toolbarSpinner = (MaterialSpinner)getActivity().findViewById(R.id.spinner);
 
-
         setContentView(mContentView);
         if (isAdded()) {
             obtainData();

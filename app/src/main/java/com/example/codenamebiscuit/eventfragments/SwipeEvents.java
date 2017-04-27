@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import java.util.concurrent.ExecutionException;
 
 
+
 public class SwipeEvents extends ProgressFragment{
 
     private SwipeDeckAdapter adapter;
@@ -141,7 +142,8 @@ public class SwipeEvents extends ProgressFragment{
             try {
                 if(imagePosition>=0) {
                     String background = data.get(imagePosition).getString("img_path");
-                    ImageLoader.loadBackgroundImage(getContext(), background, swipeImage); }
+                    ImageLoader.loadBackgroundImage(getContext(), background, swipeImage);
+                }
                 else ImageLoader.loadBackgroundResource(getContext(), R.drawable.livbg, swipeImage);
             } catch (JSONException e) {e.printStackTrace(); } }
 
@@ -194,7 +196,7 @@ public class SwipeEvents extends ProgressFragment{
             FloatingActionButton swipeButton = (FloatingActionButton)v.findViewById(R.id.swipeButton);
             final ProgressBar progressBar = (ProgressBar)v.findViewById(R.id.swipeProgress);
             //loadImage(frontCardImage, image, progressBar);
-            ImageLoader.loadImage(getActivity(), image, frontCardImage, progressBar);
+            ImageLoader.loadImageFitCenter(getActivity(), image, frontCardImage, progressBar);
 
 
             TextView eventName = (TextView)v.findViewById(R.id.slidename);

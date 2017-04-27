@@ -310,7 +310,7 @@ public class DisplayEvent extends AppCompatActivity{
 
     private void loadImage(){
         final ProgressBar progressBar = (ProgressBar)findViewById(R.id.displayProgress);
-        ImageLoader.loadCroppedImage(this, eventImage, displayEventImage, progressBar);
+        ImageLoader.loadImageFitCenter(this, eventImage, displayEventImage, progressBar);
     }
 
     @Override

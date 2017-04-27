@@ -59,6 +59,7 @@ public class ImageLoader {
     }
     public static void loadImage(Context context, String imgPath, ImageView imageView, final ProgressBar progressBar){
         Glide.with(context).load(getPath(imgPath)).error(R.drawable.placeholder)
+                .crossFade(500)
                 .diskCacheStrategy(DiskCacheStrategy.ALL)
                 .listener(new RequestListener<String, GlideDrawable>() {
                     @Override
@@ -75,13 +76,27 @@ public class ImageLoader {
                 })
                 .into(imageView);
     }
-    public static void loadImage(Context context, String imgPath, ImageView imageView){
+    public static void loadImageFitCenter(Context context, String imgPath, ImageView imageView, final ProgressBar progressBar){
         Glide.with(context).load(getPath(imgPath)).diskCacheStrategy(DiskCacheStrategy.ALL)
-                .error(R.drawable.placeholder).into(imageView);
+                 .error(R.drawable.placeholder)
+                .listener(new RequestListener<String, GlideDrawable>() {
+                    @Override
+                    public boolean onException(Exception e, String model, Target<GlideDrawable> target, boolean isFirstResource) {
+                        progressBar.setVisibility(View.GONE);
+                        return false;
+                    }
+
+                    @Override
+                    public boolean onResourceReady(GlideDrawable resource, String model, Target<GlideDrawable> target, boolean isFromMemoryCache, boolean isFirstResource) {
+                        progressBar.setVisibility(View.GONE);
+                        return false;
+                    }
+                })
+                .into(imageView);
     }
     public static void loadBackgroundImage(Context context, String imgPath, ImageView imageView){
         Glide.with(context).load(getPath(imgPath)).error(R.drawable.placeholder)
-                .thumbnail(0.50f)
+                .override(18, 18)
                 .diskCacheStrategy(DiskCacheStrategy.ALL)
                 .crossFade()
                 .centerCrop()

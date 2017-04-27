@@ -12,7 +12,6 @@
         android:id="@+id/lnr_main"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/map_pager_border"
         android:orientation="vertical">
        <include layout="@layout/standard_layout"/>
 
