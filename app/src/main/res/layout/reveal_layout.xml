@@ -11,12 +11,23 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
 
         <ImageView
             android:id="@+id/reveal_event_image"
             android:layout_width="match_parent"
             android:layout_height="380dp"
             android:scaleType="fitXY" />
+        <ProgressBar
+            android:id="@+id/reveal_progress"
+            android:layout_width="match_parent"
+            android:layout_height="140dp"
+            android:layout_gravity="center"/>
+        </FrameLayout>
+
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"

@@ -9,25 +9,30 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
+
     <ImageView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:id="@+id/swipeBackground"
         android:scaleType="fitXY"
       />
+
     <com.example.codenamebiscuit.swipedeck.SwipeDeck
         android:id="@+id/swipe_deck"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginTop="80dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="75dp"
         android:paddingStart="3dp"
         android:paddingEnd="3dp"
         swipedeck:max_visible="2"
-        swipedeck:card_spacing="15dp"
+        swipedeck:card_spacing="5dp"
         swipedeck:render_above="true"
         swipedeck:rotation_degrees="15"
         swipedeck:opacity_end="0.8"
         />
+
+
+
 
 
 

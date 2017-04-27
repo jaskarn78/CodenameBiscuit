@@ -34,12 +34,4 @@
         <item>@string/pref_age_twenty_one_value</item>
     </array>
 
-    <array name="filter_labels">
-        <item name="Nearest"/>
-        <item name="Furthest"/>
-        <item name="Age"/>
-        <item name="Newest"/>
-        <item name="Oldest"/>
-    </array>
-
 </resources>

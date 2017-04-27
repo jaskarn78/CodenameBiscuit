@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:background="@color/livinBlack"
-    tools:context="com.example.codenamebiscuit.MapActivity">
+    tools:context="com.example.codenamebiscuit.eventfragments.MapActivity">
 
     <android.support.v7.widget.Toolbar
         android:id="@+id/toolbar"

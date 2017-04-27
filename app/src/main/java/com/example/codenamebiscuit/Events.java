@@ -1,13 +1,8 @@
 package com.example.codenamebiscuit;
 
 import android.app.Activity;
-import android.content.Context;
 import android.location.Location;
-import android.os.Parcel;
-import android.os.Parcelable;
-import android.util.Log;
 
-import com.example.codenamebiscuit.helper.DistanceCalculator;
 import com.example.codenamebiscuit.helper.GPSTracker;
 
 import org.json.JSONException;
@@ -20,7 +15,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
-import java.util.concurrent.ExecutionException;
 
 /**
  * Created by jaskarnjagpal on 4/11/17.

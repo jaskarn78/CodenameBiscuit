@@ -6,9 +6,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="1dp"
+        android:layout_gravity="center"
         card_view:cardCornerRadius="5dp"
         card_view:cardElevation="1dp"
-        android:layout_gravity="center"
         card_view:cardUseCompatPadding="true">
 
 
@@ -20,15 +20,26 @@
             <LinearLayout
                 android:id="@+id/front_view"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:orientation="vertical">
 
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                <ProgressBar
+                    android:layout_width="match_parent"
+                    android:layout_height="140dp"
+                    android:layout_gravity="center"
+                    android:id="@+id/swipeProgress"/>
 
                 <ImageView
                     android:id="@+id/offer_image"
                     android:layout_width="match_parent"
-                    android:layout_height="400dp"
+                    android:layout_height="380dp"
                     android:scaleType="fitXY" />
+                </FrameLayout>
+
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="1dp"

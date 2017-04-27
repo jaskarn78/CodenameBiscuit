@@ -13,8 +13,6 @@
     <color name="transLivinBlack">#99000000</color>
     <color name="transparentLivinBlack">#da000000</color>
     <color name="transparentBlack">#50000000</color>
-    <color name="transparentLivinPink">#87ff9dfc</color>
-
 
 
     <string-array name="livColors">

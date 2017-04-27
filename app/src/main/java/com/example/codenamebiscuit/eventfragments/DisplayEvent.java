@@ -17,15 +17,15 @@ import android.view.WindowManager;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.resource.drawable.GlideDrawable;
-import com.bumptech.glide.request.RequestListener;
-import com.bumptech.glide.request.target.Target;
 import com.example.codenamebiscuit.R;
+import com.example.codenamebiscuit.helper.ImageLoader;
+import com.facebook.share.model.ShareLinkContent;
+import com.facebook.share.widget.ShareDialog;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -49,7 +49,7 @@ import java.util.Date;
 public class DisplayEvent extends AppCompatActivity{
 
     private ImageView displayEventImage;
-    private TextView displayEventName, displayEventStartDate, displayEventStartTIme;
+    private TextView  displayEventStartDate, displayEventStartTIme;
     private TextView displayEventDesc, displayEventLocation, displayEventPref;
     private TextView displayEventDistance, displayEventCost, likeText;
     private TextView displayEventHoster;
@@ -63,7 +63,7 @@ public class DisplayEvent extends AppCompatActivity{
     private RatingBar ratingBar;
     private double eventLat, eventLng;
     private IconicsImageView webSite, navigate;
-    private IconicsImageView phone;
+    private IconicsImageView phone, shareBtn;
     private WebView webView;
     private Toolbar toolbar;
     private TextView toolbarTitle;
@@ -87,7 +87,7 @@ public class DisplayEvent extends AppCompatActivity{
         this.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         this.getSupportActionBar().setHomeAsUpIndicator(upArrow);
         bindViews(savedInstanceState);
-
+        shareButton();
         setupMap();
 
     }
@@ -112,6 +112,7 @@ public class DisplayEvent extends AppCompatActivity{
 
         likeText = (TextView)findViewById(R.id.currentRating);
         likeButton = (LikeButton)findViewById(R.id.like);
+        shareBtn = (IconicsImageView)findViewById(R.id.event_share);
 
         phone = (IconicsImageView)findViewById(R.id.event_call);
         webSite = (IconicsImageView)findViewById(R.id.event_website);
@@ -308,12 +309,8 @@ public class DisplayEvent extends AppCompatActivity{
     }
 
     private void loadImage(){
-        Glide.with(this)
-                .load(getImageURL(eventImage))
-                .centerCrop()
-                .placeholder(R.drawable.progress)
-                .error(R.drawable.placeholder)
-                .into(displayEventImage);
+        final ProgressBar progressBar = (ProgressBar)findViewById(R.id.displayProgress);
+        ImageLoader.loadCroppedImage(this, eventImage, displayEventImage, progressBar);
     }
 
     @Override
@@ -328,6 +325,19 @@ public class DisplayEvent extends AppCompatActivity{
         else
             return getResources().getString(R.string.IMAGE_URL_PATH) + path;
 
+    }
+
+    private void shareButton(){
+        shareBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ShareLinkContent content = new ShareLinkContent.Builder()
+                        .setContentUrl(Uri.parse("https://developers.facebook.com"))
+                        .build();
+                ShareDialog shareDialog = new ShareDialog(DisplayEvent.this);
+                shareDialog.show(content, ShareDialog.Mode.AUTOMATIC);
+            }
+        });
     }
 
 

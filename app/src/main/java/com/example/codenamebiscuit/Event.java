@@ -1,8 +1,10 @@
 package com.example.codenamebiscuit;
 
+
+
+import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
 
 /**
  * Created by jaskarnjagpal on 4/18/17.
@@ -16,7 +18,22 @@ public class Event {
     private String eventEndTime;    private String eventStartDate;      private String eventEndDate;
     private String eventWebsite;    private String Origin, destination; private String currentLat, currentLng;
 
-    public Event(ArrayList<JSONObject> data){
+    public Event(JSONObject data) throws JSONException {
+        this.eventName = data.getString("event_name");
+        this.eventImage = getImageString(data.getString("img_path"));
+        this.lat = data.getDouble("lat");
+        this.lng = data.getDouble("lng");
 
+    }
+
+
+    private String getImageString(String fileName){
+        return "http://athena.ecs.csus.edu/~teamone/events/"+fileName;
+    }
+    public String name(){
+        return eventName;
+    }
+    public String image(){
+        return eventImage;
     }
 }

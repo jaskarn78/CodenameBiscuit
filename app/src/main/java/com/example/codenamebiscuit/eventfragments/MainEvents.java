@@ -1,4 +1,4 @@
-package com.example.codenamebiscuit;
+package com.example.codenamebiscuit.eventfragments;
 
 import android.graphics.Color;
 import android.os.Bundle;
@@ -16,6 +16,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.devspark.progressfragment.ProgressFragment;
+import com.example.codenamebiscuit.R;
 import com.example.codenamebiscuit.eventfragments.DeletedEventsFrag;
 import com.example.codenamebiscuit.eventfragments.GridMainEventsFrag;
 import com.example.codenamebiscuit.eventfragments.SavedEventsFrag;

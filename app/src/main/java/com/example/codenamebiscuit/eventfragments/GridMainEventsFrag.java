@@ -6,11 +6,18 @@ package com.example.codenamebiscuit.eventfragments;
 
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.design.widget.Snackbar;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+
+
 import com.devspark.progressfragment.ProgressFragment;
 import com.example.codenamebiscuit.Events;
 import com.example.codenamebiscuit.R;
@@ -19,10 +26,8 @@ import com.example.codenamebiscuit.requests.UpdateDbOnSwipe;
 import com.example.codenamebiscuit.rv.EventAdapter;
 import com.github.brnunes.swipeablerecyclerview.SwipeableRecyclerViewTouchListener;
 import com.jaredrummler.materialspinner.MaterialSpinner;
-
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import java.util.ArrayList;
 import java.util.concurrent.ExecutionException;
 
@@ -39,7 +44,6 @@ public class GridMainEventsFrag extends ProgressFragment {
     private String userId;
     private View mContentView;
     private MaterialSpinner toolbarSpinner;
-    private Handler mHandler;
     private Runnable mShowContentRunnable = new Runnable() {
         @Override
         public void run() {if (isAdded()) { setContentShown(true);}} };
@@ -58,8 +62,9 @@ public class GridMainEventsFrag extends ProgressFragment {
     public static GridMainEventsFrag newInstance(Bundle bundle) {
         GridMainEventsFrag gridMainEventsFrag = new GridMainEventsFrag();
         gridMainEventsFrag.setArguments(bundle);
-        return gridMainEventsFrag;
-    }
+        return gridMainEventsFrag; }
+
+
     public ArrayList<JSONObject> getData(){ return data; }
 
     @Override
@@ -69,12 +74,21 @@ public class GridMainEventsFrag extends ProgressFragment {
         mRecyclerView = (RecyclerView) mContentView.findViewById(R.id.recyclerview_events);
         return super.onCreateView(inflater, container, savedInstanceState); }
 
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        menu.findItem(R.id.refresh).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                eneableRefreshing();
+                return false;}});
+        super.onCreateOptionsMenu(menu, inflater); }
+
 
     private void obtainData() {
         try {
             setContentShown(false);
-            mHandler = new Handler();
-            mHandler.postDelayed(mShowContentRunnable, 1000);
+            Handler mHandler = new Handler();
+            mHandler.postDelayed(mShowContentRunnable, 800);
             data = new QueryEventList(getString(R.string.DATABASE_MAIN_EVENTS_PULLER), userId).execute().get();
             Events.fromJson(data, getActivity());
             mAdapter = new EventAdapter(getContext().getApplicationContext(), 2, "", getActivity());
@@ -103,10 +117,10 @@ public class GridMainEventsFrag extends ProgressFragment {
             mRecyclerView.setHasFixedSize(false);
             mRecyclerView.setItemViewCacheSize(200);
             mRecyclerView.setDrawingCacheEnabled(true);
-            mRecyclerView.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_AUTO);
-
+            mRecyclerView.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_HIGH);
             enableCardSwiping();
-            setupSpinner();} }
+            setupSpinner();
+            } }
 
 
     private void enableCardSwiping() {
@@ -122,6 +136,8 @@ public class GridMainEventsFrag extends ProgressFragment {
                     public void onDismissedBySwipeLeft(RecyclerView recyclerView, int[] ints) {
                         for (int position : ints) {
                             try {
+                                Snackbar.make(getContentView(), "Event Removed: "+mAdapter.getObject().get(position)
+                                        .get("event_id"), Snackbar.LENGTH_SHORT).show();
                                 mAdapter.notifyItemRemoved(position);
                                 deleteEvent.put("user_id", mAdapter.getObject().get(position).getString("user_id"));
                                 deleteEvent.put("event_id", mAdapter.getObject().get(position).getString("event_id"));
@@ -132,7 +148,10 @@ public class GridMainEventsFrag extends ProgressFragment {
                     @Override
                     public void onDismissedBySwipeRight(RecyclerView recyclerView, int[] ints) {
                         for (int position : ints) {
-                            try {mAdapter.notifyItemRemoved(position);
+                            try {
+                                Snackbar.make(getContentView(), "Event Saved: "+mAdapter.getObject().get(position)
+                                    .get("event_id"), Snackbar.LENGTH_SHORT).show();
+                                mAdapter.notifyItemRemoved(position);
                                 saveEvent.put("user_id", mAdapter.getObject().get(position).getString("user_id"));
                                 saveEvent.put("event_id", mAdapter.getObject().get(position).getString("event_id"));
                                 data.remove(position);
@@ -164,4 +183,11 @@ public class GridMainEventsFrag extends ProgressFragment {
                 }}});
 
     }
+
+    private void eneableRefreshing(){
+        FragmentTransaction ft = getFragmentManager().beginTransaction();
+        ft.detach(GridMainEventsFrag.this); ft.attach(GridMainEventsFrag.this);
+        ft.commit();
+    }
+
 }

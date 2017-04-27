@@ -1,26 +1,27 @@
 package com.example.codenamebiscuit.eventfragments;
 
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.devspark.progressfragment.ProgressFragment;
 import com.example.codenamebiscuit.Events;
 import com.example.codenamebiscuit.R;
 import com.example.codenamebiscuit.helper.EventBundle;
+import com.example.codenamebiscuit.helper.ImageLoader;
 import com.example.codenamebiscuit.requests.QueryEventList;
 import com.example.codenamebiscuit.requests.UpdateDbOnSwipe;
 import com.example.codenamebiscuit.swipedeck.SwipeDeck;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -33,14 +34,11 @@ public class SwipeEvents extends ProgressFragment{
     private SwipeDeckAdapter adapter;
     private JSONObject saveEvent, deleteEvent;
     private String image; private String userId;
-    private Bundle eventBundle;
     private EventBundle events;
     private TextView numOfEvents;
-    private JSONObject user;
     private ArrayList<JSONObject> data;
     private View mContentView;
     private SwipeDeck cardStack;
-    private Handler mHandler;
     private int currentPosition;
     private ImageView swipeImage;
     private Runnable mShowContentRunnable = new Runnable() {
@@ -57,14 +55,13 @@ public class SwipeEvents extends ProgressFragment{
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         userId= getArguments().getString("currentUserId");
-        user=new JSONObject();
         data = new ArrayList<>();
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState){
-        setHasOptionsMenu(true);
+        setHasOptionsMenu(false);
         mContentView = inflater.inflate(R.layout.activity_swipe_events, container, false);
         return super.onCreateView(inflater, container, savedInstanceState); }
 
@@ -76,7 +73,7 @@ public class SwipeEvents extends ProgressFragment{
 
     private void obtainData(){
         setContentShown(false);
-        mHandler = new Handler();
+        Handler mHandler = new Handler();
         mHandler.postDelayed(mShowContentRunnable, 300);
         GridMainEventsFrag frag = (GridMainEventsFrag)getFragmentManager().findFragmentByTag("eventsFrag");
         if(frag!=null) data = frag.getData();
@@ -85,12 +82,11 @@ public class SwipeEvents extends ProgressFragment{
             Events.fromJson(data, getActivity());
         } catch (InterruptedException | ExecutionException e) { e.printStackTrace(); }
         events = new EventBundle(data);
-        adapter = new SwipeDeckAdapter(getContext()); adapter.setData(data);
+        adapter = new SwipeDeckAdapter(); adapter.setData(data);
         cardStack = (SwipeDeck) mContentView.findViewById(R.id.swipe_deck);
         swipeImage = (ImageView)mContentView.findViewById(R.id.swipeBackground);
         numOfEvents = (TextView)getActivity().findViewById(R.id.toolbar_title);
         cardStack.setAdapter(adapter);
-
     }
 
 
@@ -106,8 +102,7 @@ public class SwipeEvents extends ProgressFragment{
             setContentView(mContentView);
             obtainData();
             numOfEvents = (TextView)getActivity().findViewById(R.id.toolbar_title);
-            if(data.size()==0)
-                numOfEvents.setText("Empty");
+            if(data.size()==0)  numOfEvents.setText("Empty");
             else { numOfEvents.setText(currentPosition + "/" + data.size());
                 loadBackgroundImage((int)cardStack.getTopCardItemId()+1); }
 
@@ -115,6 +110,7 @@ public class SwipeEvents extends ProgressFragment{
                 @Override
                 public void cardSwipedLeft(long stableId) {
                     try {
+                        Snackbar.make(getContentView(), "Event Removed: "+adapter.getItem((int) stableId).get("event_id"), Snackbar.LENGTH_SHORT).show();
                         deleteEvent.put("event_id", adapter.getItem((int) stableId).get("event_id"));
                         deleteEvent.put("user_id", adapter.getItem((int) stableId).get("user_id"));
                         loadBackgroundImage((int)cardStack.getTopCardItemId());
@@ -122,11 +118,12 @@ public class SwipeEvents extends ProgressFragment{
                     new UpdateDbOnSwipe(getString(R.string.DATABASE_STORE_DELETED_EVENTS)).execute(deleteEvent);
                     if(currentPosition!=data.size())
                         numOfEvents.setText((++currentPosition)+"/"+(data.size()));
-                    else numOfEvents.setText("Empty"); }
+                    else numOfEvents.setText("Empty");}
 
                 @Override
                 public void cardSwipedRight(long stableId) {
                     try {
+                        Snackbar.make(getContentView(), "Event Saved: "+adapter.getItem((int) stableId).get("event_id"), Snackbar.LENGTH_SHORT).show();
                         loadBackgroundImage((int)cardStack.getTopCardItemId());
                         saveEvent.put("event_id", adapter.getItem((int) stableId).get("event_id"));
                         saveEvent.put("user_id", adapter.getItem((int) stableId).get("user_id"));
@@ -134,35 +131,30 @@ public class SwipeEvents extends ProgressFragment{
                     new UpdateDbOnSwipe(getString(R.string.DATABASE_STORE_SAVED_EVENTS)).execute(saveEvent);
                     if(currentPosition!=data.size())
                         numOfEvents.setText((++currentPosition)+"/"+(data.size()));
-                    else numOfEvents.setText("Empty"); }
+                    else numOfEvents.setText("Empty");}
 
                 @Override
-                public boolean isDragEnabled(long itemId) {
-                    return true;} });
+                public boolean isDragEnabled(long itemId) { return true;} });
         } }
 
         private void loadBackgroundImage(int imagePosition){
             try {
                 if(imagePosition>=0) {
-                    String background = getImageURL(data.get(imagePosition).getString("img_path"));
-                    Glide.with(this).load(background).error(R.drawable.placeholder)
-                            .diskCacheStrategy(DiskCacheStrategy.ALL)
-                            .centerCrop().crossFade().into(swipeImage); }
-                else Glide.with(this).load(R.drawable.livbg).crossFade().into(swipeImage);
+                    String background = data.get(imagePosition).getString("img_path");
+                    ImageLoader.loadBackgroundImage(getContext(), background, swipeImage); }
+                else ImageLoader.loadBackgroundResource(getContext(), R.drawable.livbg, swipeImage);
             } catch (JSONException e) {e.printStackTrace(); } }
 
 
-    /**
+    /**********************************************************************************************************
      * Assigns values to views within the cards
      * Handles flip animation to reveal additional event information
      * inflates layout cards.xml and assigns values to the views
-     */
+     ***********************************************************************************************************/
     public class SwipeDeckAdapter extends BaseAdapter {
-        private Context context;
         private ArrayList<JSONObject> data;
 
-        public SwipeDeckAdapter(Context context) {
-            this.context = context;
+        public SwipeDeckAdapter() {
             data = new ArrayList<>(); }
 
         public void setData(ArrayList<JSONObject> data) {
@@ -190,23 +182,25 @@ public class SwipeEvents extends ProgressFragment{
             View v;
             LayoutInflater inflater = getActivity().getLayoutInflater();
             v = inflater.inflate(R.layout.cards, parent, false);
-            try {
-                image = getImageURL(data.get((int)getItemId(position)).getString("img_path"));
+            try { image = data.get((int)getItemId(position)).getString("img_path");
             } catch (JSONException e) {e.printStackTrace();}
             /**
              * initialize all views on the back side of the card
              * assign values to all views
              * event information retrieved from json array testData
              */
-            eventBundle = events.getBundle((int)getItemId(position));
+            Bundle eventBundle = events.getBundle((int) getItemId(position));
             ImageView frontCardImage = (ImageView) v.findViewById(R.id.offer_image);
             FloatingActionButton swipeButton = (FloatingActionButton)v.findViewById(R.id.swipeButton);
-            loadImage(frontCardImage, image);
+            final ProgressBar progressBar = (ProgressBar)v.findViewById(R.id.swipeProgress);
+            //loadImage(frontCardImage, image, progressBar);
+            ImageLoader.loadImage(getActivity(), image, frontCardImage, progressBar);
+
 
             TextView eventName = (TextView)v.findViewById(R.id.slidename);
             eventName.setText(eventBundle.getString("eventName"));
             TextView eventHoster = (TextView)v.findViewById(R.id.slideHoster);
-            eventHoster.setText(eventBundle.getString("eventHoster"));
+            eventHoster.setText("Presented By: "+eventBundle.getString("eventHoster"));
             TextView eventLocation = (TextView)v.findViewById(R.id.slideLocation);
             eventLocation.setText(eventBundle.getString("eventLocation"));
             TextView eventPreference = (TextView)v.findViewById(R.id.slidePref);
@@ -219,8 +213,7 @@ public class SwipeEvents extends ProgressFragment{
                     Intent intent = new Intent(getActivity(), DisplayEvent.class);
                     intent.putExtras(events.getBundle((int)getItemId(position))); getContext().startActivity(intent);
                 }
-            });
-            return v;
+            }); return v;
         }
 
     }
@@ -229,15 +222,6 @@ public class SwipeEvents extends ProgressFragment{
         return dateString.substring(5, 10);
     }
 
-    private String getImageURL(String path) {
-        return getActivity().getString(R.string.IMAGE_URL_PATH) + path;
-    }
-
-    private void loadImage(final ImageView imageView, String image) {
-        Glide.with(SwipeEvents.this)
-                .load(image).diskCacheStrategy(DiskCacheStrategy.ALL)
-                .centerCrop().fitCenter().placeholder(R.drawable.progress).into(imageView);
-    }
 
     public ArrayList<JSONObject> getData(){ return data; }
 }

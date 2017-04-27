@@ -1,4 +1,4 @@
-package com.example.codenamebiscuit;
+package com.example.codenamebiscuit.helper;
 
 /**
  * Created by jaskarnjagpal on 1/31/17.
@@ -7,6 +7,8 @@ package com.example.codenamebiscuit;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+
+import com.example.codenamebiscuit.MainActivity;
 
 
 public class SplashScreen extends Activity {

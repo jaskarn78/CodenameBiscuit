@@ -11,35 +11,33 @@ import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.preference.PreferenceManager;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.View;
-import android.widget.CompoundButton;
 import android.widget.ImageView;
-import android.widget.TextView;
 
-import com.bumptech.glide.Glide;
-import com.example.codenamebiscuit.ArchivedEvents;
+import com.example.codenamebiscuit.eventfragments.ArchivedEvents;
 import com.example.codenamebiscuit.MainActivity;
-import com.example.codenamebiscuit.MapActivity;
+import com.example.codenamebiscuit.eventfragments.ClusterMap;
+import com.example.codenamebiscuit.eventfragments.MapActivity;
 import com.example.codenamebiscuit.R;
 import com.example.codenamebiscuit.login.ChooseLogin;
 import com.example.codenamebiscuit.settings.UserSettingsActivity;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.maps.android.clustering.ClusterManager;
 import com.mikepenz.materialdrawer.AccountHeader;
 import com.mikepenz.materialdrawer.AccountHeaderBuilder;
 import com.mikepenz.materialdrawer.Drawer;
 import com.mikepenz.materialdrawer.DrawerBuilder;
-import com.mikepenz.materialdrawer.interfaces.OnCheckedChangeListener;
 import com.mikepenz.materialdrawer.model.DividerDrawerItem;
 import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
 import com.mikepenz.materialdrawer.model.ProfileDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IProfile;
-import com.mikepenz.materialdrawer.model.interfaces.Nameable;
 import com.mikepenz.materialdrawer.util.AbstractDrawerImageLoader;
 import com.mikepenz.materialdrawer.util.DrawerImageLoader;
 
-import java.util.List;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
 
 
 /**
@@ -55,7 +53,7 @@ public class CreateDrawer {
     private Bundle bundle;
     Drawer result=null;
     AccountHeader headerResult=null;
-    private FragmentManager fragmentManager;
+    private FragmentManager fm;
     private int livinPink, overlay;
     private int livinBlack, livinWhite;
     private PrimaryDrawerItem gridEvents;
@@ -66,10 +64,12 @@ public class CreateDrawer {
     GPSTracker gps;
     LatLng latLng;
     private Bitmap bitmap;
+    ArrayList<JSONObject> data;
     SharedPreferences preferences;
 
 
-    public CreateDrawer(Bundle savedState, Toolbar toolbar, Activity activity, String userId) {
+
+    public CreateDrawer(Bundle savedState, Toolbar toolbar, Activity activity, String userId, FragmentManager fm, ArrayList<JSONObject> data) {
 
         preferences = PreferenceManager.getDefaultSharedPreferences(activity.getApplicationContext());
         this.pic=preferences.getString("user_image", null);
@@ -80,6 +80,9 @@ public class CreateDrawer {
         this.savedState=savedState; this.toolbar=toolbar;
         this.activity=activity;
         this.bundle = new Bundle();
+        this.fm=fm;
+        this.data=data;
+
 
         livinPink=activity.getColor(R.color.livinPink);
         overlay=activity.getColor(R.color.black_overlay);
@@ -98,9 +101,7 @@ public class CreateDrawer {
         DrawerImageLoader.init(new AbstractDrawerImageLoader() {
             @Override
             public void set(ImageView imageView, Uri uri, Drawable placeholder) {
-                Glide.with(imageView.getContext()).load(uri).placeholder(placeholder)
-                        .fitCenter().centerCrop().into(imageView);
-            }
+                ImageLoader.loadImageFromUri(imageView.getContext(), uri, imageView); }
         });
 
         IProfile profile = new ProfileDrawerItem().withName(fName + " " + lName).withIcon(Uri.parse(pic)).withEmail(email).withIdentifier(100);
@@ -169,7 +170,17 @@ public class CreateDrawer {
                                 .withIconColor(livinWhite)
                                 .withSelectedTextColor(livinPink)
                                 .withSelectedIconColor(livinPink)
-                                .withSelectable(false)
+                                .withSelectable(false),
+                        new DividerDrawerItem(),
+                    new PrimaryDrawerItem()
+                        .withName("Map List")
+                        .withIcon(R.drawable.ic_map_white_48dp)
+                        .withIdentifier(6)
+                        .withTextColor(livinWhite)
+                        .withIconColor(livinWhite)
+                        .withSelectedTextColor(livinPink)
+                        .withSelectedIconColor(livinPink)
+                        .withSelectable(false)
 
                 )
                 .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
@@ -178,7 +189,6 @@ public class CreateDrawer {
                         // do something with the clicked item :D
                         if (drawerItem != null) {
                             Intent intent = null;
-
                             if (drawerItem.getIdentifier()==1)
                                 intent = new Intent(activity, MainActivity.class);
                             else if(drawerItem.getIdentifier()==2)
@@ -196,7 +206,8 @@ public class CreateDrawer {
                                 preferences.edit().putString("lName", null).apply();
                                 preferences.edit().putString("email", null).apply();
                                 intent = new Intent(activity, ChooseLogin.class);
-                            }
+                            }else if(drawerItem.getIdentifier()==6){
+                                intent = new Intent(activity, ClusterMap.class); }
                             if (intent != null) {
                                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                                 intent.putExtra("userId", userId);
@@ -208,38 +219,14 @@ public class CreateDrawer {
                 .withShowDrawerOnFirstLaunch(false)
                 .build();
 
-
     }
 
-    private OnCheckedChangeListener onCheckedChangeListener = new OnCheckedChangeListener() {
-        @Override
-        public void onCheckedChanged(IDrawerItem drawerItem, CompoundButton buttonView, boolean isChecked) {
-            View v = result.getSlider();
-            List<IDrawerItem> primaryDrawerItem = result.getDrawerItems();
-            TextView title = (TextView)activity.findViewById(R.id.toolbar_title);
-            if (drawerItem.getIdentifier()==8) {
-                if(isChecked) {
-                    Log.i("material-drawer", "DrawerItem: " + ((Nameable) drawerItem).getName() + " - toggleChecked: " + isChecked);
-                    toolbar.setBackgroundColor(activity.getColor(R.color.livinBlack));
-                    v.setBackgroundColor(activity.getColor(R.color.livinBlack));
-                    title.setTextColor(livinPink);
-
-                }else {
-                    toolbar.setBackgroundColor(activity.getColor(R.color.livinPink));
-                    v.setBackgroundColor(activity.getColor(R.color.material_drawer_background));
-                    title.setTextColor(activity.getColor(R.color.livinBlack)); } } } };
 
 
     public void setBundle(Bundle bundle){
         this.bundle=bundle;
     }
 
-    public void setBitmap(Bitmap picture){
-        bitmap=picture;
-    }
 
-    public AccountHeader getHeaderResult(){
-        return headerResult;
-    }
 
 }

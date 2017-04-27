@@ -1,4 +1,4 @@
-package com.example.codenamebiscuit;
+package com.example.codenamebiscuit.eventfragments;
 
 import android.app.Dialog;
 import android.content.SharedPreferences;
@@ -21,8 +21,7 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.TextView;
 
-import com.example.codenamebiscuit.eventfragments.DeletedEventsFrag;
-import com.example.codenamebiscuit.eventfragments.SavedEventsFrag;
+import com.example.codenamebiscuit.R;
 import com.example.codenamebiscuit.requests.RunQuery;
 import com.geniusforapp.fancydialog.FancyAlertDialog;
 

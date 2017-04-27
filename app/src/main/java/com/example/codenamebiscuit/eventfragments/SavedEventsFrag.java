@@ -15,16 +15,12 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.os.Handler;
-import android.widget.ImageView;
-import android.widget.TextView;
 
-import com.bumptech.glide.Glide;
 import com.devspark.progressfragment.ProgressFragment;
 import com.example.codenamebiscuit.R;
 import com.example.codenamebiscuit.requests.QueryEventList;
 import com.example.codenamebiscuit.rv.ClickListener;
 import com.example.codenamebiscuit.rv.EventAdapter;
-import com.rohit.recycleritemclicksupport.RecyclerItemClickSupport;
 
 import org.json.JSONException;
 import org.json.JSONObject;

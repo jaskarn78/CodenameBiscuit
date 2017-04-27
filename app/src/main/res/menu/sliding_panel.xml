@@ -3,16 +3,11 @@
     >
 
     <item
-        android:id="@+id/action_toggle"
+        android:id="@+id/refresh"
         android:orderInCategory="100"
-        sothree:showAsAction="never"
-        android:title="@string/togglepref"/>
-
-    <item
-        android:id="@+id/action_anchor"
-        android:orderInCategory="200"
-        sothree:showAsAction="never"
-        android:title="@string/anchorpref"/>
+        sothree:showAsAction="always"
+        android:icon="@drawable/ic_refresh_white_48dp"
+        android:title="@string/refresh"/>
 
 
     <item

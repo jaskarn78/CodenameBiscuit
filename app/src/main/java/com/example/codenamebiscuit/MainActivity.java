@@ -2,6 +2,7 @@ package com.example.codenamebiscuit;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.ActivityInfo;
 import android.database.DataSetObserver;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -33,9 +34,7 @@ import com.facebook.FacebookSdk;
 import com.hlab.fabrevealmenu.view.FABRevealMenu;
 import com.jaredrummler.materialspinner.MaterialSpinner;
 import com.mikepenz.iconics.view.IconicsImageView;
-import com.wunderlist.slidinglayer.SlidingLayer;
 
-import net.cachapa.expandablelayout.ExpandableLayout;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -83,6 +82,7 @@ public class MainActivity extends AppCompatActivity {
         this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
         setContentView(R.layout.launch_layout);
+        this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         gps = new GPSTracker(this);
 
         pref = PreferenceManager.getDefaultSharedPreferences(this);
@@ -190,8 +190,8 @@ public class MainActivity extends AppCompatActivity {
                 userId=pref.getString("user_id", null);
                 currentUserId.put("user_id", userId);
             } catch (JSONException e) { e.printStackTrace(); }
-            createDrawer = new CreateDrawer(savedstate, toolbar, this, userId);
-            createDrawer.loadDrawer();;
+
+
             bindViews();
             bundle.putString("currentUserId", userId);
 
@@ -205,8 +205,16 @@ public class MainActivity extends AppCompatActivity {
             transaction.setCustomAnimations(R.anim.fadein, R.anim.fadeout);
             transaction.replace(R.id.fragment_container, eventsFrag, "eventsFrag");
             transaction.commit();
+
+            ArrayList<JSONObject> data = new ArrayList<>();
+            data = eventsFrag.getData();
+            createDrawer = new CreateDrawer(savedstate, toolbar, this, userId, getSupportFragmentManager(), data);
+            createDrawer.loadDrawer();
+
         }
     }
+
+
 
     /*********************************************************************************
      Create Menu
@@ -219,14 +227,17 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
         MenuItem item =menu.findItem(R.id.action_grid_to_full).setVisible(true);
+        MenuItem refresh = menu.findItem(R.id.refresh);
         TextView textView = (TextView)findViewById(R.id.toolbar_title);
         if(eventsFrag!=null && swipeEvents!=null) {
             if (eventsFrag.isAdded()) {
                 textView.setVisibility(View.GONE);
+                refresh.setVisible(true);
                 revealFrame.setVisibility(View.VISIBLE);
                 toolbarSpinner.setVisibility(View.VISIBLE);
                 item.setIcon(R.drawable.ic_fullscreen_white_48dp);}
             else if (swipeEvents.isAdded()) {
+                refresh.setVisible(false);
                 textView.setVisibility(View.VISIBLE);
                 toolbarSpinner.setVisibility(View.GONE);
                 revealFrame.setVisibility(View.GONE);

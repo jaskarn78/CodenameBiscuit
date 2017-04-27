@@ -85,20 +85,12 @@
     <string name="PUSH_USER_PREFERENCES">http://athena.ecs.csus.edu/~teamone/php/android/push_user_preferences.php</string>
     <string name="RESTORE_ALL_SAVED_EVENTS">http://athena.ecs.csus.edu/~teamone/php/android/restore_all_saved_events.php</string>
     <string name="RESTORE_ALL_DELETED_EVENTS">http://athena.ecs.csus.edu/~teamone/php/android/restore_all_deleted_events.php</string>
-    <string name="DISTANCE">https://maps.googleapis.com/maps/api/distancematrix/json?</string>
-    <string name="MAP_KEY">&amp;mode=driving&amp;units=imperial&amp;language=fr-FR&amp;key=AIzaSyBlO5pNtSW6d40ByCqCOPsjht2ohbnOKPA</string>
-
-    <!--string name="IMAGE_URL_PATH">http://jagpal-development.com/events/</string-->
 
 
-    <string name="lorem_ipsum">Lorem ipsum dolor sit amet, consequat eu sem, interdum nam a vel. Diam urna in fermentum, vivamus fusce adipiscing mi. Urna libero amet euismod vulputate porttitor, malesuada tortor metus interdum, blandit tincidunt amet sollicitudin dui imperdiet, dolor in, pellentesque hendrerit. Aliquam quam et pariatur rerum, ipsum consequat, quis in.</string>
+
     <string name="title_activity_archived_events">ArchivedEvents</string>
-    <string name="togglepref">Toggle Preferences</string>
-    <string name="anchorpref">Anchor Preferences</string>
     <string name="refresh">Refresh</string>
-    <string name="launch_map">Launch Map</string>
     <string name="event_name">Event Name</string>
-    <string name="restore_event">Restore Event</string>
     <string name="restore_to_main_events_list">Restore to main events list?</string>
     <string name="don_t_show_me_this_again">Don\'t show me this again</string>
     <string name="show_dialog">Show Restore Prompt</string>
@@ -106,6 +98,7 @@
     <string name="restore_all_saved">Restore All Saved</string>
     <string name="restore_all_removed">Restore All Removed</string>
     <string name="filter_events">Filter Events</string>
+    <string name="lorem_ipsum">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</string>
 
 
 </resources>

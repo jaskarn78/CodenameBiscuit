@@ -54,6 +54,8 @@ dependencies {
         transitive = true
     }
     //testCompile 'junit:junit:4.12'
+
+
     compile 'com.android.support:appcompat-v7:25.3.0'
     compile 'com.lorentzos.swipecards:library:1.0.9'
     compile 'com.android.support:preference-v7:25.3.0'
@@ -68,23 +70,25 @@ dependencies {
     compile 'com.daimajia.swipelayout:library:1.2.0@aar'
     compile 'com.daimajia.androidanimations:library:2.2@aar'
     compile 'com.mikepenz:materialize:1.0.0@aar'
-    compile 'com.wunderlist:sliding-layer:1.2.5'
     compile 'com.github.medyo:fancybuttons:1.8.3'
     compile 'com.github.bumptech.glide:glide:3.7.0'
     compile 'com.github.jd-alexander:LikeButton:0.2.0'
     compile 'com.geniusforapp.fancydialog:FancyDialog:0.0.7'
     compile 'com.android.support:percent:25.3.0'
-    compile 'com.rohit.recycleritemclicksupport:recycleritemclicksupport:1.0.1'
     compile 'com.github.Bhoomika06:Styled-Map-Pager:1.0.0'
     compile 'devlight.io:navigationtabbar:1.2.5'
     compile 'com.github.johnkil.android-progressfragment:progressfragment:1.4.+'
     compile 'com.github.rey5137:material:1.2.4'
-    compile 'net.cachapa.expandablelayout:expandablelayout:2.8'
     compile 'com.jaredrummler:material-spinner:1.1.0'
     compile 'com.hlab.fabrevealmenu:fab-reveal-menu:1.0.2'
     compile 'com.github.faruktoptas:FancyShowCaseView:0.0.6'
+    compile 'com.google.maps.android:android-maps-utils:0.5+'
+
 
 
 }
+
+
+
 
 

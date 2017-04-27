@@ -17,7 +17,6 @@ import com.devspark.progressfragment.ProgressFragment;
 import com.example.codenamebiscuit.R;
 import com.example.codenamebiscuit.requests.QueryEventList;
 import com.example.codenamebiscuit.rv.EventAdapter;
-import com.rohit.recycleritemclicksupport.RecyclerItemClickSupport;
 
 import org.json.JSONObject;
 
@@ -98,14 +97,6 @@ public class DeletedEventsFrag extends ProgressFragment{
         LinearLayoutManager layoutManager
                 = new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false);
         mRecyclerView.setLayoutManager(layoutManager);
-        RecyclerItemClickSupport.addTo(mRecyclerView).setOnItemClickListener(new RecyclerItemClickSupport.OnItemClickListener() {
-            @Override
-            public void onItemClicked(RecyclerView recyclerView, int i, View view) {
-                Intent intent = new Intent(getActivity(), DisplayEvent.class);
-                intent.putExtras(bundle);
-                getContext().startActivity(intent);
-            }
-        });
         mRecyclerView.setHasFixedSize(false);
         mRecyclerView.setItemViewCacheSize(100);
         mRecyclerView.setDrawingCacheEnabled(true);

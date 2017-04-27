@@ -6,7 +6,7 @@
 
     <item>
         <bitmap
-            android:gravity="fill_vertical"
+            android:gravity="center"
             android:mipMap="true"
             android:src="@drawable/logo"/>
     </item>

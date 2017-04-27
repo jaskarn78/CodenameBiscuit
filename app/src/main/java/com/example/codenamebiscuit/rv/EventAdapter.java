@@ -19,11 +19,10 @@ import android.webkit.WebView;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.load.resource.drawable.GlideDrawable;
@@ -35,16 +34,13 @@ import com.daimajia.swipe.SwipeLayout;
 import com.example.codenamebiscuit.R;
 import com.example.codenamebiscuit.eventfragments.DisplayEvent;
 import com.example.codenamebiscuit.helper.EventBundle;
-import com.example.codenamebiscuit.requests.UpdateDbOnSwipe;
-import com.hlab.fabrevealmenu.view.FABRevealMenu;
-import com.mikepenz.iconics.view.IconicsImageView;
+import com.example.codenamebiscuit.helper.ImageLoader;
+import com.example.codenamebiscuit.requests.UpdateDbOnSwipe;;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.w3c.dom.Text;
 
 import java.util.ArrayList;
-import java.util.zip.Inflater;
 
 import me.toptas.fancyshowcase.FancyShowCaseView;
 import me.toptas.fancyshowcase.FocusShape;
@@ -165,27 +161,6 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
                 new UpdateDbOnSwipe(context.getString(R.string.DATABASE_RESTORE_DELETED_EVENTS)).execute(restoreEvent); }
     }
 
-    public String getImageURL(String path) {
-        return context.getString(R.string.IMAGE_URL_PATH) + path; }
-
-    public void loadImage(final ImageView imageView, final String URL, final ProgressBar progressBar) {
-        Glide.with(imageView.getContext())
-                .load(URL)
-                .error(R.drawable.placeholder)
-                .diskCacheStrategy(DiskCacheStrategy.ALL)
-                .listener(new RequestListener<String, GlideDrawable>() {
-                    @Override
-                    public boolean onException(Exception e, String model,
-                                               com.bumptech.glide.request.target.Target<GlideDrawable> target,
-                                               boolean isFirstResource) { progressBar.setVisibility(View.GONE);
-                        return false; }
-
-                    @Override
-                    public boolean onResourceReady(GlideDrawable resource, String model,
-                                                   com.bumptech.glide.request.target.Target<GlideDrawable> target,
-                                                   boolean isFromMemoryCache, boolean isFirstResource) { progressBar.setVisibility(View.GONE);
-                        return false; } }).into(imageView);
-    }
 
     public void clear() {
         mEventData.clear();
@@ -304,7 +279,7 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
              * the loaded image to the event imageview in the layout
              ******************************************************************************/
             final ProgressBar progressBar = (ProgressBar) rootView.findViewById(R.id.progress_bar);
-            loadImage(eventAdapterViewHolder.mEventImage, getImageURL(eventPath), progressBar);
+            ImageLoader.loadFullImage(activity, eventPath, eventAdapterViewHolder.mEventImage, progressBar);
 
 
             /*****************************************************************************************
@@ -327,7 +302,6 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
             eventAdapterViewHolder.cardView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    EventBundle eventBundle = new EventBundle(mEventData);
                     Intent intent = new Intent(activity, DisplayEvent.class);
                     intent.putExtras(bundle);
                     activity.startActivity(intent);}});
@@ -338,7 +312,9 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
          * ****************************************************************************************/
         if (type == 2) {
             final ProgressBar progressBar2 = (ProgressBar) rootView.findViewById(R.id.grid_progress);
-            loadImage(eventAdapterViewHolder.mEventImage, getImageURL(eventPath), progressBar2);
+
+            ImageLoader.loadFullImage(activity, eventPath,eventAdapterViewHolder.mEventImage, progressBar2);
+
             final EventBundle eventBundle = new EventBundle(mEventData);
             eventAdapterViewHolder.gridCards.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -355,6 +331,7 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
                                     final TextView eventDate = (TextView)view.findViewById(R.id.slideDate);
                                     final TextView eventHoster = (TextView)view.findViewById(R.id.slideHoster);
                                     final FloatingActionButton fab = (FloatingActionButton)view.findViewById(R.id.revealFab);
+                                    final ProgressBar progressBar3 = (ProgressBar)view.findViewById(R.id.reveal_progress);
 
                                     eventName.setText(eventInfo.getString("eventName"));
                                     eventLocation.setText(eventInfo.getString("eventLocation"));
@@ -362,8 +339,8 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
                                     eventDate.setText(parseDate(eventInfo.getString("eventDate")));
                                     eventHoster.setText("Presented By: "+eventInfo.getString("eventHoster"));
 
-                                    Glide.with(activity).load(getImageURL(eventBundle.getBundle(eventAdapterViewHolder.getAdapterPosition())
-                                            .getString("eventImage"))).placeholder(R.drawable.progress).centerCrop().fitCenter().into(revealImage);
+                                    String imageEvent = eventBundle.getBundle(eventAdapterViewHolder.getAdapterPosition()).getString("eventImage");
+                                    ImageLoader.loadImage(activity, imageEvent, revealImage, progressBar3);
                                     fab.setOnClickListener(new View.OnClickListener() {
                                         @Override
                                         public void onClick(View v) {
@@ -374,6 +351,12 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
     private String parseDate(String dateString){
         dateString = dateString.replace('-', '/');
         return dateString.substring(5, 10);
+    }
+    public String getImageURL(String path) {
+        return context.getString(R.string.IMAGE_URL_PATH) + path; }
+
+    public void loadImage(final ImageView imageView, final String URL, final ProgressBar progressBar) {
+        ImageLoader.loadImage(activity, URL, imageView, progressBar);
     }
 
 }

@@ -1,4 +1,4 @@
-package com.example.codenamebiscuit;
+package com.example.codenamebiscuit.eventfragments;
 
 import android.content.Context;
 import android.content.Intent;
@@ -29,11 +29,10 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.resource.drawable.GlideDrawable;
-import com.bumptech.glide.request.RequestListener;
-import com.example.codenamebiscuit.eventfragments.DisplayEvent;
+
+import com.example.codenamebiscuit.R;
 import com.example.codenamebiscuit.helper.GPSTracker;
+import com.example.codenamebiscuit.helper.ImageLoader;
 import com.example.codenamebiscuit.requests.QueryEventList;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -131,7 +130,7 @@ public class MapActivity extends AppCompatActivity {
                 latsArrayList.add(data.get(i).getDouble("lat"));
                 lngsArrayList.add(data.get(i).getDouble("lng"));
                 nameList.add(data.get(i).getString("event_name"));
-                imageList.add(getString(R.string.IMAGE_URL_PATH)+ data.get(i).getString("img_path"));
+                imageList.add(data.get(i).getString("img_path"));
                 descList.add(data.get(i).getString("event_description"));
                 hosterList.add(data.get(i).getString("event_sponsor"));
                 prefList.add(data.get(i).getString("preference_name"));
@@ -170,7 +169,7 @@ public class MapActivity extends AppCompatActivity {
                 map.setMapType(GoogleMap.MAP_TYPE_NORMAL);
                 MyLocation location = latLngsArrayList.get(0);
                 Point mappoint = map.getProjection().toScreenLocation(
-                        new LatLng(location.getLatitude(), location.getLongitude()));
+                        new LatLng(latLngsArrayList.get(1).getLatitude(), latLngsArrayList.get(1).getLongitude()));
                 mappoint.set(mappoint.x, mappoint.y - 30);
                 map.animateCamera(CameraUpdateFactory.newLatLng(map.getProjection().fromScreenLocation(mappoint)));
                 customMap = new CustomMap(map, latLngsArrayList, getApplicationContext());
@@ -182,7 +181,7 @@ public class MapActivity extends AppCompatActivity {
                     Log.e("Explore detail activity", "Can't find style. Error: " + e);
                 }
                 handleMap();
-                event_pager.setAdapter(new MapViewPagerAdapter(getApplicationContext(), latLngsArrayList));
+                event_pager.setAdapter(new MapViewPagerAdapter(getApplicationContext(), latLngsArrayList));;
                 for(int i=0; i<latLngsArrayList.size(); i++){
                     customMap.addPin(latLngsArrayList.get(i), i);
                 }
@@ -404,25 +403,7 @@ public class MapActivity extends AppCompatActivity {
 
             final ProgressBar progressBar = (ProgressBar)itemView.findViewById(R.id.progress_bar);
             ImageView tv_image = (ImageView)itemView.findViewById(R.id.iv_event_image);
-            Glide.with(getApplicationContext())
-                    .load(imageList.get(position))
-                    .placeholder(R.drawable.progress)
-                    .error(R.drawable.placeholder)
-                    .listener(new RequestListener<String, GlideDrawable>() {
-                        @Override
-                        public boolean onException(Exception e, String model, com.bumptech.glide.request.target.Target<GlideDrawable> target, boolean isFirstResource) {
-                            progressBar.setVisibility(View.GONE);
-                            return false;
-                        }
-
-                        @Override
-                        public boolean onResourceReady(GlideDrawable resource, String model, com.bumptech.glide.request.target.Target<GlideDrawable> target, boolean isFromMemoryCache, boolean isFirstResource) {
-                            progressBar.setVisibility(View.GONE);
-                            return false;
-                        }
-                    })
-                    .into(tv_image);
-            //Picasso.with(getContext().getApplicationContext()).load(imageList.get(position)).fit().into(tv_image);
+            ImageLoader.loadFullImage(getApplicationContext(), imageList.get(position), tv_image, progressBar);
 
             tv_image.setOnClickListener(new View.OnClickListener() {
                 @Override

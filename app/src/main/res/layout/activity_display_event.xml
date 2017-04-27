@@ -11,24 +11,30 @@
         <android.support.design.widget.AppBarLayout
             android:id="@+id/appbar"
             android:layout_width="match_parent"
-            android:layout_height="330dp"
+            android:layout_height="wrap_content"
             android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
             android:fitsSystemWindows="true">
             <android.support.design.widget.CollapsingToolbarLayout
                 android:id="@+id/collapsing_toolbar"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 app:layout_scrollFlags="scroll|exitUntilCollapsed"
                 android:fitsSystemWindows="true"
                 app:contentScrim="@android:color/transparent"
                 app:expandedTitleMarginStart="48dp"
                 app:expandedTitleMarginEnd="54dp">
 
+
                 <ImageView
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
+                    android:layout_height="500dp"
                     android:id="@+id/display_event_image"
                     />
+                <ProgressBar
+                    android:layout_width="match_parent"
+                    android:layout_height="140dp"
+                    android:layout_gravity="center"
+                    android:id="@+id/displayProgress"/>
                 <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="70dp"
@@ -38,6 +44,7 @@
                     android:layout_gravity="bottom"
                     android:layout_marginTop="15dp"
                     app:layout_collapseMode="pin"
+                    app:layout_collapseParallaxMultiplier="0.25"
                     android:fitsSystemWindows="true"
                     >
 
@@ -115,9 +122,12 @@
 
                 </android.support.v7.widget.Toolbar>
 
+
             </android.support.design.widget.CollapsingToolbarLayout>
 
+
         </android.support.design.widget.AppBarLayout>
+
 
     <android.support.v4.widget.NestedScrollView
         android:layout_width="match_parent"
@@ -154,7 +164,7 @@
                     android:layout_marginEnd="25dp"
                     android:tint="@color/livinPink"
                     android:id="@+id/event_call"
-                    android:foreground="?android:attr/selectableItemBackgroundBorderless"
+                    android:foreground="?android:attr/selectableItemBackground"
                     android:clickable="true"
                     />
 
@@ -168,7 +178,7 @@
                     android:layout_marginBottom="10dp"
                     android:tint="@color/livinPink"
                     android:id="@+id/event_directions"
-                    android:foreground="?android:attr/selectableItemBackgroundBorderless"
+                    android:foreground="?android:attr/selectableItemBackground"
                     android:clickable="true"
                     />
                 <com.mikepenz.iconics.view.IconicsImageView
@@ -181,7 +191,7 @@
                     android:layout_marginBottom="10dp"
                     android:tint="@color/livinPink"
                     android:id="@+id/event_share"
-                    android:foreground="?android:attr/selectableItemBackgroundBorderless"
+                    android:foreground="?android:attr/selectableItemBackground"
                     android:clickable="true"
                     />
                 <com.mikepenz.iconics.view.IconicsImageView
@@ -194,7 +204,7 @@
                     android:layout_marginEnd="10dp"
                     android:tint="@color/livinPink"
                     android:id="@+id/event_website"
-                    android:foreground="?android:attr/selectableItemBackgroundBorderless"
+                    android:foreground="?android:attr/selectableItemBackground"
                     android:clickable="true"
                     />
             </LinearLayout>
@@ -505,4 +515,5 @@
         </LinearLayout>
 
     </android.support.v4.widget.NestedScrollView>
+
 </android.support.design.widget.CoordinatorLayout>
