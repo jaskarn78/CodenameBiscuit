@@ -37,7 +37,7 @@ public class ClusterMap extends AppCompatActivity implements MapViewPager.Callba
         leftButton = (IconicsButton) findViewById(R.id.left_nav);
         leftButton.setVisibility(View.GONE);
         rightButton=(IconicsButton) findViewById(R.id.right_nav);
-        viewPager.setPageMargin(Utils.dp(this, 10));
+        viewPager.setPageMargin(Utils.dp(this, 18));
         viewPager.addOnPageChangeListener(this);
         setupNavButtons();
         Utils.setMargins(viewPager, 0, 0, 0, 10);
@@ -64,7 +64,10 @@ public class ClusterMap extends AppCompatActivity implements MapViewPager.Callba
 
     @Override
     public void onMapViewPagerReady() {
-
+        mvp.getMap().setPadding(0,
+                Utils.dp(this, 40),
+                Utils.getNavigationBarWidth(this),
+                viewPager.getHeight() + Utils.getNavigationBarHeight(this));
     }
 
     @Override
@@ -77,7 +80,7 @@ public class ClusterMap extends AppCompatActivity implements MapViewPager.Callba
         if(position==0)
             leftButton.setVisibility(View.GONE);
         else leftButton.setVisibility(View.VISIBLE);
-        if(position==viewPager.getAdapter().getCount())
+        if(position==viewPager.getAdapter().getCount()-1)
             rightButton.setVisibility(View.GONE);
         else rightButton.setVisibility(View.VISIBLE);
     }

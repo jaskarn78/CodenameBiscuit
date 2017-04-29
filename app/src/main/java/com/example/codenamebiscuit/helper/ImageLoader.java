@@ -42,6 +42,7 @@ public class ImageLoader {
     public static void loadFullImage(Context context, String imgPath, ImageView imageView, final ProgressBar progressBar){
         Glide.with(context).load(getPath(imgPath))
                 .diskCacheStrategy(DiskCacheStrategy.ALL)
+                .override(1200, 1200)
                 .listener(new RequestListener<String, GlideDrawable>() {
                     @Override
                     public boolean onException(Exception e, String model, Target<GlideDrawable> target, boolean isFirstResource) {
@@ -59,7 +60,7 @@ public class ImageLoader {
     }
     public static void loadImage(Context context, String imgPath, ImageView imageView, final ProgressBar progressBar){
         Glide.with(context).load(getPath(imgPath)).error(R.drawable.placeholder)
-                .crossFade(500)
+                .crossFade(500).override(1200, 1200)
                 .diskCacheStrategy(DiskCacheStrategy.ALL)
                 .listener(new RequestListener<String, GlideDrawable>() {
                     @Override
@@ -78,7 +79,7 @@ public class ImageLoader {
     }
     public static void loadImageFitCenter(Context context, String imgPath, ImageView imageView, final ProgressBar progressBar){
         Glide.with(context).load(getPath(imgPath)).diskCacheStrategy(DiskCacheStrategy.ALL)
-                 .error(R.drawable.placeholder)
+                 .error(R.drawable.placeholder).crossFade(500).override(1200, 1200)
                 .listener(new RequestListener<String, GlideDrawable>() {
                     @Override
                     public boolean onException(Exception e, String model, Target<GlideDrawable> target, boolean isFirstResource) {
@@ -97,24 +98,22 @@ public class ImageLoader {
     public static void loadBackgroundImage(Context context, String imgPath, ImageView imageView){
         Glide.with(context).load(getPath(imgPath)).error(R.drawable.placeholder)
                 .override(18, 18)
-                .diskCacheStrategy(DiskCacheStrategy.ALL)
                 .crossFade()
                 .centerCrop()
                 .into(imageView);
     }
     public static void loadBackgroundResource(Context context, int imgPath, ImageView imageView){
         Glide.with(context).load(imgPath).error(R.drawable.placeholder)
-                .thumbnail(0.25f)
                 .crossFade()
                 .diskCacheStrategy(DiskCacheStrategy.ALL)
-                .sizeMultiplier(0.25f)
-                .centerCrop()
-                .fitCenter().load(imgPath)
+                .override(1200, 1200)
+                .fitCenter()
+                .load(imgPath)
                 .into(imageView);
     }
     public static void loadPagerImage(Context context, String imgPath, ImageView imageView, final ProgressBar progressBar){
         Glide.with(context).load(getPath(imgPath)).diskCacheStrategy(DiskCacheStrategy.ALL)
-                .crossFade().override(600, 400).fitCenter()
+                .crossFade().override(1200, 1200).fitCenter()
                 .error(R.drawable.placeholder)
                 .listener(new RequestListener<String, GlideDrawable>() {
                     @Override
