@@ -84,7 +84,9 @@ dependencies {
     compile 'com.hlab.fabrevealmenu:fab-reveal-menu:1.0.2'
     compile 'com.github.faruktoptas:FancyShowCaseView:0.0.6'
     compile 'com.google.maps.android:android-maps-utils:0.5+'
-    compile 'io.nlopez.clusterer:library:1.0.6'
+    compile 'com.github.nitrico.mapviewpager:mapviewpager:1.0.0'
+    compile 'com.google.android.gms:play-services-maps:10.2.1'
+
 
 
 

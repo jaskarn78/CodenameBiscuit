@@ -1,0 +1,85 @@
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    >
+
+    <FrameLayout
+        android:id="@+id/scroll"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/pager_border">
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:background="@color/livinBlack"
+            android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+            app:popupTheme="@style/ThemeOverlay.AppCompat">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="left">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/pager_name"
+                    android:text="Event Name"
+                    android:textSize="18sp"
+                    android:ellipsize="marquee"
+                    android:marqueeRepeatLimit="marquee_forever"
+                    android:scrollHorizontally="true"
+                    android:textColor="@color/livinWhite"
+                    />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/pager_distance"
+                    android:text="0.5mi"
+                    android:layout_marginStart="10dp"
+                    android:textSize="12sp"
+                    android:textColor="@color/livinPink"
+
+                    />
+
+            </LinearLayout>
+
+
+
+        </android.support.v7.widget.Toolbar>
+
+        <ImageView
+            android:id="@+id/pager_event_image"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/pager_image_border"
+            android:scaleType="fitXY"
+          />
+        </LinearLayout>
+
+
+        <ProgressBar
+            android:layout_width="240dp"
+            android:layout_height="240dp"
+            android:id="@+id/pager_progress"
+            android:layout_gravity="center"
+            android:visibility="gone"/>
+
+
+    </FrameLayout>
+
+</LinearLayout>

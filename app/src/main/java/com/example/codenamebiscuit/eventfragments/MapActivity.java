@@ -41,6 +41,7 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.thebrownarrow.customstyledmap.CustomMap;
 import com.thebrownarrow.model.MyLocation;
 
@@ -167,23 +168,17 @@ public class MapActivity extends AppCompatActivity {
 
                 map = googleMap;
                 map.setMapType(GoogleMap.MAP_TYPE_NORMAL);
-                MyLocation location = latLngsArrayList.get(0);
                 Point mappoint = map.getProjection().toScreenLocation(
                         new LatLng(latLngsArrayList.get(1).getLatitude(), latLngsArrayList.get(1).getLongitude()));
                 mappoint.set(mappoint.x, mappoint.y - 30);
                 map.animateCamera(CameraUpdateFactory.newLatLng(map.getProjection().fromScreenLocation(mappoint)));
-                customMap = new CustomMap(map, latLngsArrayList, getApplicationContext());
 
-                try {
-                    //customMap.setCustomMapStyle(R.raw.mapstyle);
-                    // Customise the styling of the base map using a JSON object defined in a raw resource file.
-                } catch (Resources.NotFoundException e) {
-                    Log.e("Explore detail activity", "Can't find style. Error: " + e);
-                }
                 handleMap();
+
                 event_pager.setAdapter(new MapViewPagerAdapter(getApplicationContext(), latLngsArrayList));;
                 for(int i=0; i<latLngsArrayList.size(); i++){
-                    customMap.addPin(latLngsArrayList.get(i), i);
+                    map.addMarker(new MarkerOptions().position(new LatLng(latLngsArrayList.get(i).getLatitude(),
+                            latLngsArrayList.get(i).getLongitude())));
                 }
             }
         });
@@ -198,8 +193,6 @@ public class MapActivity extends AppCompatActivity {
                         new LatLng(location.getLatitude(), location.getLongitude()));
                 mappoint.set(mappoint.x, mappoint.y - 30);
                 map.animateCamera(CameraUpdateFactory.newLatLng(map.getProjection().fromScreenLocation(mappoint)));
-
-                customMap.addSelectedCustomPin(position);
             }
 
             @Override
@@ -228,136 +221,18 @@ public class MapActivity extends AppCompatActivity {
 
     private void handleMap() {;
         if (map != null) {
-            if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                // TODO: Consider calling
-                //    ActivityCompat#requestPermissions
-                // here to request the missing permissions, and then overriding
-                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-                //                                          int[] grantResults)
-                // to handle the case where the user grants the permission. See the documentation
-                // for ActivityCompat#requestPermissions for more details.
-                return;
-            }
-
-            map.setMyLocationEnabled(true);
-
             map.getUiSettings().setMapToolbarEnabled(false);
             map.getUiSettings().setZoomControlsEnabled(false);
-
-            map.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
-                @Override
-                public boolean onMarkerClick(final Marker marker) {
-
-                    final int mPosition = (int) marker.getTag();
-                    try {
-                        if (previousSelectedMarker != null) {
-
-                            MyLocation location = latLngsArrayList.get(mPosition);
-
-                            if (map.getCameraPosition().zoom >= 13) {
-                                previousSelectedMarker.setIcon(BitmapDescriptorFactory.fromBitmap(
-                                        BitmapFactory.decodeResource(getResources(),
-                                                R.drawable.ic_near_normal_pin)));
-                            } else if (map.getCameraPosition().zoom < 13) {
-                                previousSelectedMarker.setIcon(BitmapDescriptorFactory.fromBitmap(
-                                        BitmapFactory.decodeResource(getResources(),
-                                                R.drawable.ic_normal_pin)));
-                            }
-                        }
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-
-                    marker.setIcon(null);
-                    marker.setIcon(BitmapDescriptorFactory.fromBitmap(
-                            BitmapFactory.decodeResource(getResources(),
-                                    R.drawable.ic_selected_pin)));
-
-
-                    previousSelectedMarker = marker;
-
-                    if (event_pager.getVisibility() != View.VISIBLE) {
-
-                        event_pager.startAnimation(slide_in_up);
-                        slide_in_up.setAnimationListener(new Animation.AnimationListener() {
-                            @Override
-                            public void onAnimationStart(Animation arg0) {
-
-                                event_pager.setVisibility(View.VISIBLE);
-                            }
-
-                            @Override
-                            public void onAnimationRepeat(Animation arg0) {
-
-                            }
-
-                            @Override
-                            public void onAnimationEnd(Animation arg0) {
-
-                            }
-                        });
-
-                        event_pager.setCurrentItem(0, true);
-
-                    } else {
-                        event_pager.setCurrentItem(0, true);
-                    }
-
-                    return false;
-                }
-            });
-
-            map.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
-                @Override
-                public void onMapClick(LatLng latLng) {
-
-                    if (event_pager.getVisibility() == View.VISIBLE) {
-                        event_pager.startAnimation(slide_out_down);
-
-                        slide_out_down.setAnimationListener(new Animation.AnimationListener() {
-                            @Override
-                            public void onAnimationStart(Animation arg0) {
-
-                            }
-
-                            @Override
-                            public void onAnimationRepeat(Animation arg0) {
-
-                            }
-
-                            @Override
-                            public void onAnimationEnd(Animation arg0) {
-                                event_pager.setVisibility(View.GONE);
-                                event_pager.clearAnimation();
-                            }
-                        });
-                    }
-                }
-            });
-
 
         } else {
             supportMapFragment.getMapAsync(new OnMapReadyCallback() {
                 @Override
                 public void onMapReady(GoogleMap googleMap) {
-
                     map = googleMap;
-                    map.setMapType(GoogleMap.MAP_TYPE_NORMAL);
-                    customMap = new CustomMap(map, latLngsArrayList,getApplicationContext());
-
-                    try {
-                        customMap.setCustomMapStyle(R.raw.mapstyle);
-                        // Customise the styling of the base map using a JSON object defined in a raw resource file.
-                    } catch (Resources.NotFoundException e) {
-                        Log.e("Explore detail activity", "Can't find style. Error: " + e);
-                    }
-
-                    handleMap();
-                }
-            });
-
+                    handleMap(); } });
         }
     }
+
     class MapViewPagerAdapter extends PagerAdapter {
         ArrayList<MyLocation> arr_LocationList;
         Context context;

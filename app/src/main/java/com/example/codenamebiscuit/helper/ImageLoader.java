@@ -112,7 +112,27 @@ public class ImageLoader {
                 .fitCenter().load(imgPath)
                 .into(imageView);
     }
+    public static void loadPagerImage(Context context, String imgPath, ImageView imageView, final ProgressBar progressBar){
+        Glide.with(context).load(getPath(imgPath)).diskCacheStrategy(DiskCacheStrategy.ALL)
+                .crossFade().override(600, 400).fitCenter()
+                .error(R.drawable.placeholder)
+                .listener(new RequestListener<String, GlideDrawable>() {
+                    @Override
+                    public boolean onException(Exception e, String model, Target<GlideDrawable> target, boolean isFirstResource) {
+                        progressBar.setVisibility(View.GONE);
+                        return false;
+                    }
+
+                    @Override
+                    public boolean onResourceReady(GlideDrawable resource, String model, Target<GlideDrawable> target, boolean isFromMemoryCache, boolean isFirstResource) {
+                        progressBar.setVisibility(View.GONE);
+                        return false;
+                    }
+                })
+                .into(imageView);
+    }
     public static String getPath(String path){
         return "http://athena.ecs.csus.edu/~teamone/events/"+path;
     }
+
 }

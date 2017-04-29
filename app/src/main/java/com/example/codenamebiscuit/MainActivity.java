@@ -307,6 +307,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void setupSpinner() {
-        toolbarSpinner.setItems("Distance: Nearest", "Distance: Furthest", "Date: Earliest", "Date: Latest"); }
+        toolbarSpinner.setItems("Distance: Nearest", "Distance: Furthest", "Date: Earliest", "Date: Latest");
+        toolbarSpinner.animate(); }
 
 }

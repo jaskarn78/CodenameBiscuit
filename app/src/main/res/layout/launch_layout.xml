@@ -40,6 +40,7 @@
                     android:layout_height="wrap_content"
                     app:ms_text_color="@color/livinWhite"
                     app:ms_background_color="@color/livinBlack"
+                    app:ms_arrow_tint="@color/livinPink"
                     android:padding="2dp"
                     />
 

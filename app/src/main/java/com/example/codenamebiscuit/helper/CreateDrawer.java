@@ -133,7 +133,7 @@ public class CreateDrawer {
                                 .withSelectedTextColor(livinWhite)
                                 .withSelectedIconColor(livinWhite)
                                 .withSelectedColor(activity.getColor(R.color.translivinPink))
-                                .withSetSelected(true),
+                                .withSetSelected(false),
                         new DividerDrawerItem(),
 
                         archivedEvents
@@ -141,6 +141,7 @@ public class CreateDrawer {
                                 .withName("Archived Events")
                                 .withIcon(R.drawable.ic_archive_white_48dp)
                                 .withTextColor(livinWhite)
+                                .withSelectedColor(activity.getColor(R.color.translivinPink))
                                 .withSelectable(false),
                         new DividerDrawerItem(),
                         mapEvents
@@ -148,6 +149,7 @@ public class CreateDrawer {
                                 .withName("Launch Map")
                                 .withIcon(R.drawable.ic_map_white_48dp)
                                 .withTextColor(livinWhite)
+                                .withSelectedColor(activity.getColor(R.color.translivinPink))
                                 .withSelectable(false),
                         new DividerDrawerItem(),
 
@@ -159,6 +161,7 @@ public class CreateDrawer {
                                 .withIconColor(livinWhite)
                                 .withSelectedTextColor(livinPink)
                                 .withSelectedIconColor(livinPink)
+                                .withSelectedColor(activity.getColor(R.color.translivinPink))
                                 .withSelectable(false),
 
                         new DividerDrawerItem(),
@@ -170,17 +173,9 @@ public class CreateDrawer {
                                 .withIconColor(livinWhite)
                                 .withSelectedTextColor(livinPink)
                                 .withSelectedIconColor(livinPink)
+                                .withSelectedColor(activity.getColor(R.color.translivinPink))
                                 .withSelectable(false),
-                        new DividerDrawerItem(),
-                    new PrimaryDrawerItem()
-                        .withName("Map List")
-                        .withIcon(R.drawable.ic_map_white_48dp)
-                        .withIdentifier(6)
-                        .withTextColor(livinWhite)
-                        .withIconColor(livinWhite)
-                        .withSelectedTextColor(livinPink)
-                        .withSelectedIconColor(livinPink)
-                        .withSelectable(false)
+                        new DividerDrawerItem()
 
                 )
                 .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
@@ -194,7 +189,7 @@ public class CreateDrawer {
                             else if(drawerItem.getIdentifier()==2)
                                 intent = new Intent(activity, ArchivedEvents.class);
                             else if(drawerItem.getIdentifier()==3) {
-                                intent = new Intent(activity, MapActivity.class);
+                                intent = new Intent(activity,ClusterMap.class);
                             }
                             else if (drawerItem.getIdentifier()==4)
                                 intent = new Intent(activity, UserSettingsActivity.class);
@@ -206,8 +201,7 @@ public class CreateDrawer {
                                 preferences.edit().putString("lName", null).apply();
                                 preferences.edit().putString("email", null).apply();
                                 intent = new Intent(activity, ChooseLogin.class);
-                            }else if(drawerItem.getIdentifier()==6){
-                                intent = new Intent(activity, ClusterMap.class); }
+                            }
                             if (intent != null) {
                                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                                 intent.putExtra("userId", userId);
