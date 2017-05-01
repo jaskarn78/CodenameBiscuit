@@ -207,13 +207,10 @@ public class ArchivedEvents extends AppCompatActivity {
             }
 
             @Override
-            public void onPageScrollStateChanged(final int state) {
-
-            }
-
+            public void onPageScrollStateChanged(final int state) { }
         });
-
     }
+
     private class MyPagerAdapter extends FragmentPagerAdapter {
 
         public Bundle bundle  = new Bundle();

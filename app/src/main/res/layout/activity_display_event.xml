@@ -27,7 +27,7 @@
 
                 <ImageView
                     android:layout_width="match_parent"
-                    android:layout_height="500dp"
+                    android:layout_height="430dp"
                     android:scaleType="fitXY"
                     android:adjustViewBounds="true"
                     android:id="@+id/display_event_image"
@@ -61,7 +61,7 @@
                         android:marqueeRepeatLimit="marquee_forever"
                         android:scrollHorizontally="true"
                         android:maxLines="1"
-                        android:textSize="20sp"
+                        android:textSize="17sp"
                         android:layout_marginStart="15dp"
                         android:layout_marginTop="5dp"
                         android:textColor="@color/livinWhite"
@@ -70,7 +70,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:textSize="16sp"
+                        android:textSize="13sp"
                         android:layout_marginStart="15dp"
                         android:ellipsize="marquee"
                         android:focusableInTouchMode="true"

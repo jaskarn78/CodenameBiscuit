@@ -35,7 +35,7 @@
                 android:layout_height="50dp"
                 android:background="@color/livinBlack"
                 app:layout_collapseMode="parallax"
-                app:layout_scrollFlags="scroll|exitUntilCollapsed"
+                app:layout_scrollFlags="scroll|exitUntilCollapsed|enterAlwaysCollapsed|enterAlways|snap"
                 >
 
                 <TextView

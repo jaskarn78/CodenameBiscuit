@@ -2,8 +2,6 @@ package com.example.codenamebiscuit.helper;
 
 import android.os.Bundle;
 
-import com.example.codenamebiscuit.Event;
-
 import org.json.JSONException;
 import org.json.JSONObject;
 

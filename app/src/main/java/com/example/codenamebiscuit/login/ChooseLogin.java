@@ -237,7 +237,7 @@ public class ChooseLogin extends AppCompatActivity implements GoogleApiClient.On
         initializeTokens();
 
         // Initialize Facebook LoginButton
-        LoginButton mLoginButton = (LoginButton) findViewById(R.id.btnFacebookSignup);
+        final LoginButton mLoginButton = (LoginButton) findViewById(R.id.btnFacebookSignup);
 
         // Set permissions and register the callback
         mLoginButton.registerCallback(mCallbackManager, new FacebookCallback<LoginResult>() {
@@ -282,7 +282,8 @@ public class ChooseLogin extends AppCompatActivity implements GoogleApiClient.On
 
             @Override
             public void onCancel() {
-                mProgressDialog.dismiss();
+                if(mProgressDialog!=null)
+                    mProgressDialog.dismiss();
             }
 
             @Override

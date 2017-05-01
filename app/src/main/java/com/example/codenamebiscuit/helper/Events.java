@@ -1,9 +1,7 @@
-package com.example.codenamebiscuit;
+package com.example.codenamebiscuit.helper;
 
 import android.app.Activity;
 import android.location.Location;
-
-import com.example.codenamebiscuit.helper.GPSTracker;
 
 import org.json.JSONException;
 import org.json.JSONObject;

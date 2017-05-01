@@ -5,7 +5,6 @@ import android.content.Context;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 
-import com.example.codenamebiscuit.Events;
 import com.example.codenamebiscuit.R;
 import com.example.codenamebiscuit.eventfragments.MapFragment;
 import com.example.codenamebiscuit.requests.QueryEventList;
@@ -32,6 +31,7 @@ public class MapViewPagerAdapter extends MapViewPager.MultiAdapter {
     public static ArrayList<String> eventName;
     public static ArrayList<String> eventImage;
     public static ArrayList<String> eventDistance;
+    public static EventBundle bundle;
 
     public MapViewPagerAdapter(FragmentManager fm, Context context, String user_id, Activity activity){
         super(fm);
@@ -42,6 +42,7 @@ public class MapViewPagerAdapter extends MapViewPager.MultiAdapter {
         try {
             data = new QueryEventList(context.getString(R.string.DATABASE_MAIN_EVENTS_PULLER), user_id).execute().get();
             Events.fromJson(data, activity);
+            bundle = new EventBundle(data);
             for(JSONObject obj :data) {
                 double lat = obj.getDouble("lat"); double lng =obj.getDouble("lng");
                 eventName.add(obj.getString("event_name"));

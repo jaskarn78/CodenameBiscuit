@@ -25,6 +25,8 @@
         sothree:showAsAction="never"
         android:orderInCategory="104"
         android:title="@string/show_dialog"
+        android:visible="false"
         />
+
 
 </menu>

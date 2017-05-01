@@ -1,0 +1,10 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:sothree="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/view_event"
+        sothree:showAsAction="ifRoom"
+        android:orderInCategory="101"
+        android:title="@string/more_details"
+        />
+</menu>

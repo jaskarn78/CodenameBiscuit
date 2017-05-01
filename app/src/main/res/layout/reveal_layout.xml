@@ -1,10 +1,13 @@
 <android.support.design.widget.CoordinatorLayout
     xmlns:card_view="http://schemas.android.com/apk/res-auto"
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
+    android:layout_width="wrap_content"
     android:layout_height="wrap_content"
+    android:layout_marginStart="10dp"
+    android:layout_marginEnd="10dp"
     android:background="@drawable/card_border"
     android:layout_gravity="center">
+
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -13,24 +16,39 @@
 
         <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
+            android:layout_height="370dp"
+            android:id="@+id/imageFrame">
 
         <ImageView
             android:id="@+id/reveal_event_image"
             android:layout_width="match_parent"
-            android:layout_height="480dp"
+            android:layout_height="match_parent"
             android:scaleType="fitXY" />
         <ProgressBar
             android:id="@+id/reveal_progress"
             android:layout_width="match_parent"
-            android:layout_height="140dp"
-            android:layout_gravity="center"/>
+            android:layout_height="match_parent" />
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/revealFab"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            xmlns:app="http://schemas.android.com/apk/res-auto"
+            app:rippleColor="@color/black_overlay"
+            android:layout_gravity="end|bottom"
+            app:useCompatPadding="true"
+            app:fabSize="mini"
+            app:pressedTranslationZ="3dp"
+            android:src="@drawable/ic_arrow_forward_black_48dp"
+            android:clickable="true"
+            />
+
         </FrameLayout>
 
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
+            android:id="@+id/view"
             android:background="@color/livinWhite"/>
         <FrameLayout
             android:layout_width="match_parent"
@@ -38,20 +56,9 @@
             android:padding="5dp"
             android:background="@color/livinBlack">
             <include layout="@layout/card_content" />
+
         </FrameLayout>
+
         </LinearLayout>
 
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/revealFab"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        app:layout_anchor="@id/reveal_event_image"
-        app:layout_anchorGravity="bottom|end"
-        app:useCompatPadding="true"
-        app:elevation="5dp"
-        app:rippleColor="@color/black_overlay"
-        android:src="@drawable/ic_arrow_forward_black_48dp"
-        android:clickable="true"
-        />
-    </android.support.design.widget.CoordinatorLayout>
+</android.support.design.widget.CoordinatorLayout>

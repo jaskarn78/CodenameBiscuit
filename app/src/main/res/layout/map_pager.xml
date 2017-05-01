@@ -25,7 +25,9 @@
             android:layout_width="match_parent"
             android:layout_height="40dp"
             android:background="@color/livinBlack"
-            android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+            android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
+            android:foreground="?android:attr/selectableItemBackground"
+            android:clickable="true"
             app:popupTheme="@style/ThemeOverlay.AppCompat">
 
             <LinearLayout
@@ -67,6 +69,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:background="@drawable/pager_image_border"
+            android:adjustViewBounds="true"
             android:scaleType="fitXY"
           />
         </LinearLayout>

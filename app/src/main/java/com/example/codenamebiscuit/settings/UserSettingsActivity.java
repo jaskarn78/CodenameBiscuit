@@ -72,8 +72,6 @@ public class UserSettingsActivity
         this.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         TextView tv = (TextView)findViewById(R.id.toolbar_title);
-        Typeface typeface = Typeface.createFromAsset(getApplicationContext().getAssets(), "fonts/Raleway-Black.ttf");
-        tv.setTypeface(typeface);
 
 
         Profile fbprofile = Profile.getCurrentProfile();
@@ -108,14 +106,14 @@ public class UserSettingsActivity
         String imageUrl = profile.getProfilePictureUri(200, 200).toString();
 
         //        this.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        Glide.with(this).load(imageUrl).centerCrop().fitCenter().into((ImageView)findViewById(R.id.pref_user_image));
+        //Glide.with(this).load(imageUrl).centerCrop().fitCenter().into((ImageView)findViewById(R.id.pref_user_image));
 
         mNameView = (TextView) findViewById(R.id.pref_user_name);
         mNameView.setText(name + " " + surname);
     }
 
     private void initializeGoogleProfileInfo(String fName, String lName, Uri url){
-        Glide.with(this).load(url).centerCrop().fitCenter().into((ImageView)findViewById(R.id.pref_user_image));
+        //Glide.with(this).load(url).centerCrop().fitCenter().into((ImageView)findViewById(R.id.pref_user_image));
         mNameView = (TextView) findViewById(R.id.pref_user_name);
         mNameView.setText(fName + " " + lName);
     }

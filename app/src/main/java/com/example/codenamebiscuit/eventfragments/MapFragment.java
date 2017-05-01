@@ -1,10 +1,16 @@
 package com.example.codenamebiscuit.eventfragments;
 
+import android.content.Intent;
+import android.graphics.ColorFilter;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewCompat;
+import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
@@ -13,6 +19,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.example.codenamebiscuit.R;
+import com.example.codenamebiscuit.helper.EventBundle;
 import com.example.codenamebiscuit.helper.ImageLoader;
 import com.example.codenamebiscuit.helper.MapViewPagerAdapter;
 
@@ -56,7 +63,20 @@ public class MapFragment extends Fragment {
         ImageLoader.loadPagerImage(getContext(), MapViewPagerAdapter.eventImage.get(index), pagerImage, pagerProgress);
         name.setText(MapViewPagerAdapter.eventName.get(index));
         distance.setText(MapViewPagerAdapter.eventDistance.get(index)+" mi");
-        toolbar.inflateMenu(R.menu.archived);
+        toolbar.inflateMenu(R.menu.pager_menu);
+        Drawable d = getActivity().getDrawable(R.drawable.ic_arrow_forward_black_48dp);
+        d.setColorFilter(getActivity().getColor(R.color.livinWhite), PorterDuff.Mode.SRC_ATOP);
+        toolbar.getMenu().findItem(R.id.view_event).setIcon(d);
+        toolbar.getMenu().findItem(R.id.view_event).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                Intent intent = new Intent(getActivity(), DisplayEvent.class);
+                intent.putExtras(MapViewPagerAdapter.bundle.getBundle(index));
+                startActivity(intent);
+                return false;
+            }
+        });
+
 
     }
 

@@ -21,7 +21,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="80dp"
-            android:background="#63ed65"
+            android:background="@color/livinBlack"
             android:gravity="center"
             android:tag="Bottom3"
             android:weightSum="10">
@@ -31,25 +31,44 @@
                 android:layout_width="27dp"
                 android:layout_height="30dp"
                 android:layout_weight="1"
-                android:src="@drawable/ic_restore_white_24dp" />
+                android:src="@drawable/ic_restore_white_24dp"
+                android:tint="#63ed65"/>
 
             <TextView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="5"
                 android:text="Restore Item?"
-                android:textColor="#fff"
+                android:textColor="#63ed65"
                 android:textSize="17sp" />
-
-            <Button
-                android:id="@+id/delete"
+            <LinearLayout
+                android:orientation="vertical"
                 android:layout_width="0dp"
-                android:layout_height="40dp"
+                android:layout_height="wrap_content"
                 android:layout_weight="4"
-                android:background="@color/livinWhite"
-                android:layout_marginEnd="2dp"
-                android:text="Yes,Restore"
-                android:textColor="#63ed65" />
+                android:layout_marginEnd="2dp">
+
+                <Button
+                    android:id="@+id/delete"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:layout_weight="4"
+                    android:background="#63ed65"
+                    android:layout_marginEnd="2dp"
+                    android:layout_marginBottom="3dp"
+                    android:text="Yes,Restore"
+                    android:textColor="@color/livinWhite" />
+                <Button
+                    android:id="@+id/cancel"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:layout_weight="6"
+                    android:background="#FF0000"
+                    android:layout_marginEnd="2dp"
+                    android:text="No, Cancel"
+                    android:textColor="@color/livinWhite" />
+            </LinearLayout>
+
         </LinearLayout>
 
 

@@ -1,12 +1,19 @@
 package com.example.codenamebiscuit.eventfragments;
 
+import android.content.pm.ActivityInfo;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.support.v4.app.NavUtils;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.TextView;
 
 import com.example.codenamebiscuit.R;
+import com.example.codenamebiscuit.helper.EventBundle;
 import com.example.codenamebiscuit.helper.MapViewPagerAdapter;
 import com.example.codenamebiscuit.helper.Utils;
 import com.github.nitrico.mapviewpager.MapViewPager;
@@ -23,6 +30,7 @@ public class ClusterMap extends AppCompatActivity implements MapViewPager.Callba
     private int currentPage;
     private IconicsButton leftButton;
     private IconicsButton rightButton;
+    private Toolbar toolbar;
 
 
     @Override
@@ -30,6 +38,16 @@ public class ClusterMap extends AppCompatActivity implements MapViewPager.Callba
         this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.cluster_map);
+        this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        this.getSupportActionBar().setDisplayShowTitleEnabled(false);
+        final Drawable upArrow = getResources().getDrawable(R.drawable.ic_arrow_back_black_18dp);
+        upArrow.setColorFilter(getResources().getColor(R.color.livinPink), PorterDuff.Mode.SRC_ATOP);
+        this.getSupportActionBar().setHomeAsUpIndicator(upArrow);
+        this.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
         String user_id = getIntent().getStringExtra("userId");
 
         SupportMapFragment map = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
@@ -45,6 +63,10 @@ public class ClusterMap extends AppCompatActivity implements MapViewPager.Callba
         mvp = new MapViewPager.Builder(this).mapFragment(map).viewPager(viewPager)
                 .position(0).adapter(new MapViewPagerAdapter(getSupportFragmentManager(), this, user_id, this))
                 .callback(this).build();
+    }
+    @Override
+    public void onBackPressed(){
+        NavUtils.navigateUpFromSameTask(this);
     }
 
     private void setupNavButtons(){

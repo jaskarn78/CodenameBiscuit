@@ -4,19 +4,24 @@
     android:layout_height="match_parent"
     android:layout_margin="3dp"
     android:foreground="?android:attr/selectableItemBackground"
+    android:background="@color/livinWhite"
     android:id="@+id/card_relative_layout"
     >
 
-    <ImageView
+    <ImageButton
         android:id="@+id/row_menu"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
+        android:layout_width="35dp"
+        android:layout_height="35dp"
         android:layout_alignParentEnd="true"
+        android:layout_alignParentTop="true"
         android:layout_margin="5dp"
         android:layout_below="@+id/tv_event_name"
         android:clickable="true"
-        android:background="@android:color/transparent"
-        android:src="@drawable/ic_shortcut_more_vert" />
+        android:background="@color/livinWhite"
+        android:foreground="?android:attr/selectableItemBackground"
+        android:tint="@color/livinPink"
+        android:scaleType="fitXY"
+        android:src="@drawable/ic_more_vert_white_48dp" />
 
 
     <ImageView

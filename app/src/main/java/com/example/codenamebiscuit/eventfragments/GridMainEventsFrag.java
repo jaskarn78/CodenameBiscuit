@@ -4,6 +4,7 @@ package com.example.codenamebiscuit.eventfragments;
  * Created by jaskarnjagpal on 3/1/17.
  */
 
+import android.app.Dialog;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.Snackbar;
@@ -19,11 +20,13 @@ import android.view.ViewGroup;
 
 
 import com.devspark.progressfragment.ProgressFragment;
-import com.example.codenamebiscuit.Events;
+import com.example.codenamebiscuit.helper.Events;
 import com.example.codenamebiscuit.R;
 import com.example.codenamebiscuit.requests.QueryEventList;
+import com.example.codenamebiscuit.requests.RunQuery;
 import com.example.codenamebiscuit.requests.UpdateDbOnSwipe;
 import com.example.codenamebiscuit.rv.EventAdapter;
+import com.geniusforapp.fancydialog.FancyAlertDialog;
 import com.github.brnunes.swipeablerecyclerview.SwipeableRecyclerViewTouchListener;
 import com.jaredrummler.materialspinner.MaterialSpinner;
 import org.json.JSONException;
@@ -154,7 +157,7 @@ public class GridMainEventsFrag extends ProgressFragment {
                                 saveEvent.put("user_id", mAdapter.getObject().get(position).getString("user_id"));
                                 saveEvent.put("event_id", mAdapter.getObject().get(position).getString("event_id"));
                                 data.remove(position);
-                                mAdapter.removeBundleAtPosition(position);
+                                //mAdapter.removeBundleAtPosition(position);
                                 new UpdateDbOnSwipe(getString(R.string.DATABASE_STORE_SAVED_EVENTS)).execute(saveEvent);
                             } catch (JSONException e) {e.printStackTrace();} } }
                 }); mRecyclerView.addOnItemTouchListener(swipeTouchListener); }
@@ -182,6 +185,7 @@ public class GridMainEventsFrag extends ProgressFragment {
                 }}});
 
     }
+
 
     private void eneableRefreshing(){
         FragmentTransaction ft = getFragmentManager().beginTransaction();

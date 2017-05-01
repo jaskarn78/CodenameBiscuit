@@ -112,15 +112,11 @@
                 android:value=".MainActivity" />
         </activity>
 
-        <activity
-            android:name=".eventfragments.MapActivity"
-            android:label="Map Events"
-            android:theme="@style/AppTheme">
+        <activity android:name=".eventfragments.ClusterMap" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".MainActivity" />
+                android:value=".MainActivity"/>
         </activity>
-        <activity android:name=".eventfragments.ClusterMap" />
     </application>
 
 </manifest>

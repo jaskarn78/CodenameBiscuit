@@ -14,7 +14,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.devspark.progressfragment.ProgressFragment;
-import com.example.codenamebiscuit.Events;
+import com.example.codenamebiscuit.helper.Events;
 import com.example.codenamebiscuit.R;
 import com.example.codenamebiscuit.helper.EventBundle;
 import com.example.codenamebiscuit.helper.ImageLoader;

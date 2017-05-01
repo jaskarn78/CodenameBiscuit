@@ -98,6 +98,9 @@
     <string name="restore_all_saved">Restore All Saved</string>
     <string name="restore_all_removed">Restore All Removed</string>
     <string name="filter_events">Filter Events</string>
+    <string name="more_details">More Details</string>
+    <string name="remove">Remove</string>
+    <string name="restore">Restore</string>
 
 
 </resources>

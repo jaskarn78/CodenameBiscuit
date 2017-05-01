@@ -1,17 +1,11 @@
 package com.example.codenamebiscuit.requests;
 
-import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
-import android.os.Handler;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
-import android.view.View;
-import android.widget.ListView;
 
-import com.example.codenamebiscuit.Events;
-import com.example.codenamebiscuit.MainActivity;
 import com.example.codenamebiscuit.rv.EventAdapter;
 
 import org.json.JSONArray;
@@ -26,7 +20,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by jaskarnjagpal on 2/2/17.
