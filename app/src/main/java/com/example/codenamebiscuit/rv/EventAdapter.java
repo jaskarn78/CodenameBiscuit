@@ -373,10 +373,10 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
          * ****************************************************************************************/
         if (type == 2) {
             final ProgressBar progressBar2 = (ProgressBar) rootView.findViewById(R.id.grid_progress);
-
-            ImageLoader.loadFullImage(activity, eventPath, eventAdapterViewHolder.mEventImage, progressBar2);
+            ImageLoader.loadGridImage(activity, eventPath, eventAdapterViewHolder.mEventImage, progressBar2);
 
             final EventBundle eventBundle = new EventBundle(mEventData);
+            final String finalEvent = event;
             eventAdapterViewHolder.gridCards.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -396,7 +396,8 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
 
                                     eventName.setText(eventInfo.getString("eventName"));
                                     eventLocation.setText(eventInfo.getString("eventLocation"));
-                                    eventPreferences.setText(eventInfo.getString("eventPreference"));
+                                    eventPreferences.setText(eventInfo.getString("eventPreference").replace(",",  " | " ));
+
                                     eventDate.setText(parseDate(eventInfo.getString("eventDate")));
                                     eventHoster.setText("Presented By: "+eventInfo.getString("eventHoster"));
 
@@ -407,7 +408,7 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
                                         public void onClick(View v) {
                                             Intent intent = new Intent(activity, DisplayEvent.class);
                                             intent.putExtras(eventInfo); activity.startActivity(intent); } });
-                                } }).focusOn(v).focusShape(FocusShape.ROUNDED_RECTANGLE).roundRectRadius(v.getWidth()).build().show(); } }); }
+                                } }).closeOnTouch(true).title(finalEvent).focusOn(v).focusShape(FocusShape.ROUNDED_RECTANGLE).roundRectRadius(v.getWidth()).build().show(); } }); }
         }
 
 

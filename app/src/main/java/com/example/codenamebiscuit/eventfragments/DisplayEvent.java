@@ -35,6 +35,8 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.like.LikeButton;
 import com.mikepenz.iconics.view.IconicsImageView;
+import com.thefinestartist.finestwebview.FinestWebView;
+import com.thefinestartist.finestwebview.FinestWebViewActivity;
 
 import java.text.ParseException;
 import java.util.Date;
@@ -173,7 +175,7 @@ public class DisplayEvent extends AppCompatActivity{
        // displayEventName.setText(eventName);
         displayEventHoster.setText("Presented By: "+eventHoster);
         displayEventDistance.setText(eventDistance+" mi");
-        displayEventPref.setText(eventPreferences+" | Sports | Music");
+        displayEventPref.setText(eventPreferences.replace(",", " | "));
         displayEventLocation.setText(eventLocation);
         displayEventStartDate.setText("Start Date: "+parseDate(eventDate));
         displayEventStartTIme.setText("Start Time: "+parseTime(eventTime));
@@ -181,7 +183,6 @@ public class DisplayEvent extends AppCompatActivity{
         displayEventDesc.setText(eventDescription+ " Lorem ipsum dolor sit amet, consectetur adipisicing elit, " +
                 "sed do eiusmod ");
 
-        setupWebView();
         setupWebsiteBtn();
         setupNavigateBtn();
         setupPhone();
@@ -219,33 +220,19 @@ public class DisplayEvent extends AppCompatActivity{
 
 
     private void setupWebsiteBtn(){
-        webView.getSettings().setJavaScriptEnabled(true);
-        webView.getSettings().setLoadWithOverviewMode(true);
-        webView.getSettings().setUseWideViewPort(true);
-        webView.setVerticalScrollBarEnabled(true);
-        webView.setHorizontalScrollBarEnabled(true);
-        webView.setWebViewClient(new WebViewClient() {
-
-            @Override
-            public boolean shouldOverrideUrlLoading(WebView view, String url) {
-                view.loadUrl(url);
-                return true;
-            }
-
-            @Override
-            public void onPageFinished(WebView view, final String url) {
-            }
-        });
         webSite.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(webView.getVisibility()==View.GONE) {
-                    Toast.makeText(DisplayEvent.this, "Loading: "+eventWebsite, Toast.LENGTH_SHORT).show();
-                    webView.setVisibility(View.VISIBLE);
-                    webView.loadUrl(eventWebsite);
+                if(eventWebsite.contains("http"))
+                    new FinestWebView.Builder(DisplayEvent.this).titleDefault(eventWebsite)
+                        .show(eventWebsite);
+                else{
+                    new FinestWebView.Builder(DisplayEvent.this)
+                            .titleDefault("http://"+eventWebsite).titleColorRes(R.color.livinPink)
+                            .menuColorRes(R.color.livinWhite).iconDefaultColorRes(R.color.livinWhite)
+                            .show("http://"+eventWebsite);
                 }
-                else
-                    webView.setVisibility(View.GONE); }
+            }
         });
     }
 
@@ -259,14 +246,6 @@ public class DisplayEvent extends AppCompatActivity{
                 startActivity(i);
             }
         });
-    }
-
-    private void setupWebView(){
-        webView.getSettings().setJavaScriptEnabled(true);
-        webView.getSettings().setLoadWithOverviewMode(true);
-        webView.getSettings().setUseWideViewPort(true);
-        webView.setVerticalScrollBarEnabled(true);
-        webView.setHorizontalScrollBarEnabled(true);
     }
 
     private void setupPhone(){

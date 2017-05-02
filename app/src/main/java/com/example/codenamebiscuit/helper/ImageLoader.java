@@ -44,7 +44,7 @@ public class ImageLoader {
     }
     public static void loadImage(Context context, String imgPath, ImageView imageView, final ProgressBar progressBar){
         Glide.with(context).load(getPath(imgPath)).error(R.drawable.placeholder)
-                .crossFade().override(1200, 1200).centerCrop()
+                .crossFade().override(800, 800).centerCrop()
                 .diskCacheStrategy(DiskCacheStrategy.ALL)
                 .listener(new RequestListener<String, GlideDrawable>() {
                     @Override
@@ -57,6 +57,26 @@ public class ImageLoader {
                         progressBar.setVisibility(View.GONE);
                         return false; }
                 }).into(imageView);
+    }
+
+    public static void loadGridImage(Context context, String imgPath, ImageView imageView, final ProgressBar progressBar){
+        Glide.with(context).load(getPath(imgPath)).error(R.drawable.placeholder)
+                .crossFade().override(1200, 1200)
+                .diskCacheStrategy(DiskCacheStrategy.ALL)
+                .listener(new RequestListener<String, GlideDrawable>() {
+                    @Override
+                    public boolean onException(Exception e, String model, Target<GlideDrawable> target, boolean isFirstResource) {
+                        progressBar.setVisibility(View.GONE);
+                        return false;
+                    }
+
+                    @Override
+                    public boolean onResourceReady(GlideDrawable resource, String model, Target<GlideDrawable> target, boolean isFromMemoryCache, boolean isFirstResource) {
+                        progressBar.setVisibility(View.GONE);
+                        return false;
+                    }
+                })
+                .into(imageView);
     }
     public static void loadImageFitCenter(Context context, String imgPath, ImageView imageView, final ProgressBar progressBar){
         Glide.with(context).load(getPath(imgPath)).diskCacheStrategy(DiskCacheStrategy.ALL)

@@ -94,24 +94,6 @@
                 android:text="Preference1"
                 android:textColor="@color/livinPink"
                 />
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/slidepref2"
-                android:textSize="12sp"
-                android:text="Preference2"
-                android:layout_marginStart="5dp"
-                android:textColor="@color/livinPink"
-                />
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/slidePref3"
-                android:textSize="12sp"
-                android:text="Preference3"
-                android:layout_marginStart="5dp"
-                android:textColor="@color/livinPink"
-                />
         </LinearLayout>
     </LinearLayout>
 

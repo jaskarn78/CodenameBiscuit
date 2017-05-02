@@ -84,6 +84,8 @@ dependencies {
     compile 'com.hlab.fabrevealmenu:fab-reveal-menu:1.0.2'
     compile 'com.github.faruktoptas:FancyShowCaseView:0.0.6'
     compile 'com.github.nitrico.mapviewpager:mapviewpager:1.0.0'
+    compile 'com.thefinestartist:finestwebview:1.2.7'
+
 
 }
 

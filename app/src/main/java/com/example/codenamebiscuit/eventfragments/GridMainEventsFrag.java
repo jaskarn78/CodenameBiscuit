@@ -49,7 +49,9 @@ public class GridMainEventsFrag extends ProgressFragment {
     private MaterialSpinner toolbarSpinner;
     private Runnable mShowContentRunnable = new Runnable() {
         @Override
-        public void run() {if (isAdded()) { setContentShown(true);}} };
+        public void run() {if (isAdded()) {
+            setContentShown(true);
+            mRecyclerView.scrollToPosition(0);} } };
 
 
     @Override
@@ -170,17 +172,27 @@ public class GridMainEventsFrag extends ProgressFragment {
                 switch (i) {
                     case 0:
                         Events.fromJson(data, getActivity());
-                        mAdapter.setEventData(data);mAdapter.notifyDataSetChanged();break;
+                        mAdapter.setEventData(data);mAdapter.notifyDataSetChanged();
+                        mRecyclerView.smoothScrollToPosition(0);
+                        break;
                     case 1:
                         Events.toFurthest(data);
-                        mAdapter.setEventData(data);mAdapter.notifyDataSetChanged();break;
+                        mAdapter.setEventData(data);mAdapter.notifyDataSetChanged();
+                        mRecyclerView.smoothScrollToPosition(0);
+                        break;
                     case 2:
                         Events.toEarliest(data);
-                        mAdapter.setEventData(data);mAdapter.notifyDataSetChanged();break;
+                        mAdapter.setEventData(data);mAdapter.notifyDataSetChanged();
+                        mRecyclerView.smoothScrollToPosition(0);
+                        break;
                     case 3:
                         Events.toLatest(data);
-                        mAdapter.setEventData(data); mAdapter.notifyDataSetChanged(); break;
-                    default: materialSpinner.setSelectedIndex(0);break;
+                        mAdapter.setEventData(data); mAdapter.notifyDataSetChanged();
+                        mRecyclerView.smoothScrollToPosition(0);
+                        break;
+                    default: materialSpinner.setSelectedIndex(0);
+                        mRecyclerView.smoothScrollToPosition(0);
+                        break;
 
                 }}});
 
@@ -191,6 +203,7 @@ public class GridMainEventsFrag extends ProgressFragment {
         FragmentTransaction ft = getFragmentManager().beginTransaction();
         ft.detach(GridMainEventsFrag.this); ft.attach(GridMainEventsFrag.this);
         ft.commit();
+
     }
 
 }
