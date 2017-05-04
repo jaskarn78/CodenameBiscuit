@@ -60,7 +60,7 @@ public class MapFragment extends Fragment {
         Bundle args = getArguments();
         if (args != null) index = args.getInt("INDEX", 0);
         ViewCompat.setElevation(getView(), 10f);
-        ImageLoader.loadPagerImage(getContext(), MapViewPagerAdapter.eventImage.get(index), pagerImage, pagerProgress);
+        ImageLoader.loadImage(getContext(), MapViewPagerAdapter.eventImage.get(index), pagerImage, pagerProgress);
         name.setText(MapViewPagerAdapter.eventName.get(index));
         distance.setText(MapViewPagerAdapter.eventDistance.get(index)+" mi");
         toolbar.inflateMenu(R.menu.pager_menu);

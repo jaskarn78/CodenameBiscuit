@@ -1,21 +1,22 @@
 package com.example.codenamebiscuit;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
-import android.database.DataSetObserver;
 import android.os.Bundle;
+import android.os.Handler;
+import android.speech.RecognizerIntent;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.AppCompatDelegate;
 import android.support.v7.preference.PreferenceManager;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.view.KeyEvent;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
@@ -43,6 +44,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
+import br.com.mauker.materialsearchview.MaterialSearchView;
 import mehdi.sakout.fancybuttons.FancyButton;
 
 public class MainActivity extends AppCompatActivity {
@@ -59,6 +61,8 @@ public class MainActivity extends AppCompatActivity {
     FABRevealMenu fabMenu;
     private View fabMenuView;
     private MaterialSpinner toolbarSpinner;
+    private MaterialSearchView searchView;
+
     Bundle bundle = new Bundle();
     private String userId;
 
@@ -84,6 +88,8 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.launch_layout);
         this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         gps = new GPSTracker(this);
+        searchView = (MaterialSearchView)findViewById(R.id.search_view);
+
 
         pref = PreferenceManager.getDefaultSharedPreferences(this);
         preferences = new JSONObject(); removed = new JSONObject();
@@ -149,17 +155,26 @@ public class MainActivity extends AppCompatActivity {
         FancyButton outdoorButton = (FancyButton) fabMenuView.findViewById(R.id.btn_outdoors);
         FancyButton healthButton = (FancyButton) fabMenuView.findViewById(R.id.btn_health);
         FancyButton entertainmentButton = (FancyButton) fabMenuView.findViewById(R.id.btn_entertainment);
-        FancyButton performingButton = (FancyButton) fabMenuView.findViewById(R.id.btn_performing);
+        FancyButton charityButton = (FancyButton) fabMenuView.findViewById(R.id.btn_charity);
         FancyButton retailButton = (FancyButton) fabMenuView.findViewById(R.id.btn_retail);
         FancyButton familyButton = (FancyButton) fabMenuView.findViewById(R.id.btn_family);
 
         List<FancyButton> btnList = new ArrayList();
         btnList.add(musicFancyButton);btnList.add(foodButton); btnList.add(sportsButton);
         btnList.add(outdoorButton); btnList.add(healthButton); btnList.add(familyButton);
-        btnList.add(retailButton); btnList.add(performingButton); btnList.add(entertainmentButton);
+        btnList.add(retailButton); btnList.add(charityButton); btnList.add(entertainmentButton);
         setupPreferences(btnList);
         closeButton.setOnClickListener(new View.OnClickListener() {
-            @Override public void onClick(View v) { fabMenu.closeMenu(); refresh(); } });
+            @Override public void onClick(View v) {
+                fabMenu.closeMenu();
+                final ProgressDialog dialog = new ProgressDialog(MainActivity.this);
+                dialog.setMessage("Updating...Please wait"); dialog.show();
+                Handler handler = new Handler();
+                handler.postDelayed(new Runnable() {
+                    public void run() { refresh();
+                        if(!eventsFrag.isDetached()) dialog.dismiss(); }
+                }, 1000); if(dialog.isShowing()) dialog.dismiss();} });
+
     }
 
 
@@ -191,6 +206,8 @@ public class MainActivity extends AppCompatActivity {
                 currentUserId.put("user_id", userId);
             } catch (JSONException e) { e.printStackTrace(); }
 
+            createDrawer = new CreateDrawer(savedstate, toolbar, this, userId, getSupportFragmentManager());
+            createDrawer.loadDrawer();
 
             bindViews();
             bundle.putString("currentUserId", userId);
@@ -206,11 +223,6 @@ public class MainActivity extends AppCompatActivity {
             transaction.replace(R.id.fragment_container, eventsFrag, "eventsFrag");
             transaction.commit();
 
-            ArrayList<JSONObject> data = new ArrayList<>();
-            data = eventsFrag.getData();
-            createDrawer = new CreateDrawer(savedstate, toolbar, this, userId, getSupportFragmentManager(), data);
-            createDrawer.loadDrawer();
-
         }
     }
 
@@ -222,17 +234,26 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.sliding_panel, menu);
+        menu.findItem(R.id.search_action).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                if(!searchView.isOpen())
+                    searchView.openSearch();
+                else searchView.closeSearch();
+                return false; } });
         return true; }
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
         MenuItem item =menu.findItem(R.id.action_grid_to_full).setVisible(true);
         MenuItem refresh = menu.findItem(R.id.refresh);
+        MenuItem search = menu.findItem(R.id.search_action);
         TextView textView = (TextView)findViewById(R.id.toolbar_title);
         if(eventsFrag!=null && swipeEvents!=null) {
             if (eventsFrag.isAdded()) {
                 textView.setVisibility(View.GONE);
                 refresh.setVisible(true);
+                search.setVisible(true);
                 revealFrame.setVisibility(View.VISIBLE);
                 toolbarSpinner.setVisibility(View.VISIBLE);
                 item.setIcon(R.drawable.ic_fullscreen_white_48dp);}
@@ -248,7 +269,6 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
         fragmentTransaction.setCustomAnimations(R.anim.slide_in_up, R.anim.slide_out_down);
-
         switch (item.getItemId()) {
              case R.id.action_grid_to_full:
                 if(eventsFrag.isAdded()){
@@ -290,7 +310,7 @@ public class MainActivity extends AppCompatActivity {
                         catch (JSONException e) { e.printStackTrace(); }
                         new RunQuery(getString(R.string.PUSH_USER_PREFERENCES)).execute(preferences);}
                     else {
-                        btnList.get(finalI).setBackgroundColor(getColor(R.color.translivinPink));
+                        btnList.get(finalI).setBackgroundColor(getColor(R.color.transparentPink));
                         btnList.get(finalI).setSelected(false);
                         try { preferences.put("pref_id" + (finalI + 1), 0);
                         } catch (JSONException e) { e.printStackTrace(); }
@@ -307,7 +327,21 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void setupSpinner() {
-        toolbarSpinner.setItems("Distance: Nearest", "Distance: Furthest", "Date: Earliest", "Date: Latest");
+        toolbarSpinner.setItems("Nearest", "Furthest", "Earliest", "Latest");
         toolbarSpinner.animate(); }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == MaterialSearchView.REQUEST_VOICE && resultCode == RESULT_OK) {
+            ArrayList<String> matches = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
+            if (matches != null && matches.size() > 0) {
+                String searchWrd = matches.get(0);
+                if (!TextUtils.isEmpty(searchWrd)) {
+                    searchView.setQuery(searchWrd, false); } }
+
+            return;
+        }
+        super.onActivityResult(requestCode, resultCode, data);
+    }
 
 }

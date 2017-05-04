@@ -67,7 +67,7 @@ public class CreateDrawer {
 
 
 
-    public CreateDrawer(Bundle savedState, Toolbar toolbar, Activity activity, String userId, FragmentManager fm, ArrayList<JSONObject> data) {
+    public CreateDrawer(Bundle savedState, Toolbar toolbar, Activity activity, String userId, FragmentManager fm) {
 
         preferences = PreferenceManager.getDefaultSharedPreferences(activity.getApplicationContext());
         this.pic=preferences.getString("user_image", null);
@@ -79,7 +79,6 @@ public class CreateDrawer {
         this.activity=activity;
         this.bundle = new Bundle();
         this.fm=fm;
-        this.data=data;
 
 
         livinPink=activity.getColor(R.color.livinPink);

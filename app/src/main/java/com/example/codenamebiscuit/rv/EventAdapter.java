@@ -102,10 +102,6 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
     }
 
 
-    public void removeBundleAtPosition(int position){
-        bundleList.remove(position);}
-
-
     @Override
     public int getItemCount() {
         if(mEventData==null)  return 0;
@@ -244,59 +240,36 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
 
     @Override
     public void onBindViewHolder(final EventAdapterViewHolder eventAdapterViewHolder, final int position) {
-        String eventLocation = null;
-        String eventPref = null;
-        String eventPath = null;
-        String event = null;
-        String eventInfo = "";
-        String startDate = null;
-        String startTime = null;
-        String eventid = null;
-        String userId = null;
-        String eventHoster = null;
-        String cost = null;
-        Double lat = 0.0;
-        String eventWebsite = null;
-        int eventDistance = 0;
-        Double lng = 0.0;
+        String eventLocation = null;    String eventPref = null;    String eventPath = null;
+        String event = null;            String eventInfo = "";      String startDate = null;
+        String startTime = null;        String eventid = null;      String userId = null;
+        String eventHoster = null;      String cost = null;         Double lat = 0.0;
+        String eventWebsite = null;     int eventDistance = 0;      Double lng = 0.0;
+        String eventPhone = null;
 
         final JSONObject restoreEvent = new JSONObject();
         final JSONObject eventObject = mEventData.get(position);
 
         try {
-            eventLocation = eventObject.getString("event_location");
-            eventPref = eventObject.getString("preference_name");
-            eventPath = eventObject.getString("img_path");
-            event = eventObject.getString("event_name");
-            eventHoster = eventObject.getString("event_sponsor");
-            cost = eventObject.getString("event_cost");
-            startDate = eventObject.getString("start_date");
-            startTime = eventObject.getString("start_time");
-            eventid = eventObject.getString("event_id");
-            userId = eventObject.getString("event_id");
-            lat = eventObject.getDouble("lat");
-            lng = eventObject.getDouble("lng");
-            eventInfo = eventObject.getString("event_description");
-            eventWebsite = eventObject.getString("event_website");
-            eventDistance = eventObject.getInt("event_distance");
+            eventLocation = eventObject.getString("event_location");    eventPref = eventObject.getString("preference_name").replace("|", "·");
+            eventPath = eventObject.getString("img_path");              event = eventObject.getString("event_name");
+            eventHoster = eventObject.getString("event_sponsor");       cost = eventObject.getString("event_cost");
+            startDate = eventObject.getString("start_date");            startTime = eventObject.getString("start_time");
+            eventid = eventObject.getString("event_id");                userId = eventObject.getString("event_id");
+            lat = eventObject.getDouble("lat");                         lng = eventObject.getDouble("lng");
+            eventInfo = eventObject.getString("event_description");     eventWebsite = eventObject.getString("event_website");
+            eventDistance = eventObject.getInt("event_distance");       eventPhone = eventObject.getString("event_phone");
         } catch (JSONException e) { e.printStackTrace(); }
 
-
         final Bundle bundle = new Bundle();
-        bundle.putString("eventName", event);
-        bundle.putString("eventImage", eventPath);
-        bundle.putString("eventDate", startDate);
-        bundle.putString("eventTime", startTime);
-        bundle.putString("eventLocation", eventLocation);
-        bundle.putString("eventPreference", eventPref);
-        bundle.putString("eventDescription", eventInfo);
-        bundle.putString("eventHoster", eventHoster);
-        bundle.putString("eventDistance", eventDistance + "");
-        bundle.putString("eventCost", cost);
-        bundle.putString("eventId", eventid);
-        bundle.putDouble("eventLat", lat);
-        bundle.putDouble("eventLng", lng);
-        bundle.putString("eventWebsite", eventWebsite);
+        bundle.putString("eventName", event);                   bundle.putString("eventImage", eventPath);
+        bundle.putString("eventDate", startDate);               bundle.putString("eventTime", startTime);
+        bundle.putString("eventLocation", eventLocation);       bundle.putString("eventPreference", eventPref);
+        bundle.putString("eventDescription", eventInfo);        bundle.putString("eventHoster", eventHoster);
+        bundle.putString("eventDistance",eventDistance + "");   bundle.putString("eventCost", cost);
+        bundle.putString("eventId", eventid);                   bundle.putDouble("eventLat", lat);
+        bundle.putDouble("eventLng", lng);                      bundle.putString("eventWebsite", eventWebsite);
+        bundle.putString("eventPhone", eventPhone);
         setBundle(bundle);
 
         if (type == 1) {
@@ -315,16 +288,12 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
             eventAdapterViewHolder.mSwipeLayout.addSwipeListener(new SimpleSwipeListener() {
                 @Override
                 public void onOpen(SwipeLayout layout) {
-                    YoYo.with(Techniques.Tada).duration(500).delay(100).playOn(layout.findViewById(R.id.trash));
-                }
-            });
+                    YoYo.with(Techniques.Tada).duration(500).delay(100).playOn(layout.findViewById(R.id.trash)); } });
 
             eventAdapterViewHolder.rowMenuImage.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    setupPopUpButton(popupMenu, eventAdapterViewHolder.mSwipeLayout, position);
-                }
-            });
+                    setupPopUpButton(popupMenu, eventAdapterViewHolder.mSwipeLayout, position); } });
 
             /********************************************************************************
              * Loads event image from url obtained from database and assigns
@@ -343,16 +312,13 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
                 @Override
                 public void onClick(View view) {
                     setupDeleteButton(restoreEvent, position, eventAdapterViewHolder.mEventImage.getDrawable(),
-                            eventAdapterViewHolder.mEventName.getText().toString());
-                }
-            });
+                            eventAdapterViewHolder.mEventName.getText().toString()); } });
 
             eventAdapterViewHolder.buttonCancel.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     eventAdapterViewHolder.mSwipeLayout.close();
-                }
-            });
+                } });
 
             /*****************************************************************************************
              * Clicking on a saved or deleted event will start DisplayEvent activity
@@ -363,13 +329,13 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
                 public void onClick(View v) {
                     Intent intent = new Intent(activity, DisplayEvent.class);
                     intent.putExtras(bundle);
-                    activity.startActivity(intent);
-                }
-            });
+                    activity.startActivity(intent); } });
         }
 
         /*****************************************************************************************
          * Type 2 represents the grid layout and its corresponding views are set
+         * Loads the event image for the grid item and sets up the reveal layout which is shown
+         * when staggered grid item is clicked
          * ****************************************************************************************/
         if (type == 2) {
             final ProgressBar progressBar2 = (ProgressBar) rootView.findViewById(R.id.grid_progress);
@@ -377,6 +343,8 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
 
             final EventBundle eventBundle = new EventBundle(mEventData);
             final String finalEvent = event;
+
+            /*Sets up the reveal layout which is shown when a grid item is clicked*/
             eventAdapterViewHolder.gridCards.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -396,13 +364,13 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
 
                                     eventName.setText(eventInfo.getString("eventName"));
                                     eventLocation.setText(eventInfo.getString("eventLocation"));
-                                    eventPreferences.setText(eventInfo.getString("eventPreference").replace(",",  " | " ));
+                                    eventPreferences.setText(eventInfo.getString("eventPreference").replace("|",  " · " ));
 
                                     eventDate.setText(parseDate(eventInfo.getString("eventDate")));
                                     eventHoster.setText("Presented By: "+eventInfo.getString("eventHoster"));
 
                                     String imageEvent = eventBundle.getBundle(eventAdapterViewHolder.getAdapterPosition()).getString("eventImage");
-                                    ImageLoader.loadImage(activity, imageEvent, revealImage, progressBar3);
+                                    ImageLoader.loadImageFitCenter(activity, imageEvent, revealImage, progressBar3);
                                     fab.setOnClickListener(new View.OnClickListener() {
                                         @Override
                                         public void onClick(View v) {
@@ -415,12 +383,6 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
     private String parseDate(String dateString){
         dateString = dateString.replace('-', '/');
         return dateString.substring(5, 10);
-    }
-    public String getImageURL(String path) {
-        return context.getString(R.string.IMAGE_URL_PATH) + path; }
-
-    public void loadImage(final ImageView imageView, final String URL, final ProgressBar progressBar) {
-        ImageLoader.loadImage(activity, URL, imageView, progressBar);
     }
 
 }

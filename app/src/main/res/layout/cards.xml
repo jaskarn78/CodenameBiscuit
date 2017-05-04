@@ -58,38 +58,6 @@
 
 
 
-                <com.getbase.floatingactionbutton.FloatingActionsMenu
-                    xmlns:fab="http://schemas.android.com/apk/res-auto"
-                    android:id="@+id/multiple_actions_left"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignBottom="@+id/offer_image"
-                    android:layout_alignEnd="@+id/offer_image"
-                    android:layout_marginEnd="16dp"
-                    android:layout_marginRight="16dp"
-                    android:layout_marginTop="16dp"
-                    android:visibility="gone"
-                    fab:fab_addButtonColorNormal="@color/livinPink"
-                    fab:fab_addButtonColorPressed="@color/livinWhite"
-                    fab:fab_addButtonPlusIconColor="@color/cardview_light_background"
-                    fab:fab_addButtonStrokeVisible="false"
-                    fab:fab_expandDirection="up">
-
-                    <com.getbase.floatingactionbutton.FloatingActionButton
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        fab:fab_colorNormal="@color/livinPink"
-                        fab:fab_colorPressed="@color/livinWhite"
-                        fab:fab_size="mini" />
-
-                    <com.getbase.floatingactionbutton.FloatingActionButton
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        fab:fab_colorNormal="@color/livinPink"
-                        fab:fab_colorPressed="@color/livinWhite"
-                        fab:fab_size="normal" />
-
-                </com.getbase.floatingactionbutton.FloatingActionsMenu>
 
             </LinearLayout>
 

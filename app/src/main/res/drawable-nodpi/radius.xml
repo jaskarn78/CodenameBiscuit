@@ -4,7 +4,7 @@
     android:shape="rectangle"   >
 
     <solid
-        android:color="@color/transparentLivinBlack" >
+        android:color="@color/transLivinBlack" >
     </solid>
 
     <corners

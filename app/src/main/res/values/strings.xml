@@ -74,7 +74,6 @@
     <string name="google_maps_key" templateMergeStrategy="preserve">AIzaSyDXcIGF3rFsw_ZcxCS6udrjz5cpVeaCK4I</string>
 
     <string name="DATABASE_MAIN_EVENTS_PULLER">http://athena.ecs.csus.edu/~teamone/php/android/pull_main_events_list.php</string>
-    <string name="IMAGE_URL_PATH">http://athena.ecs.csus.edu/~teamone/events/</string>
     <string name="DATABASE_STORE_SAVED_EVENTS">http://athena.ecs.csus.edu/~teamone/php/android/store_saved_events.php</string>
     <string name="DATABASE_SAVED_EVENTS_PULLER">http://athena.ecs.csus.edu/~teamone/php/android/pull_saved_events_list.php</string>
     <string name="DATABASE_STORE_DELETED_EVENTS">http://athena.ecs.csus.edu/~teamone/php/android/store_deleted_events.php</string>
@@ -94,12 +93,9 @@
     <string name="restore_to_main_events_list">Restore to main events list?</string>
     <string name="don_t_show_me_this_again">Don\'t show me this again</string>
     <string name="show_dialog">Show Restore Prompt</string>
-    <string name="livit">LIVIT</string>
     <string name="restore_all_saved">Restore All Saved</string>
     <string name="restore_all_removed">Restore All Removed</string>
-    <string name="filter_events">Filter Events</string>
     <string name="more_details">More Details</string>
-    <string name="remove">Remove</string>
     <string name="restore">Restore</string>
 
 

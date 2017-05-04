@@ -9,10 +9,10 @@
         android:id="@+id/coordLayout">
 
 
-
         <android.support.design.widget.AppBarLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:id="@+id/appbarlayout"
             android:theme="@style/AppTheme.AppBarOverlay"
             android:fitsSystemWindows="true">
 
@@ -20,7 +20,8 @@
             <android.support.v7.widget.Toolbar
                 android:id="@+id/toolbar"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
+                android:elevation="4dp"
                 android:background="@color/livinBlack"
                 android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
                 app:layout_scrollFlags="scroll|enterAlways"
@@ -36,7 +37,8 @@
                     android:id="@+id/toolbar_title" />
                 <com.jaredrummler.materialspinner.MaterialSpinner
                     android:id="@+id/spinner"
-                    android:layout_width="190dp"
+                    android:layout_width="150dp"
+                    android:visibility="gone"
                     android:layout_height="wrap_content"
                     app:ms_text_color="@color/livinWhite"
                     app:ms_background_color="@color/livinBlack"
@@ -44,11 +46,10 @@
                     android:padding="2dp"
                     />
 
-        </android.support.v7.widget.Toolbar>
+
+            </android.support.v7.widget.Toolbar>
 
         </android.support.design.widget.AppBarLayout>
-
-
 
 
         <FrameLayout
@@ -58,7 +59,6 @@
             android:layout_height="match_parent"
             android:fitsSystemWindows="true"
             app:layout_behavior="@string/appbar_scrolling_view_behavior">
-
 
         </FrameLayout>
 
@@ -91,6 +91,15 @@
                 app:showTitle="true"/>
 
         </FrameLayout>
+
+        <br.com.mauker.materialsearchview.MaterialSearchView
+            android:id="@+id/search_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior"
+            style="@style/MaterialSearchViewStyle"
+
+        />
 
     </android.support.design.widget.CoordinatorLayout>
 

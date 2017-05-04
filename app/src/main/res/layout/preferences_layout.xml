@@ -15,18 +15,23 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/filter_events"
+                    android:text="Preferences"
                     android:layout_gravity="center"
-                    android:textSize="25sp"
+                    android:textSize="20sp"
                     android:id="@+id/filterText"
                     android:textColor="@color/livinWhite"/>
                 <com.mikepenz.iconics.view.IconicsImageView
-                    android:layout_width="35dp"
-                    android:layout_height="35dp"
+                    android:layout_width="45dp"
+                    android:layout_height="45dp"
                     android:src="@drawable/ic_refresh_white_48dp"
                     android:id="@+id/exit_icon"
                     android:layout_gravity="end"
                     android:layout_margin="15dp"
+                    android:clickable="true"
+                    android:elevation="10dp"
+                    xmlns:app="http://schemas.android.com/apk/res-auto"
+                    app:iiv_contour_width="10dp"
+                    app:iiv_contour_color="@color/livinBlack"
                     android:tint="@color/livinPink"/>
             </FrameLayout>
 
@@ -184,23 +189,21 @@
 
                 </mehdi.sakout.fancybuttons.FancyButton>
 
+
                 <mehdi.sakout.fancybuttons.FancyButton
-                    android:id="@+id/btn_performing"
+                    android:id="@+id/btn_charity"
                     android:layout_width="85dp"
                     android:layout_height="85dp"
                     android:layout_marginEnd="10dp"
                     android:layout_marginStart="10dp"
                     fancy:fb_defaultColor="@color/transparentPink"
                     fancy:fb_focusColor="#313131"
-                    fancy:fb_iconPaddingLeft="0dp"
-                    fancy:fb_iconPaddingRight="0dp"
                     fancy:fb_iconPosition="top"
-                    fancy:fb_iconResource="@drawable/theater"
+                    fancy:fb_iconResource="@drawable/volunteering"
                     fancy:fb_radius="64dp"
-                    fancy:fb_text="Entertainment"
+                    fancy:fb_text="Charity"
                     fancy:fb_textColor="@color/livinBlack"
-                    fancy:fb_textSize="11sp">
-
+                    fancy:fb_textSize="12sp">
                 </mehdi.sakout.fancybuttons.FancyButton>
 
                 <mehdi.sakout.fancybuttons.FancyButton
@@ -212,11 +215,12 @@
                     fancy:fb_iconPaddingLeft="0dp"
                     fancy:fb_iconPaddingRight="0dp"
                     fancy:fb_iconPosition="top"
-                    fancy:fb_iconResource="@drawable/movie"
+                    fancy:fb_iconResource="@drawable/theater"
                     fancy:fb_radius="64dp"
-                    fancy:fb_text="Charity"
+                    fancy:fb_text="Entertainment"
                     fancy:fb_textColor="@color/livinBlack"
-                    fancy:fb_textSize="12sp">
+                    fancy:fb_textSize="11sp">
+
                 </mehdi.sakout.fancybuttons.FancyButton>
             </LinearLayout>
 

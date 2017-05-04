@@ -50,7 +50,6 @@ dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
     // icon fonts used inside the sample
 
-
     compile('com.mikepenz:materialdrawer:5.8.1@aar') {
         transitive = true
     }
@@ -65,12 +64,10 @@ dependencies {
     compile 'com.squareup.okhttp3:okhttp:3.6.0'
     compile 'com.google.android.gms:play-services-auth:10.2.1'
     compile 'com.android.support:design:25.3.0'
-    compile 'com.getbase:floatingactionbutton:1.10.1'
     compile 'com.github.brnunes:swipeablerecyclerview:1.0.2'
     compile 'pub.devrel:easypermissions:0.3.0'
     compile 'com.daimajia.swipelayout:library:1.2.0@aar'
     compile 'com.daimajia.androidanimations:library:2.2@aar'
-    compile 'com.mikepenz:materialize:1.0.0@aar'
     compile 'com.github.medyo:fancybuttons:1.8.3'
     compile 'com.github.bumptech.glide:glide:3.7.0'
     compile 'com.github.jd-alexander:LikeButton:0.2.0'
@@ -85,6 +82,9 @@ dependencies {
     compile 'com.github.faruktoptas:FancyShowCaseView:0.0.6'
     compile 'com.github.nitrico.mapviewpager:mapviewpager:1.0.0'
     compile 'com.thefinestartist:finestwebview:1.2.7'
+    compile 'br.com.mauker.materialsearchview:materialsearchview:1.2.2'
+
+
 
 
 }

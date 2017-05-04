@@ -171,7 +171,7 @@ public class Events implements Serializable{
             public int compare(JSONObject o1, JSONObject o2) {
                 if(getDate(getDate(o1))==getDate((getDate(o2))))
                     return 0;
-                else if(getDate(getDate(o1)).after(getDate((getDate(o2)))))
+                else if(getDate(getDate(o2)).before(getDate((getDate(o2)))))
                     return 1;
                 else return -1;
             }

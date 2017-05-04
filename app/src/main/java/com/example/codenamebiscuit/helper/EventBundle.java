@@ -13,7 +13,6 @@ import java.util.ArrayList;
 
 public class EventBundle {
     private ArrayList<JSONObject> data;
-    private Bundle bundle;
     public EventBundle(ArrayList<JSONObject> data){
         this.data=data;
     }
@@ -35,47 +34,19 @@ public class EventBundle {
             bundle.putDouble("eventLat", data.get(position).getDouble("lat"));
             bundle.putDouble("eventLng", data.get(position).getDouble("lng"));
             bundle.putString("eventWebsite", data.get(position).getString("event_website"));
+            bundle.putString("eventPhone", data.get(position).getString("event_phone"));
         } catch (JSONException e) { e.printStackTrace(); }
         return bundle;
     }
 
-    public static ArrayList<String> getNameBundle(ArrayList<JSONObject> data){
-        ArrayList<String> eventNames = new ArrayList<>();
-        for(int i=0; i<data.size(); i++){
+    public ArrayList<String> getEventStringList(){
+        ArrayList<String> events = new ArrayList<>();
+        for(JSONObject obj : data){
             try {
-                eventNames.add(data.get(i).getString("event_name"));
-            } catch (JSONException e) {e.printStackTrace();}
+                events.add(obj.getString("event_name")+" By " + ""+obj.getString("event_sponsor"));
+            } catch (JSONException e) { e.printStackTrace(); }
         }
-        return eventNames;
+        return events;
     }
-    public static ArrayList<String> getImageBundle(ArrayList<JSONObject> data){
-        Bundle bundle = new Bundle();
-        ArrayList<String> eventImage = new ArrayList<>();
-        for(int i=0; i<data.size(); i++){
-            try {
-                eventImage.add(data.get(i).getString("img_path"));
-            } catch (JSONException e) {e.printStackTrace();}
-        } bundle.putStringArrayList("eventImageList", eventImage);
-        return eventImage;
-    }
-    public static ArrayList<String> getLocationBundle(ArrayList<JSONObject> data){
-        Bundle bundle = new Bundle();
-        ArrayList<String> eventLocation = new ArrayList<>();
-        for(int i=0; i<data.size(); i++){
-            try {
-                eventLocation.add(data.get(i).getString("event_location"));
-            } catch (JSONException e) {e.printStackTrace();}
-        } bundle.putStringArrayList("eventLocation", eventLocation);
-        return eventLocation;
-    }
-    public static ArrayList<String> getHosterBundle(ArrayList<JSONObject> data){
-        Bundle bundle = new Bundle();
-        ArrayList<String> eventHoster = new ArrayList<>();
-        for(int i=0; i<data.size(); i++){
-            try {
-                eventHoster.add(data.get(i).getString("event_sponsor"));
-            } catch (JSONException e) {e.printStackTrace();}
-        } bundle.putStringArrayList("eventHoster", eventHoster);
-        return eventHoster;
-    }
+
 }

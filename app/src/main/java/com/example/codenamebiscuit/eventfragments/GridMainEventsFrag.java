@@ -4,35 +4,44 @@ package com.example.codenamebiscuit.eventfragments;
  * Created by jaskarnjagpal on 3/1/17.
  */
 
-import android.app.Dialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.speech.RecognizerIntent;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.LinearLayout;
+import android.widget.Toast;
 
 
 import com.devspark.progressfragment.ProgressFragment;
+import com.example.codenamebiscuit.helper.EventBundle;
 import com.example.codenamebiscuit.helper.Events;
 import com.example.codenamebiscuit.R;
 import com.example.codenamebiscuit.requests.QueryEventList;
-import com.example.codenamebiscuit.requests.RunQuery;
 import com.example.codenamebiscuit.requests.UpdateDbOnSwipe;
 import com.example.codenamebiscuit.rv.EventAdapter;
-import com.geniusforapp.fancydialog.FancyAlertDialog;
 import com.github.brnunes.swipeablerecyclerview.SwipeableRecyclerViewTouchListener;
 import com.jaredrummler.materialspinner.MaterialSpinner;
 import org.json.JSONException;
 import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.concurrent.ExecutionException;
+
+import br.com.mauker.materialsearchview.MaterialSearchView;
+
+import static android.app.Activity.RESULT_OK;
 
 
 /**
@@ -45,13 +54,17 @@ public class GridMainEventsFrag extends ProgressFragment {
     private JSONObject saveEvent, deleteEvent;
     private ArrayList<JSONObject> data;
     private String userId;
+    private MaterialSearchView searchView;
     private View mContentView;
     private MaterialSpinner toolbarSpinner;
+    private LinearLayout bgImage;
     private Runnable mShowContentRunnable = new Runnable() {
         @Override
         public void run() {if (isAdded()) {
             setContentShown(true);
-            mRecyclerView.scrollToPosition(0);} } };
+            mRecyclerView.scrollToPosition(0);
+            toolbarSpinner.setSelectedIndex(0);
+        } } };
 
 
     @Override
@@ -77,6 +90,7 @@ public class GridMainEventsFrag extends ProgressFragment {
                              Bundle savedInstanceState) {
         mContentView = inflater.inflate(R.layout.activity_main, container, false);
         mRecyclerView = (RecyclerView) mContentView.findViewById(R.id.recyclerview_events);
+        bgImage = (LinearLayout) mContentView.findViewById(R.id.bgImage);
         return super.onCreateView(inflater, container, savedInstanceState); }
 
     @Override
@@ -86,6 +100,11 @@ public class GridMainEventsFrag extends ProgressFragment {
             public boolean onMenuItemClick(MenuItem item) {
                 eneableRefreshing();
                 return false;}});
+        menu.findItem(R.id.clear_search).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                searchView.clearHistory(); searchView.closeSearch();
+                return false;} });
         super.onCreateOptionsMenu(menu, inflater); }
 
 
@@ -93,12 +112,20 @@ public class GridMainEventsFrag extends ProgressFragment {
         try {
             setContentShown(false);
             Handler mHandler = new Handler();
-            mHandler.postDelayed(mShowContentRunnable, 800);
+            mHandler.postDelayed(mShowContentRunnable, 900);
             data = new QueryEventList(getString(R.string.DATABASE_MAIN_EVENTS_PULLER), userId).execute().get();
+            setupBgImage();
             Events.fromJson(data, getActivity());
             mAdapter = new EventAdapter(getContext().getApplicationContext(), 2, "", getActivity());
             mAdapter.setEventData(data);
         } catch (InterruptedException | ExecutionException e) { e.printStackTrace(); } }
+
+
+    private void setupBgImage(){
+        if(data.isEmpty()) {
+            bgImage.setVisibility(View.VISIBLE);
+            Toast.makeText(getContext(), "No Events Available...", Toast.LENGTH_SHORT).show();
+        }else bgImage.setVisibility(View.GONE); }
 
 
 
@@ -111,7 +138,7 @@ public class GridMainEventsFrag extends ProgressFragment {
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         toolbarSpinner = (MaterialSpinner)getActivity().findViewById(R.id.spinner);
-
+        searchView = (MaterialSearchView)getActivity().findViewById(R.id.search_view);
         setContentView(mContentView);
         if (isAdded()) {
             obtainData();
@@ -122,9 +149,31 @@ public class GridMainEventsFrag extends ProgressFragment {
             mRecyclerView.setItemViewCacheSize(200);
             mRecyclerView.setDrawingCacheEnabled(true);
             mRecyclerView.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_HIGH);
-            enableCardSwiping();
-            setupSpinner();
+            enableCardSwiping();    setupSpinner();  setupSearchView();
             } }
+
+    private void setupSearchView(){
+        searchView.adjustTintAlpha(0.8f);
+        final EventBundle eventsBundle = new EventBundle(data);
+        searchView.addSuggestions(eventsBundle.getEventStringList());
+        searchView.setCloseOnTintClick(true);
+        searchView.setOnQueryTextListener(new MaterialSearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String s) { return true; }
+
+            @Override
+            public boolean onQueryTextChange(String s) { return true; } });
+
+        searchView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                int dataPosition =  eventsBundle.getEventStringList().indexOf(searchView.getSuggestionAtPosition(position));
+                searchView.setQuery(searchView.getSuggestionAtPosition(position), true);
+                Bundle bundle = eventsBundle.getBundle(dataPosition);
+                Intent intent = new Intent(getActivity(), DisplayEvent.class);
+                intent.putExtras(bundle); getActivity().startActivity(intent);
+            }});
+    }
 
 
     private void enableCardSwiping() {
@@ -162,7 +211,8 @@ public class GridMainEventsFrag extends ProgressFragment {
                                 //mAdapter.removeBundleAtPosition(position);
                                 new UpdateDbOnSwipe(getString(R.string.DATABASE_STORE_SAVED_EVENTS)).execute(saveEvent);
                             } catch (JSONException e) {e.printStackTrace();} } }
-                }); mRecyclerView.addOnItemTouchListener(swipeTouchListener); }
+                }); mRecyclerView.addOnItemTouchListener(swipeTouchListener);
+    }
 
 
     private void setupSpinner(){
@@ -192,9 +242,7 @@ public class GridMainEventsFrag extends ProgressFragment {
                         break;
                     default: materialSpinner.setSelectedIndex(0);
                         mRecyclerView.smoothScrollToPosition(0);
-                        break;
-
-                }}});
+                        break;}}});
 
     }
 
@@ -202,8 +250,7 @@ public class GridMainEventsFrag extends ProgressFragment {
     private void eneableRefreshing(){
         FragmentTransaction ft = getFragmentManager().beginTransaction();
         ft.detach(GridMainEventsFrag.this); ft.attach(GridMainEventsFrag.this);
-        ft.commit();
+        ft.commit();}
 
-    }
 
 }

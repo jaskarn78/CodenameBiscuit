@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.telephony.PhoneNumberUtils;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
@@ -58,11 +59,10 @@ public class DisplayEvent extends AppCompatActivity{
     private String eventName, eventImage, eventDate, eventCost;
     private String eventTime, eventDescription, eventLocation;
     private String eventPreferences, eventHoster, eventDistance;
-    private String eventWebsite;
+    private String eventWebsite, eventPhone;
     private int mapImage;
     private LikeButton likeButton;
     private String eventId;
-    private RatingBar ratingBar;
     private double eventLat, eventLng;
     private IconicsImageView webSite, navigate;
     private IconicsImageView phone, shareBtn;
@@ -71,7 +71,6 @@ public class DisplayEvent extends AppCompatActivity{
     private TextView toolbarTitle;
     MapView mapView;
     private GoogleMap googleMap;
-    Typeface typeface;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -154,7 +153,7 @@ public class DisplayEvent extends AppCompatActivity{
         eventLng = bundle.getDouble("eventLng");
         mapImage = bundle.getInt("mapImage");
         eventWebsite = bundle.getString("eventWebsite");
-        Log.i("coords", eventLat+", "+eventLng);
+        eventPhone = bundle.getString("eventPhone");
 
     }
 
@@ -175,7 +174,7 @@ public class DisplayEvent extends AppCompatActivity{
        // displayEventName.setText(eventName);
         displayEventHoster.setText("Presented By: "+eventHoster);
         displayEventDistance.setText(eventDistance+" mi");
-        displayEventPref.setText(eventPreferences.replace(",", " | "));
+        displayEventPref.setText(eventPreferences.replace("|", "·"));
         displayEventLocation.setText(eventLocation);
         displayEventStartDate.setText("Start Date: "+parseDate(eventDate));
         displayEventStartTIme.setText("Start Time: "+parseTime(eventTime));
@@ -230,10 +229,7 @@ public class DisplayEvent extends AppCompatActivity{
                     new FinestWebView.Builder(DisplayEvent.this)
                             .titleDefault("http://"+eventWebsite).titleColorRes(R.color.livinPink)
                             .menuColorRes(R.color.livinWhite).iconDefaultColorRes(R.color.livinWhite)
-                            .show("http://"+eventWebsite);
-                }
-            }
-        });
+                            .show("http://"+eventWebsite); } } });
     }
 
     private void setupNavigateBtn(){
@@ -252,10 +248,12 @@ public class DisplayEvent extends AppCompatActivity{
         phone.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(Intent.ACTION_DIAL);
-                intent.setData(Uri.parse("tel:9167777777"));
-                startActivity(intent);
-            }
+                if(eventPhone!=null) {
+                    Intent intent = new Intent(Intent.ACTION_DIAL);
+                    intent.setData(Uri.parse("tel:"+eventPhone));
+                    startActivity(intent);
+                }else
+                    Toast.makeText(DisplayEvent.this, "No Phone Number Provided", Toast.LENGTH_SHORT).show();}
         });
     }
 
@@ -287,21 +285,12 @@ public class DisplayEvent extends AppCompatActivity{
 
     private void loadImage(){
         final ProgressBar progressBar = (ProgressBar)findViewById(R.id.displayProgress);
-        ImageLoader.loadImageFitCenter(this, eventImage, displayEventImage, progressBar);
-    }
+        ImageLoader.loadImageFitCenter(this, eventImage, displayEventImage, progressBar); }
 
     @Override
     public void onBackPressed()
     {
         super.onBackPressed();
-    }
-
-    public String getImageURL(String path) {
-        if(path.contains("http"))
-            return path;
-        else
-            return getResources().getString(R.string.IMAGE_URL_PATH) + path;
-
     }
 
     private void shareButton(){

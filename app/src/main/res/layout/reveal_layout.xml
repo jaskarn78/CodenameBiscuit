@@ -16,7 +16,7 @@
 
         <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="370dp"
+            android:layout_height="410dp"
             android:id="@+id/imageFrame">
 
         <ImageView
@@ -37,7 +37,7 @@
             app:rippleColor="@color/black_overlay"
             android:layout_gravity="end|bottom"
             app:useCompatPadding="true"
-            app:fabSize="mini"
+            app:fabSize="normal"
             app:pressedTranslationZ="3dp"
             android:src="@drawable/ic_arrow_forward_black_48dp"
             android:clickable="true"

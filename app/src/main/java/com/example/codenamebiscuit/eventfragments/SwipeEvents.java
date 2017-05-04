@@ -8,6 +8,7 @@ import android.support.design.widget.Snackbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -28,6 +29,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.concurrent.ExecutionException;
 
+import br.com.mauker.materialsearchview.MaterialSearchView;
 
 
 public class SwipeEvents extends ProgressFragment{
@@ -41,6 +43,7 @@ public class SwipeEvents extends ProgressFragment{
     private View mContentView;
     private SwipeDeck cardStack;
     private int currentPosition;
+    private MaterialSearchView searchView;
     private ImageView swipeImage;
     private Runnable mShowContentRunnable = new Runnable() {
         @Override
@@ -69,13 +72,15 @@ public class SwipeEvents extends ProgressFragment{
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        setupOnCreate();}
+        searchView = (MaterialSearchView)getActivity().findViewById(R.id.search_view);
+        setupOnCreate();
+    }
 
 
     private void obtainData(){
         setContentShown(false);
         Handler mHandler = new Handler();
-        mHandler.postDelayed(mShowContentRunnable, 300);
+        mHandler.postDelayed(mShowContentRunnable, 1000);
         GridMainEventsFrag frag = (GridMainEventsFrag)getFragmentManager().findFragmentByTag("eventsFrag");
         if(frag!=null) data = frag.getData();
         else try {
@@ -88,6 +93,31 @@ public class SwipeEvents extends ProgressFragment{
         swipeImage = (ImageView)mContentView.findViewById(R.id.swipeBackground);
         numOfEvents = (TextView)getActivity().findViewById(R.id.toolbar_title);
         cardStack.setAdapter(adapter);
+        setupSearchView();
+
+    }
+
+    private void setupSearchView(){
+        searchView.adjustTintAlpha(0.8f);
+        final EventBundle eventsBundle = new EventBundle(data);
+        searchView.addSuggestions(eventsBundle.getEventStringList());
+        searchView.setCloseOnTintClick(true);
+        searchView.setOnQueryTextListener(new MaterialSearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String s) { return true; }
+
+            @Override
+            public boolean onQueryTextChange(String s) { return true; } });
+
+        searchView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                int dataPosition =  eventsBundle.getEventStringList().indexOf(searchView.getSuggestionAtPosition(position));
+                searchView.setQuery(searchView.getSuggestionAtPosition(position), true);
+                Bundle bundle = eventsBundle.getBundle(dataPosition);
+                Intent intent = new Intent(getActivity(), DisplayEvent.class);
+                intent.putExtras(bundle); getActivity().startActivity(intent);
+            }});
     }
 
 
@@ -206,7 +236,7 @@ public class SwipeEvents extends ProgressFragment{
             TextView eventLocation = (TextView)v.findViewById(R.id.slideLocation);
             eventLocation.setText(eventBundle.getString("eventLocation"));
             TextView eventPreference = (TextView)v.findViewById(R.id.slidePref);
-            eventPreference.setText(eventBundle.getString("eventPreference"));
+            eventPreference.setText(eventBundle.getString("eventPreference").replace(",", " | "));
             TextView eventDate = (TextView)v.findViewById(R.id.slideDate);
             eventDate.setText(parseDate(eventBundle.getString("eventDate")));
             swipeButton.setOnClickListener(new View.OnClickListener() {
