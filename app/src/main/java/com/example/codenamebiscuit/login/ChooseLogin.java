@@ -425,6 +425,8 @@ public class ChooseLogin extends AppCompatActivity implements GoogleApiClient.On
         // Result returned from launching the Intent from GoogleSignInApi.getSignInIntent(...);
         if (requestCode == RC_SIGN_IN) {
             GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(intent);
+            first_name = result.getSignInAccount().getGivenName();
+            last_name = result.getSignInAccount().getFamilyName();
             try {
                 handleSignInResult(result);
             } catch (JSONException e) {
