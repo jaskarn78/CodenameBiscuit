@@ -118,11 +118,11 @@ public class CreateDrawer {
                 .withToolbar(toolbar)
                 .withSliderBackgroundColor(activity.getColor(R.color.black_overlay))
                 //.withDelayDrawerClickEvent(150)
-                .withDelayOnDrawerClose(50)
+                //.withDelayOnDrawerClose(50)
                 .withAccountHeader(headerResult)
                 .addDrawerItems(
                         gridEvents
-                                .withName("Grid Events")
+                                .withName("Upcoming Eventss")
                                 .withIcon(R.drawable.ic_home_white_48dp)
                                 .withIdentifier(1)
                                 .withTextColor(livinWhite)
@@ -202,7 +202,8 @@ public class CreateDrawer {
                             if (intent != null) {
                                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                                 intent.putExtra("userId", userId);
-                                activity.startActivity(intent); }
+                                activity.startActivity(intent);
+                            }
                             }
                         return false; }
                 })

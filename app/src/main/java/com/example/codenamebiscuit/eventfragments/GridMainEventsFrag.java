@@ -5,6 +5,7 @@ package com.example.codenamebiscuit.eventfragments;
  */
 
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.speech.RecognizerIntent;
@@ -109,10 +110,10 @@ public class GridMainEventsFrag extends ProgressFragment {
 
 
     private void obtainData() {
+        setContentShown(false);
+        Handler mHandler = new Handler();
+        mHandler.postDelayed(mShowContentRunnable, 800);
         try {
-            setContentShown(false);
-            Handler mHandler = new Handler();
-            mHandler.postDelayed(mShowContentRunnable, 900);
             data = new QueryEventList(getString(R.string.DATABASE_MAIN_EVENTS_PULLER), userId).execute().get();
             setupBgImage();
             Events.fromJson(data, getActivity());
@@ -146,23 +147,30 @@ public class GridMainEventsFrag extends ProgressFragment {
             StaggeredGridLayoutManager staggeredGridLayoutManager = new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL);
             mRecyclerView.setLayoutManager(staggeredGridLayoutManager);
             mRecyclerView.setHasFixedSize(false);
-            mRecyclerView.setItemViewCacheSize(200);
+            mRecyclerView.setItemViewCacheSize(data.size());
             mRecyclerView.setDrawingCacheEnabled(true);
             mRecyclerView.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_HIGH);
-            enableCardSwiping();    setupSpinner();  setupSearchView();
-            } }
+            enableCardSwiping();    setupSpinner();
+            }
+        setupSearchView();
+    }
 
     private void setupSearchView(){
         searchView.adjustTintAlpha(0.8f);
         final EventBundle eventsBundle = new EventBundle(data);
-        searchView.addSuggestions(eventsBundle.getEventStringList());
+        AsyncTask.execute(new Runnable() {
+            @Override
+            public void run() {
+                searchView.addSuggestions(eventsBundle.getEventStringList());
+            }
+        });
         searchView.setCloseOnTintClick(true);
         searchView.setOnQueryTextListener(new MaterialSearchView.OnQueryTextListener() {
             @Override
-            public boolean onQueryTextSubmit(String s) { return true; }
+            public boolean onQueryTextSubmit(String s) { return false; }
 
             @Override
-            public boolean onQueryTextChange(String s) { return true; } });
+            public boolean onQueryTextChange(String s) { return false; } });
 
         searchView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -194,7 +202,7 @@ public class GridMainEventsFrag extends ProgressFragment {
                                 mAdapter.notifyItemRemoved(position);
                                 deleteEvent.put("user_id", mAdapter.getObject().get(position).getString("user_id"));
                                 deleteEvent.put("event_id", mAdapter.getObject().get(position).getString("event_id"));
-                                data.remove(position);
+                                data.remove(position); searchView.removeSuggestion(data.get(position).getString("event_name")+" "+data.get(position).getString("event_sponsor"));
                                 new UpdateDbOnSwipe(getString(R.string.DATABASE_STORE_DELETED_EVENTS)).execute(deleteEvent);
                             } catch (JSONException e) { e.printStackTrace();} } }
 
@@ -207,7 +215,7 @@ public class GridMainEventsFrag extends ProgressFragment {
                                 mAdapter.notifyItemRemoved(position);
                                 saveEvent.put("user_id", mAdapter.getObject().get(position).getString("user_id"));
                                 saveEvent.put("event_id", mAdapter.getObject().get(position).getString("event_id"));
-                                data.remove(position);
+                                data.remove(position); searchView.removeSuggestion(data.get(position).getString("event_name")+" "+data.get(position).getString("event_sponsor"));
                                 //mAdapter.removeBundleAtPosition(position);
                                 new UpdateDbOnSwipe(getString(R.string.DATABASE_STORE_SAVED_EVENTS)).execute(saveEvent);
                             } catch (JSONException e) {e.printStackTrace();} } }

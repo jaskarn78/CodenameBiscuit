@@ -328,7 +328,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void setupSpinner() {
         toolbarSpinner.setItems("Nearest", "Furthest", "Earliest", "Latest");
-        toolbarSpinner.animate(); }
+    }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {

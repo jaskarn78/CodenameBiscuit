@@ -80,7 +80,7 @@ public class SwipeEvents extends ProgressFragment{
     private void obtainData(){
         setContentShown(false);
         Handler mHandler = new Handler();
-        mHandler.postDelayed(mShowContentRunnable, 1000);
+        mHandler.postDelayed(mShowContentRunnable, 400);
         GridMainEventsFrag frag = (GridMainEventsFrag)getFragmentManager().findFragmentByTag("eventsFrag");
         if(frag!=null) data = frag.getData();
         else try {
@@ -100,15 +100,7 @@ public class SwipeEvents extends ProgressFragment{
     private void setupSearchView(){
         searchView.adjustTintAlpha(0.8f);
         final EventBundle eventsBundle = new EventBundle(data);
-        searchView.addSuggestions(eventsBundle.getEventStringList());
         searchView.setCloseOnTintClick(true);
-        searchView.setOnQueryTextListener(new MaterialSearchView.OnQueryTextListener() {
-            @Override
-            public boolean onQueryTextSubmit(String s) { return true; }
-
-            @Override
-            public boolean onQueryTextChange(String s) { return true; } });
-
         searchView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -145,6 +137,7 @@ public class SwipeEvents extends ProgressFragment{
                         deleteEvent.put("event_id", adapter.getItem((int) stableId).get("event_id"));
                         deleteEvent.put("user_id", adapter.getItem((int) stableId).get("user_id"));
                         loadBackgroundImage((int)cardStack.getTopCardItemId());
+                        searchView.removeSuggestion(data.get((int)stableId).getString("event_name")+" "+data.get((int)(stableId)).getString("event_sponsor"));
                     } catch (JSONException e) { e.printStackTrace(); }
                     new UpdateDbOnSwipe(getString(R.string.DATABASE_STORE_DELETED_EVENTS)).execute(deleteEvent);
                     if(currentPosition!=data.size())
@@ -158,6 +151,7 @@ public class SwipeEvents extends ProgressFragment{
                         loadBackgroundImage((int)cardStack.getTopCardItemId());
                         saveEvent.put("event_id", adapter.getItem((int) stableId).get("event_id"));
                         saveEvent.put("user_id", adapter.getItem((int) stableId).get("user_id"));
+                        searchView.removeSuggestion(data.get((int)stableId).getString("event_name")+" "+data.get((int)(stableId)).getString("event_sponsor"));
                     } catch (JSONException e) { e.printStackTrace(); }
                     new UpdateDbOnSwipe(getString(R.string.DATABASE_STORE_SAVED_EVENTS)).execute(saveEvent);
                     if(currentPosition!=data.size())
