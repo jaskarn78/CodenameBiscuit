@@ -156,6 +156,7 @@ public class GridMainEventsFrag extends ProgressFragment {
     }
 
     private void setupSearchView(){
+        searchView.setShouldKeepHistory(false);
         searchView.adjustTintAlpha(0.8f);
         final EventBundle eventsBundle = new EventBundle(data);
         AsyncTask.execute(new Runnable() {

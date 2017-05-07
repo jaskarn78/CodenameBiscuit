@@ -99,6 +99,7 @@ public class SwipeEvents extends ProgressFragment{
 
     private void setupSearchView(){
         searchView.adjustTintAlpha(0.8f);
+        searchView.setShouldKeepHistory(false);
         final EventBundle eventsBundle = new EventBundle(data);
         searchView.setCloseOnTintClick(true);
         searchView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
