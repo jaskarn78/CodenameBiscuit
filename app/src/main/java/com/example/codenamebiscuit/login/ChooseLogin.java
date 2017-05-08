@@ -227,7 +227,9 @@ public class ChooseLogin extends AppCompatActivity implements GoogleApiClient.On
     }
     private void signIn() {
         Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
-        startActivityForResult(signInIntent, RC_SIGN_IN); }
+        App.getInstance().setClient(mGoogleApiClient);
+        startActivityForResult(signInIntent, RC_SIGN_IN);
+    }
 
     private void setupViaFB(){
         // Set permissions and register the callback

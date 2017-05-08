@@ -85,10 +85,7 @@ public class GoogleApiHelper implements GoogleApiClient.ConnectionCallbacks, Goo
     private boolean checkPlayServices() {
         int resultCode = GooglePlayServicesUtil.isGooglePlayServicesAvailable(context);
         if (resultCode != ConnectionResult.SUCCESS) {
-            /*if (GooglePlayServicesUtil.isUserRecoverableError(resultCode)) {
-                GooglePlayServicesUtil.getErrorDialog(resultCode, context, PLAY_SERVICES_REQUEST_CODE).show();
-            } else {
-            }*/
+
             Log.d(TAG, "Play Services is not suppported on this device");
             return false;
         }

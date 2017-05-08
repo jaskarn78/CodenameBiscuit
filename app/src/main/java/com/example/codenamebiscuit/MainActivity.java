@@ -139,7 +139,6 @@ public class MainActivity extends AppCompatActivity {
     public void onBackPressed() {
         if(!swipeEvents.isVisible() && !fabMenu.isShowing()) {
             new FancyAlertDialog.Builder(this).setActivity(this)
-                    .setTextTitle("Exit")
                     .setPositiveColor(R.color.livinPink).setNegativeColor(R.color.black)
                     .setPositiveButtonText("Exit").setTextSubTitle("Are you sure you would like to exit?")
                     .setNegativeButtonText("Cancel")

@@ -21,6 +21,8 @@ import com.example.codenamebiscuit.eventfragments.ClusterMap;
 import com.example.codenamebiscuit.R;
 import com.example.codenamebiscuit.login.ChooseLogin;
 import com.example.codenamebiscuit.settings.UserSettingsActivity;
+import com.facebook.Profile;
+import com.facebook.login.LoginManager;
 import com.google.android.gms.maps.model.LatLng;
 import com.mikepenz.materialdrawer.AccountHeader;
 import com.mikepenz.materialdrawer.AccountHeaderBuilder;
@@ -110,6 +112,20 @@ public class CreateDrawer {
                 .withProfileImagesClickable(true)
                 .withHeaderBackground(R.drawable.login_bg)
                 .withHeaderBackgroundScaleType(ImageView.ScaleType.CENTER_CROP)
+                .withOnAccountHeaderProfileImageListener(new AccountHeader.OnAccountHeaderProfileImageListener() {
+                    @Override
+                    public boolean onProfileImageClick(View view, IProfile iProfile, boolean b) {
+                        Intent intent = new Intent(activity, UserAccount.class);
+                        intent.putExtra("userId", userId);
+                        activity.startActivity(intent);
+                        return false;
+                    }
+
+                    @Override
+                    public boolean onProfileImageLongClick(View view, IProfile iProfile, boolean b) {
+                        return false;
+                    }
+                })
                 .withSavedInstance(savedState)
                 .build();
 
@@ -200,6 +216,10 @@ public class CreateDrawer {
                                 preferences.edit().putString("fName", null).apply();
                                 preferences.edit().putString("lName", null).apply();
                                 preferences.edit().putString("email", null).apply();
+                                if(LoginManager.getInstance()!=null)
+                                    LoginManager.getInstance().logOut();
+                                else
+                                    App.getGoogleApiHelper().mGoogleApiClient.disconnect();
                                 intent = new Intent(activity, ChooseLogin.class);
                             }
                             if (intent != null) {
@@ -215,6 +235,11 @@ public class CreateDrawer {
                 .build();
 
     }
+    public void setBackground(Drawable headerBackground) {
+        headerResult.getHeaderBackgroundView().setImageDrawable(headerBackground);
+    }
+
+
 
 
 

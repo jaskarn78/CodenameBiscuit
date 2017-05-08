@@ -98,6 +98,7 @@
     <string name="restore_all_removed">Restore All Removed</string>
     <string name="more_details">More Details</string>
     <string name="restore">Restore</string>
+    <string name="eventmessage">*Saved and removed events will be accessible up to 48 hours after the event date has passed</string>
 
 
 </resources>
