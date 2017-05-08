@@ -11,6 +11,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -22,13 +23,10 @@ import com.example.codenamebiscuit.helper.ImageLoader;
 import com.example.codenamebiscuit.requests.QueryEventList;
 import com.example.codenamebiscuit.requests.UpdateDbOnSwipe;
 import com.example.codenamebiscuit.swipedeck.SwipeDeck;
-
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import java.util.ArrayList;
 import java.util.concurrent.ExecutionException;
-
 import br.com.mauker.materialsearchview.MaterialSearchView;
 
 
@@ -42,9 +40,12 @@ public class SwipeEvents extends ProgressFragment{
     private ArrayList<JSONObject> data;
     private View mContentView;
     private SwipeDeck cardStack;
+    private EventBundle eventSuggestions;
     private int currentPosition;
     private MaterialSearchView searchView;
     private ImageView swipeImage;
+    private LinearLayout bgLayout;
+    private TextView eventsText;
     private Runnable mShowContentRunnable = new Runnable() {
         @Override
         public void run() { if(isAdded()) { setContentShown(true); } } };
@@ -67,6 +68,8 @@ public class SwipeEvents extends ProgressFragment{
                              Bundle savedInstanceState){
         setHasOptionsMenu(false);
         mContentView = inflater.inflate(R.layout.activity_swipe_events, container, false);
+        bgLayout = (LinearLayout)mContentView.findViewById(R.id.bgImage);
+        eventsText = (TextView)mContentView.findViewById(R.id.events_text);
         return super.onCreateView(inflater, container, savedInstanceState); }
 
     @Override
@@ -125,6 +128,11 @@ public class SwipeEvents extends ProgressFragment{
             currentPosition=1;
             setContentView(mContentView);
             obtainData();
+            if(data.isEmpty()){
+                bgLayout.setVisibility(View.VISIBLE);
+                eventsText.setText("0 Upcoming Events Found");
+            }else bgLayout.setVisibility(View.GONE);
+            eventSuggestions = new EventBundle(data);
             numOfEvents = (TextView)getActivity().findViewById(R.id.toolbar_title);
             if(data.size()==0)  numOfEvents.setText("Empty");
             else { numOfEvents.setText(currentPosition + "/" + data.size());
@@ -138,7 +146,7 @@ public class SwipeEvents extends ProgressFragment{
                         deleteEvent.put("event_id", adapter.getItem((int) stableId).get("event_id"));
                         deleteEvent.put("user_id", adapter.getItem((int) stableId).get("user_id"));
                         loadBackgroundImage((int)cardStack.getTopCardItemId());
-                        searchView.removeSuggestion(data.get((int)stableId).getString("event_name")+" "+data.get((int)(stableId)).getString("event_sponsor"));
+                        searchView.removeSuggestion(eventSuggestions.getEventStringList().get((int)stableId));
                     } catch (JSONException e) { e.printStackTrace(); }
                     new UpdateDbOnSwipe(getString(R.string.DATABASE_STORE_DELETED_EVENTS)).execute(deleteEvent);
                     if(currentPosition!=data.size())
@@ -152,7 +160,7 @@ public class SwipeEvents extends ProgressFragment{
                         loadBackgroundImage((int)cardStack.getTopCardItemId());
                         saveEvent.put("event_id", adapter.getItem((int) stableId).get("event_id"));
                         saveEvent.put("user_id", adapter.getItem((int) stableId).get("user_id"));
-                        searchView.removeSuggestion(data.get((int)stableId).getString("event_name")+" "+data.get((int)(stableId)).getString("event_sponsor"));
+                        searchView.removeSuggestion(eventSuggestions.getEventStringList().get((int)stableId));
                     } catch (JSONException e) { e.printStackTrace(); }
                     new UpdateDbOnSwipe(getString(R.string.DATABASE_STORE_SAVED_EVENTS)).execute(saveEvent);
                     if(currentPosition!=data.size())
@@ -167,8 +175,7 @@ public class SwipeEvents extends ProgressFragment{
             try {
                 if(imagePosition>=0) {
                     String background = data.get(imagePosition).getString("img_path");
-                    ImageLoader.loadBackgroundImage(getContext(), background, swipeImage);
-                }
+                    ImageLoader.loadBackgroundImage(getContext(), background, swipeImage); }
                 else ImageLoader.loadBackgroundResource(getContext(), R.drawable.livbg, swipeImage);
             } catch (JSONException e) {e.printStackTrace(); } }
 

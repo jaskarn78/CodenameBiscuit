@@ -44,7 +44,7 @@ public class ClusterMap extends AppCompatActivity implements MapViewPager.Callba
         setSupportActionBar(toolbar);
         this.getSupportActionBar().setDisplayShowTitleEnabled(false);
         final Drawable upArrow = getResources().getDrawable(R.drawable.ic_arrow_back_black_18dp);
-        upArrow.setColorFilter(getResources().getColor(R.color.livinPink), PorterDuff.Mode.SRC_ATOP);
+        upArrow.setColorFilter(getResources().getColor(R.color.livinWhite), PorterDuff.Mode.SRC_ATOP);
         this.getSupportActionBar().setHomeAsUpIndicator(upArrow);
         this.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 

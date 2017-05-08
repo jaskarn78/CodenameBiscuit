@@ -8,21 +8,19 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
-import android.speech.RecognizerIntent;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
-import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 
@@ -42,7 +40,6 @@ import java.util.concurrent.ExecutionException;
 
 import br.com.mauker.materialsearchview.MaterialSearchView;
 
-import static android.app.Activity.RESULT_OK;
 
 
 /**
@@ -59,6 +56,7 @@ public class GridMainEventsFrag extends ProgressFragment {
     private View mContentView;
     private MaterialSpinner toolbarSpinner;
     private LinearLayout bgImage;
+    private EventBundle eventsBundle;
     private Runnable mShowContentRunnable = new Runnable() {
         @Override
         public void run() {if (isAdded()) {
@@ -77,13 +75,6 @@ public class GridMainEventsFrag extends ProgressFragment {
         data = new ArrayList<>();
         setHasOptionsMenu(true);}
 
-
-    public static GridMainEventsFrag newInstance(Bundle bundle) {
-        GridMainEventsFrag gridMainEventsFrag = new GridMainEventsFrag();
-        gridMainEventsFrag.setArguments(bundle);
-        return gridMainEventsFrag; }
-
-
     public ArrayList<JSONObject> getData(){ return data; }
 
     @Override
@@ -92,6 +83,8 @@ public class GridMainEventsFrag extends ProgressFragment {
         mContentView = inflater.inflate(R.layout.activity_main, container, false);
         mRecyclerView = (RecyclerView) mContentView.findViewById(R.id.recyclerview_events);
         bgImage = (LinearLayout) mContentView.findViewById(R.id.bgImage);
+        TextView textView = (TextView)mContentView.findViewById(R.id.events_text);
+        textView.setText("0 Upcoming Events Found");
         return super.onCreateView(inflater, container, savedInstanceState); }
 
     @Override
@@ -158,13 +151,15 @@ public class GridMainEventsFrag extends ProgressFragment {
     private void setupSearchView(){
         searchView.setShouldKeepHistory(false);
         searchView.adjustTintAlpha(0.8f);
-        final EventBundle eventsBundle = new EventBundle(data);
-        AsyncTask.execute(new Runnable() {
-            @Override
-            public void run() {
-                searchView.addSuggestions(eventsBundle.getEventStringList());
-            }
-        });
+        eventsBundle = new EventBundle(data);
+        if(data.size()>0) {
+            AsyncTask.execute(new Runnable() {
+                @Override
+                public void run() {
+                    searchView.addSuggestions(eventsBundle.getEventStringList());
+                }
+            });
+        }else searchView.clearSuggestions();
         searchView.setCloseOnTintClick(true);
         searchView.setOnQueryTextListener(new MaterialSearchView.OnQueryTextListener() {
             @Override
@@ -203,7 +198,9 @@ public class GridMainEventsFrag extends ProgressFragment {
                                 mAdapter.notifyItemRemoved(position);
                                 deleteEvent.put("user_id", mAdapter.getObject().get(position).getString("user_id"));
                                 deleteEvent.put("event_id", mAdapter.getObject().get(position).getString("event_id"));
-                                data.remove(position); searchView.removeSuggestion(data.get(position).getString("event_name")+" "+data.get(position).getString("event_sponsor"));
+                                String suggestion = eventsBundle.getEventStringList().get(position);
+                                searchView.removeSuggestion(suggestion);
+                                data.remove(position);
                                 new UpdateDbOnSwipe(getString(R.string.DATABASE_STORE_DELETED_EVENTS)).execute(deleteEvent);
                             } catch (JSONException e) { e.printStackTrace();} } }
 
@@ -216,8 +213,9 @@ public class GridMainEventsFrag extends ProgressFragment {
                                 mAdapter.notifyItemRemoved(position);
                                 saveEvent.put("user_id", mAdapter.getObject().get(position).getString("user_id"));
                                 saveEvent.put("event_id", mAdapter.getObject().get(position).getString("event_id"));
-                                data.remove(position); searchView.removeSuggestion(data.get(position).getString("event_name")+" "+data.get(position).getString("event_sponsor"));
-                                //mAdapter.removeBundleAtPosition(position);
+                                String suggestion = eventsBundle.getEventStringList().get(position);
+                                searchView.removeSuggestion(suggestion);
+                                data.remove(position);
                                 new UpdateDbOnSwipe(getString(R.string.DATABASE_STORE_SAVED_EVENTS)).execute(saveEvent);
                             } catch (JSONException e) {e.printStackTrace();} } }
                 }); mRecyclerView.addOnItemTouchListener(swipeTouchListener);

@@ -1,5 +1,6 @@
 package com.example.codenamebiscuit.helper;
 
+import android.app.Activity;
 import android.os.Bundle;
 
 import org.json.JSONException;

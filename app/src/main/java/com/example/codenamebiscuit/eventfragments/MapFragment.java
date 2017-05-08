@@ -60,9 +60,13 @@ public class MapFragment extends Fragment {
         Bundle args = getArguments();
         if (args != null) index = args.getInt("INDEX", 0);
         ViewCompat.setElevation(getView(), 10f);
-        ImageLoader.loadImage(getContext(), MapViewPagerAdapter.eventImage.get(index), pagerImage, pagerProgress);
-        name.setText(MapViewPagerAdapter.eventName.get(index));
-        distance.setText(MapViewPagerAdapter.eventDistance.get(index)+" mi");
+        if(MapViewPagerAdapter.eventImage.size()>0) {
+            ImageLoader.loadImage(getContext(), MapViewPagerAdapter.eventImage.get(index), pagerImage, pagerProgress);
+            name.setText(MapViewPagerAdapter.eventName.get(index));
+            distance.setText(MapViewPagerAdapter.eventDistance.get(index) + " mi");
+        }else{
+            ImageLoader.loadBackgroundResource(getContext(), R.drawable.no_events, pagerImage);
+        }
         toolbar.inflateMenu(R.menu.pager_menu);
         Drawable d = getActivity().getDrawable(R.drawable.ic_arrow_forward_black_48dp);
         d.setColorFilter(getActivity().getColor(R.color.livinWhite), PorterDuff.Mode.SRC_ATOP);

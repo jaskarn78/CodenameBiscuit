@@ -101,7 +101,7 @@ public class ImageLoader {
                 .into(imageView);
     }
     public static void loadBackgroundResource(Context context, int imgPath, ImageView imageView){
-        Glide.with(context).load(imgPath).error(R.drawable.placeholder)
+        Glide.with(context).load(imgPath)
                 .crossFade()
                 .override(1200, 1200)
                 .fitCenter()

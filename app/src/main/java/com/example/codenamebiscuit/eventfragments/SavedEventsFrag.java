@@ -15,6 +15,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.os.Handler;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.devspark.progressfragment.ProgressFragment;
 import com.example.codenamebiscuit.R;
@@ -40,6 +42,7 @@ public class SavedEventsFrag extends ProgressFragment implements ClickListener{
     private ArrayList<JSONObject> data;
     private View mContentView;
     private Handler mHandler;
+    private LinearLayout bgLayout;
     private String userId;
     private Runnable mShowContentRunnable = new Runnable() {
         @Override
@@ -83,6 +86,9 @@ public class SavedEventsFrag extends ProgressFragment implements ClickListener{
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         mContentView = inflater.inflate(R.layout.activity_main, container, false);
+        bgLayout = (LinearLayout)mContentView.findViewById(R.id.bgImage);
+        TextView textView = (TextView)mContentView.findViewById(R.id.events_text);
+        textView.setText("0 Saved Events Found");
         mRecyclerView = (RecyclerView) mContentView.findViewById(R.id.recyclerview_events);
         return super.onCreateView(inflater, container, savedInstanceState);
     }
@@ -99,7 +105,9 @@ public class SavedEventsFrag extends ProgressFragment implements ClickListener{
 
         setContentView(mContentView);
         obtainData();
-
+        if(data.isEmpty()){
+            bgLayout.setVisibility(View.VISIBLE);
+        }else bgLayout.setVisibility(View.GONE);
         mAdapter.setEventData(data);
         mRecyclerView.setAdapter(mAdapter);
         LinearLayoutManager layoutManager

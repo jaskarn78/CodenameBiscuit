@@ -107,7 +107,7 @@ public class CreateDrawer {
                 .addProfiles(profile)
                 .withCurrentProfileHiddenInList(true)
                 .withProfileImagesClickable(true)
-                .withHeaderBackground(R.drawable.livbg)
+                .withHeaderBackground(R.drawable.login_bg)
                 .withHeaderBackgroundScaleType(ImageView.ScaleType.CENTER_CROP)
                 .withSavedInstance(savedState)
                 .build();

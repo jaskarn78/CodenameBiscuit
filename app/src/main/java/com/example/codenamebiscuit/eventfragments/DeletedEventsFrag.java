@@ -12,6 +12,8 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.devspark.progressfragment.ProgressFragment;
 import com.example.codenamebiscuit.R;
@@ -36,6 +38,7 @@ public class DeletedEventsFrag extends ProgressFragment{
     private RecyclerView mRecyclerView;
     private ArrayList<JSONObject> data;
     private View mContentView;
+    private LinearLayout bgLayout;
     Bundle bundle;
     private Handler mHandler;
     private Runnable mShowContentRunnable = new Runnable() {
@@ -72,9 +75,10 @@ public class DeletedEventsFrag extends ProgressFragment{
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState){
         mContentView = inflater.inflate(R.layout.activity_main, container, false);
-
+        bgLayout = (LinearLayout)mContentView.findViewById(R.id.bgImage);
         mRecyclerView = (RecyclerView) mContentView.findViewById(R.id.recyclerview_events);
-
+        TextView textView = (TextView)mContentView.findViewById(R.id.events_text);
+        textView.setText("0 Removed Events Found");
         mAdapter = new EventAdapter(getActivity().getApplicationContext(), 1, "deleted",getActivity());
         return super.onCreateView(inflater, container, savedInstanceState);
     }
@@ -92,6 +96,9 @@ public class DeletedEventsFrag extends ProgressFragment{
         setAllowEnterTransitionOverlap(true);
         setAllowReturnTransitionOverlap(true);
         obtainData();
+        if(data.isEmpty()){
+            bgLayout.setVisibility(View.VISIBLE);
+        }else bgLayout.setVisibility(View.GONE);
         mAdapter.setEventData(data);
         mRecyclerView.setAdapter(mAdapter);
         LinearLayoutManager layoutManager

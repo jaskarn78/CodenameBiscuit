@@ -54,7 +54,7 @@ public class DisplayEvent extends AppCompatActivity{
     private ImageView displayEventImage;
     private TextView  displayEventStartDate, displayEventStartTIme;
     private TextView displayEventDesc, displayEventLocation, displayEventPref;
-    private TextView displayEventDistance, displayEventCost, likeText;
+    private TextView displayEventDistance, displayEventCost, likeText, displayEventPHone;
     private TextView displayEventHoster;
     private String eventName, eventImage, eventDate, eventCost;
     private String eventTime, eventDescription, eventLocation;
@@ -131,6 +131,7 @@ public class DisplayEvent extends AppCompatActivity{
         displayEventStartDate = (TextView)findViewById(R.id.display_event_date);
         displayEventCost = (TextView)findViewById(R.id.display_event_cost);
         displayEventStartTIme = (TextView)findViewById(R.id.display_event_time);
+        displayEventPHone = (TextView)findViewById(R.id.display_event_phone);
         mapView = (MapView)findViewById(R.id.mapView);
         mapView.onCreate(savedInstanceState);
         mapView.onResume();
@@ -181,6 +182,7 @@ public class DisplayEvent extends AppCompatActivity{
         displayEventCost.setText("Entry Fee $"+ eventCost);
         displayEventDesc.setText(eventDescription+ " Lorem ipsum dolor sit amet, consectetur adipisicing elit, " +
                 "sed do eiusmod ");
+        displayEventPHone.setText(eventPhone);
 
         setupWebsiteBtn();
         setupNavigateBtn();

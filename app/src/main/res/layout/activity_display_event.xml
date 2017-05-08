@@ -422,7 +422,6 @@
                     android:layout_marginTop="20dp"
                     android:layout_marginBottom="15dp"
                     android:textColor="@color/accent"
-                    android:text="(916) 777-7777"
                     />
                 <View
                     android:layout_width="match_parent"

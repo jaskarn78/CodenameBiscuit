@@ -6,9 +6,8 @@
 
     <item>
         <bitmap
-            android:gravity="center"
             android:mipMap="true"
-            android:src="@drawable/logo"/>
+            android:src="@drawable/livit_official"/>
     </item>
 
 

@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.widget.Toast;
 
 import com.example.codenamebiscuit.R;
 import com.example.codenamebiscuit.eventfragments.MapFragment;
@@ -41,14 +42,21 @@ public class MapViewPagerAdapter extends MapViewPager.MultiAdapter {
         eventDistance = new ArrayList<>();
         try {
             data = new QueryEventList(context.getString(R.string.DATABASE_MAIN_EVENTS_PULLER), user_id).execute().get();
-            Events.fromJson(data, activity);
-            bundle = new EventBundle(data);
-            for(JSONObject obj :data) {
-                double lat = obj.getDouble("lat"); double lng =obj.getDouble("lng");
-                eventName.add(obj.getString("event_name"));
-                eventImage.add(obj.getString("img_path"));
-                eventDistance.add(obj.getString("event_distance"));
-                cameraPosition = CameraPosition.fromLatLngZoom(new LatLng(lat, lng), 14f);
+            if(data.size()>0){
+                Events.fromJson(data, activity);
+                bundle = new EventBundle(data);
+                for(JSONObject obj :data) {
+                    double lat = obj.getDouble("lat");
+                    double lng = obj.getDouble("lng");
+                    eventName.add(obj.getString("event_name"));
+                    eventImage.add(obj.getString("img_path"));
+                    eventDistance.add(obj.getString("event_distance"));
+                    cameraPosition = CameraPosition.fromLatLngZoom(new LatLng(lat, lng), 14f);
+                    eventPositions.add(cameraPosition);
+                }
+            }else{
+                Toast.makeText(activity, "No events found...", Toast.LENGTH_SHORT).show();
+                cameraPosition = CameraPosition.fromLatLngZoom(new LatLng(0.0, 0.0), 14f);
                 eventPositions.add(cameraPosition);
             }
         } catch (InterruptedException | ExecutionException | JSONException e) {
@@ -58,13 +66,18 @@ public class MapViewPagerAdapter extends MapViewPager.MultiAdapter {
     @Override
     public List<CameraPosition> getCameraPositions(int i) {
         List<CameraPosition> position = new ArrayList<>();
-        position.add(eventPositions.get(i));
+        if(eventPositions.size()>0)
+            position.add(eventPositions.get(i));
+        else
+            position.add(CameraPosition.fromLatLngZoom(new LatLng(0.0, 0.0), 14f));
         return position;
     }
 
     @Override
     public String getMarkerTitle(int page, int position) {
-        return eventName.get(page);
+        if(eventName.size()>0)
+            return eventName.get(page);
+        else return "";
     }
 
 
@@ -75,11 +88,15 @@ public class MapViewPagerAdapter extends MapViewPager.MultiAdapter {
 
     @Override
     public int getCount() {
-        return eventPositions.size();
+        if(eventPositions.size()>0)
+            return eventPositions.size();
+        else return 0;
     }
 
     @Override
     public CharSequence getPageTitle(int position) {
-        return eventName.get(position);
+        if(eventName.size()>0)
+            return eventName.get(position);
+        else return "";
     }
 }

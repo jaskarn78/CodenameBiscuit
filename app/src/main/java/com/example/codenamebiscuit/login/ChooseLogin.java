@@ -189,8 +189,9 @@ public class ChooseLogin extends AppCompatActivity implements GoogleApiClient.On
         Log.d(TAG, "handleSignInResult:" + result.isSuccess());
         if (result.isSuccess()) {
             // Signed in successfully, show authenticated UI.
-            App.getGoogleApiHelper().setSignInResult(result);
-            GoogleSignInAccount acct = App.getGoogleApiHelper().getSignInAccount();
+            //App.getGoogleApiHelper().setSignInResult(result);
+            //GoogleSignInAccount acct = App.getGoogleApiHelper().getSignInAccount();
+            GoogleSignInAccount acct = result.getSignInAccount();
 
 
             JSONObject obj = new JSONObject();
@@ -425,8 +426,8 @@ public class ChooseLogin extends AppCompatActivity implements GoogleApiClient.On
         // Result returned from launching the Intent from GoogleSignInApi.getSignInIntent(...);
         if (requestCode == RC_SIGN_IN) {
             GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(intent);
-            first_name = result.getSignInAccount().getGivenName();
-            last_name = result.getSignInAccount().getFamilyName();
+            //first_name = result.getSignInAccount().getGivenName();
+            //last_name = result.getSignInAccount().getFamilyName();
             try {
                 handleSignInResult(result);
             } catch (JSONException e) {

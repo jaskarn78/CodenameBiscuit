@@ -171,9 +171,8 @@ public class MainActivity extends AppCompatActivity {
                 dialog.setMessage("Updating...Please wait"); dialog.show();
                 Handler handler = new Handler();
                 handler.postDelayed(new Runnable() {
-                    public void run() { refresh();
-                        if(!eventsFrag.isDetached()) dialog.dismiss(); }
-                }, 1000); if(dialog.isShowing()) dialog.dismiss();} });
+                    public void run() {
+                        refresh();} }, 800);} });
 
     }
 
