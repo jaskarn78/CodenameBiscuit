@@ -14,6 +14,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.ImageView;
 
+import com.example.codenamebiscuit.UserAccount;
 import com.example.codenamebiscuit.eventfragments.ArchivedEvents;
 import com.example.codenamebiscuit.MainActivity;
 import com.example.codenamebiscuit.eventfragments.ClusterMap;
@@ -188,8 +189,10 @@ public class CreateDrawer {
                             else if(drawerItem.getIdentifier()==3) {
                                 intent = new Intent(activity,ClusterMap.class);
                             }
-                            else if (drawerItem.getIdentifier()==4)
-                                intent = new Intent(activity, UserSettingsActivity.class);
+                            else if (drawerItem.getIdentifier()==4) {
+                                intent = new Intent(activity, UserAccount.class);
+                                intent.putExtra("user_image", pic);
+                            }
                             else if(drawerItem.getIdentifier()==5) {
                                 preferences.edit().clear().apply();
                                 preferences.edit().putString("user_id", null).apply();

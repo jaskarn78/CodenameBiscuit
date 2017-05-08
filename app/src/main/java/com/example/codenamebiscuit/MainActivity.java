@@ -1,5 +1,6 @@
 package com.example.codenamebiscuit;
 
+import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -32,6 +33,7 @@ import com.example.codenamebiscuit.helper.GPSTracker;
 import com.example.codenamebiscuit.requests.QueryEventList;
 import com.example.codenamebiscuit.login.ChooseLogin;
 import com.facebook.FacebookSdk;
+import com.geniusforapp.fancydialog.FancyAlertDialog;
 import com.hlab.fabrevealmenu.view.FABRevealMenu;
 import com.jaredrummler.materialspinner.MaterialSpinner;
 import com.mikepenz.iconics.view.IconicsImageView;
@@ -62,6 +64,7 @@ public class MainActivity extends AppCompatActivity {
     private View fabMenuView;
     private MaterialSpinner toolbarSpinner;
     private MaterialSearchView searchView;
+    private int datasize;
 
     Bundle bundle = new Bundle();
     private String userId;
@@ -113,6 +116,8 @@ public class MainActivity extends AppCompatActivity {
                 fabMenu.bindAncherView(fabReveal); }
 
         checkIfFbOrGoogleLogin(savedInstanceState);
+        if(eventsFrag!=null & eventsFrag.isAdded())
+            datasize = eventsFrag.getData().size();
 
     }
 
@@ -120,6 +125,10 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        if(eventsFrag!=null && datasize<eventsFrag.getData().size()) {
+            touched = true;
+            refresh();
+        }
     }
     @Override
     public void onPause() {
@@ -128,19 +137,35 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        if(!swipeEvents.isVisible()) {
-            Intent intent = new Intent(Intent.ACTION_MAIN);
-            intent.addCategory(Intent.CATEGORY_HOME);
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            startActivity(intent);
-        }else{
+        if(!swipeEvents.isVisible() && !fabMenu.isShowing()) {
+            new FancyAlertDialog.Builder(this).setActivity(this)
+                    .setTextTitle("Exit")
+                    .setPositiveColor(R.color.livinPink).setNegativeColor(R.color.black)
+                    .setPositiveButtonText("Exit").setTextSubTitle("Are you sure you would like to exit?")
+                    .setNegativeButtonText("Cancel")
+                    .setSubtitleColor(R.color.black).setOnPositiveClicked(new FancyAlertDialog.OnPositiveClicked() {
+                @Override
+                public void OnClick(View view, Dialog dialog) {
+                    Intent intent = new Intent(Intent.ACTION_MAIN);
+                    intent.addCategory(Intent.CATEGORY_HOME);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    startActivity(intent);
+                }
+            }).setOnNegativeClicked(new FancyAlertDialog.OnNegativeClicked() {
+                @Override
+                public void OnClick(View view, Dialog dialog) {
+                    dialog.dismiss();
+                }
+            }).build().show();
+
+        }else if(swipeEvents.isVisible()){
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
             ft.setCustomAnimations(R.anim.slide_in_up, R.anim.slide_out_down);
             ft.addToBackStack("swipeEvents");
             ft.replace(R.id.fragment_container, eventsFrag, "eventsFrag");
             ft.commit(); }
 
-        if(fabMenu!=null) fabMenu.closeMenu();
+        else fabMenu.closeMenu();
     }
 
     /**********************************************************************************
@@ -167,8 +192,6 @@ public class MainActivity extends AppCompatActivity {
         closeButton.setOnClickListener(new View.OnClickListener() {
             @Override public void onClick(View v) {
                 fabMenu.closeMenu();
-                final ProgressDialog dialog = new ProgressDialog(MainActivity.this);
-                dialog.setMessage("Updating...Please wait"); dialog.show();
                 Handler handler = new Handler();
                 handler.postDelayed(new Runnable() {
                     public void run() {
@@ -245,19 +268,19 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
         MenuItem item =menu.findItem(R.id.action_grid_to_full).setVisible(true);
-        MenuItem refresh = menu.findItem(R.id.refresh);
+        //MenuItem refresh = menu.findItem(R.id.refresh);
         MenuItem search = menu.findItem(R.id.search_action);
         TextView textView = (TextView)findViewById(R.id.toolbar_title);
         if(eventsFrag!=null && swipeEvents!=null) {
             if (eventsFrag.isAdded()) {
                 textView.setVisibility(View.GONE);
-                refresh.setVisible(true);
+                //refresh.setVisible(true);
                 search.setVisible(true);
                 revealFrame.setVisibility(View.VISIBLE);
                 toolbarSpinner.setVisibility(View.VISIBLE);
                 item.setIcon(R.drawable.ic_fullscreen_white_48dp);}
             else if (swipeEvents.isAdded()) {
-                refresh.setVisible(false);
+                //refresh.setVisible(false);
                 textView.setVisibility(View.VISIBLE);
                 toolbarSpinner.setVisibility(View.GONE);
                 revealFrame.setVisibility(View.GONE);
@@ -321,7 +344,7 @@ public class MainActivity extends AppCompatActivity {
         if(touched) {
             Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-            ft.detach(fragment); ft.attach(fragment); ft.commitNowAllowingStateLoss();
+            ft.detach(fragment); ft.attach(fragment); ft.commitNow();
         }touched=false;
     }
 

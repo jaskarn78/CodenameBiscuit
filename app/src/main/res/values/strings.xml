@@ -84,6 +84,7 @@
     <string name="PUSH_USER_PREFERENCES">http://athena.ecs.csus.edu/~teamone/php/android/push_user_preferences.php</string>
     <string name="RESTORE_ALL_SAVED_EVENTS">http://athena.ecs.csus.edu/~teamone/php/android/restore_all_saved_events.php</string>
     <string name="RESTORE_ALL_DELETED_EVENTS">http://athena.ecs.csus.edu/~teamone/php/android/restore_all_deleted_events.php</string>
+    <string name="PULL_USER_JOIN_DATE">http://athena.ecs.csus.edu/~teamone/php/android/pull_user_join_date.php</string>
 
 
 

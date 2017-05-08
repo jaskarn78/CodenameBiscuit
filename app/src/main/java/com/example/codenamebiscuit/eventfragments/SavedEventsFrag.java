@@ -123,6 +123,8 @@ public class SavedEventsFrag extends ProgressFragment implements ClickListener{
 
     @Override
     public void onPrepareOptionsMenu(final Menu menu) {
+        menu.findItem(R.id.restore_removed).setVisible(false);
+        menu.findItem(R.id.restore_saved).setVisible(true);
         menu.findItem(R.id.refresh_saved).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {

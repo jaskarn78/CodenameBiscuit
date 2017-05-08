@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
-
-    <item
-        android:drawable="@color/translivinPink"/>
-
     <item>
-        <bitmap
-            android:mipMap="true"
-            android:src="@drawable/livit_official"/>
+        <shape android:shape="rectangle">
+            <solid android:color="@color/livinBlack"/>
+        </shape>
     </item>
-
-
+    <item
+        android:drawable="@drawable/liv_new"
+        android:width="490dp"
+        android:height="720dp"
+        android:gravity="center"
+        />
 </layer-list>

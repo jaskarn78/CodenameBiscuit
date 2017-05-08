@@ -50,11 +50,6 @@ public class SwipeEvents extends ProgressFragment{
         @Override
         public void run() { if(isAdded()) { setContentShown(true); } } };
 
-    public static SwipeEvents newInstance(Bundle bundle)  {
-        SwipeEvents swipeEvents = new SwipeEvents();
-        swipeEvents.setArguments(bundle);
-        return swipeEvents;}
-
 
     @Override
     public void onCreate(Bundle savedInstanceState) {

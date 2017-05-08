@@ -89,23 +89,13 @@ public class GridMainEventsFrag extends ProgressFragment {
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        menu.findItem(R.id.refresh).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem item) {
-                eneableRefreshing();
-                return false;}});
-        menu.findItem(R.id.clear_search).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem item) {
-                searchView.clearHistory(); searchView.closeSearch();
-                return false;} });
         super.onCreateOptionsMenu(menu, inflater); }
 
 
     private void obtainData() {
         setContentShown(false);
         Handler mHandler = new Handler();
-        mHandler.postDelayed(mShowContentRunnable, 800);
+        mHandler.postDelayed(mShowContentRunnable, 600);
         try {
             data = new QueryEventList(getString(R.string.DATABASE_MAIN_EVENTS_PULLER), userId).execute().get();
             setupBgImage();

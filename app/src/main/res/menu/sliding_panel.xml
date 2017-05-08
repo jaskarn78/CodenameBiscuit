@@ -7,7 +7,16 @@
         android:orderInCategory="100"
         sothree:showAsAction="never"
         android:icon="@drawable/ic_refresh_white_48dp"
+        android:visible="false"
         android:title="@string/refresh"/>
+
+    <item
+        android:id="@+id/action_grid_to_full"
+        android:title="list_to_grid"
+        android:orderInCategory="102"
+        sothree:showAsAction="always"
+        android:visible="false"
+        />
 
     <item
         android:id="@+id/search_action"
@@ -16,19 +25,7 @@
         android:icon="@drawable/ic_search_white_48dp"
         android:title="Search"/>
 
-    <item
-        android:id="@+id/clear_search"
-        android:orderInCategory="102"
-        sothree:showAsAction="never"
-        android:title="Clear Search History"/>
 
 
-    <item
-        android:id="@+id/action_grid_to_full"
-        android:title="list_to_grid"
-        android:orderInCategory="1"
-        sothree:showAsAction="always"
-        android:visible="false"
-        />
 
 </menu>
