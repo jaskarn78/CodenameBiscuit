@@ -324,7 +324,7 @@ public class ChooseLogin extends AppCompatActivity implements GoogleApiClient.On
                 .setTextTitle("Welcome to LIVIT")
                 .setImageDrawable(getDrawable(R.mipmap.livlogoweb))
                 .setTextSubTitle(first_name+" "+last_name)
-                .setBody("Tap continue to select your preferences")
+                .setBody("Turn on location services for accurate results")
                 .setPositiveButtonText("Continue")
                 .setOnPositiveClicked(new FancyAlertDialog.OnPositiveClicked() {
                     @Override

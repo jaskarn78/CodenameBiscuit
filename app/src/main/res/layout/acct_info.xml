@@ -222,7 +222,7 @@
                 android:layout_marginStart="10dp"
                 android:layout_marginTop="25dp"
                 android:layout_marginBottom="5dp"
-                android:text="Your Preferences"
+                android:text="Preferences"
                 android:textAllCaps="true"
                 android:textColor="@color/livinPink"
                 android:textSize="20sp" />
@@ -520,7 +520,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="10dp"
                 android:layout_marginTop="25dp"
-                android:text="Acount Actions"
+                android:text="Account Actions"
                 android:layout_marginBottom="5dp"
                 android:textAllCaps="true"
                 android:textColor="@color/livinPink"
@@ -633,11 +633,11 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="10dp"
+                android:layout_marginBottom="20dp"
                 android:textColor="@color/livinBlack"
                 android:textSize="15sp"
                 android:layout_gravity="center"
-                android:text="Made in Sacramento"/>
+                android:text="Made in Sacramento 2017"/>
 
 
         </LinearLayout>

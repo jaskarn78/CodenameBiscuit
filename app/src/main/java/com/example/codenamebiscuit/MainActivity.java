@@ -142,8 +142,9 @@ public class MainActivity extends AppCompatActivity {
             ft.addToBackStack("swipeEvents");
             ft.replace(R.id.fragment_container, eventsFrag, "eventsFrag");
             ft.commit(); }
-        else if(eventsFrag!=null && eventsFrag.getTouchedValue() && fabMenu.isShowing()){
-            fabMenu.closeMenu();
+        else if(eventsFrag!=null && eventsFrag.getTouchedValue()){
+            if(fabMenu.isShowing())
+                fabMenu.closeMenu();
             touched=true;
             Handler handler = new Handler();
             handler.postDelayed(new Runnable() {

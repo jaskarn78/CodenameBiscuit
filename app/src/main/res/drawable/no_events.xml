@@ -7,8 +7,8 @@
     </item>
     <item
         android:drawable="@drawable/ic_error_outline_white_48dp"
-        android:bottom="20dp"
-        android:left="20dp"
-        android:right="20dp"
-        android:top="20dp"/>
+        android:bottom="10dp"
+        android:left="10dp"
+        android:right="10dp"
+        android:top="10dp"/>
 </layer-list>
