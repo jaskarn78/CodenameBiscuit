@@ -85,9 +85,11 @@ public class UserAccount extends AppCompatActivity {
 
     @Override
     public void onBackPressed(){
-        NavUtils.navigateUpFromSameTask(this);
+        super.onBackPressed();
         Intent intent = new Intent(this, MainActivity.class);
-        intent.putExtra("touched", touched); }
+        intent.putExtra("touched", touched);
+        startActivity(intent);
+    }
 
 
     private void setupArchivedEvent() {

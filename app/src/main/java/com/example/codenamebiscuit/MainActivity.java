@@ -106,8 +106,12 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        if(eventsFrag!=null && datasize<eventsFrag.getData().size()) {
-            touched = true; refresh(); } }
+        Log.i("resumed", getIntent().getBooleanExtra("touched", false)+"");
+        if(eventsFrag!=null) {
+            touched = true; refresh();
+        }
+
+    }
 
     @Override
     public void onPause() {
