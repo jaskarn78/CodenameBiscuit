@@ -90,6 +90,7 @@ public class CreateDrawer {
                 ImageLoader.loadImageFromUri(imageView.getContext(), uri, imageView); }
         });
 
+        //navigation drawer creation
         IProfile profile = new ProfileDrawerItem().withName(fName + " " + lName).withIcon(Uri.parse(pic)).withEmail(email).withIdentifier(100);
         headerResult = new AccountHeaderBuilder()
                 .withActivity(activity)
