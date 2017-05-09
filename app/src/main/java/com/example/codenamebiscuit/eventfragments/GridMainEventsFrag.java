@@ -8,38 +8,40 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
-
-
 import com.devspark.progressfragment.ProgressFragment;
 import com.example.codenamebiscuit.helper.EventBundle;
 import com.example.codenamebiscuit.helper.Events;
 import com.example.codenamebiscuit.R;
 import com.example.codenamebiscuit.requests.QueryEventList;
+import com.example.codenamebiscuit.requests.RunQuery;
 import com.example.codenamebiscuit.requests.UpdateDbOnSwipe;
 import com.example.codenamebiscuit.rv.EventAdapter;
 import com.github.brnunes.swipeablerecyclerview.SwipeableRecyclerViewTouchListener;
+import com.hlab.fabrevealmenu.view.FABRevealMenu;
 import com.jaredrummler.materialspinner.MaterialSpinner;
+import com.mikepenz.iconics.view.IconicsImageView;
 import org.json.JSONException;
 import org.json.JSONObject;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
-
 import br.com.mauker.materialsearchview.MaterialSearchView;
-
+import mehdi.sakout.fancybuttons.FancyButton;
 
 
 /**
@@ -52,11 +54,15 @@ public class GridMainEventsFrag extends ProgressFragment {
     private JSONObject saveEvent, deleteEvent;
     private ArrayList<JSONObject> data;
     private String userId;
+    private View fabMenuView;
     private MaterialSearchView searchView;
     private View mContentView;
     private MaterialSpinner toolbarSpinner;
     private LinearLayout bgImage;
     private EventBundle eventsBundle;
+    private JSONObject preferences;
+    FABRevealMenu fabMenu;
+    private boolean touched;
     private Runnable mShowContentRunnable = new Runnable() {
         @Override
         public void run() {if (isAdded()) {
@@ -123,6 +129,7 @@ public class GridMainEventsFrag extends ProgressFragment {
         super.onActivityCreated(savedInstanceState);
         toolbarSpinner = (MaterialSpinner)getActivity().findViewById(R.id.spinner);
         searchView = (MaterialSearchView)getActivity().findViewById(R.id.search_view);
+        bindViews();
         setContentView(mContentView);
         if (isAdded()) {
             obtainData();
@@ -133,9 +140,8 @@ public class GridMainEventsFrag extends ProgressFragment {
             mRecyclerView.setItemViewCacheSize(data.size());
             mRecyclerView.setDrawingCacheEnabled(true);
             mRecyclerView.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_HIGH);
-            enableCardSwiping();    setupSpinner();
-            }
-        setupSearchView();
+            enableCardSwiping(); setupSpinner();
+        } setupSearchView();
     }
 
     private void setupSearchView(){
@@ -146,9 +152,7 @@ public class GridMainEventsFrag extends ProgressFragment {
             AsyncTask.execute(new Runnable() {
                 @Override
                 public void run() {
-                    searchView.addSuggestions(eventsBundle.getEventStringList());
-                }
-            });
+                    searchView.addSuggestions(eventsBundle.getEventStringList());} });
         }else searchView.clearSuggestions();
         searchView.setCloseOnTintClick(true);
         searchView.setOnQueryTextListener(new MaterialSearchView.OnQueryTextListener() {
@@ -165,8 +169,7 @@ public class GridMainEventsFrag extends ProgressFragment {
                 searchView.setQuery(searchView.getSuggestionAtPosition(position), true);
                 Bundle bundle = eventsBundle.getBundle(dataPosition);
                 Intent intent = new Intent(getActivity(), DisplayEvent.class);
-                intent.putExtras(bundle); getActivity().startActivity(intent);
-            }});
+                intent.putExtras(bundle); getActivity().startActivity(intent); }});
     }
 
 
@@ -208,7 +211,93 @@ public class GridMainEventsFrag extends ProgressFragment {
                                 data.remove(position);
                                 new UpdateDbOnSwipe(getString(R.string.DATABASE_STORE_SAVED_EVENTS)).execute(saveEvent);
                             } catch (JSONException e) {e.printStackTrace();} } }
+
                 }); mRecyclerView.addOnItemTouchListener(swipeTouchListener);
+    }
+
+    private void bindViews() {
+        ArrayList<FancyButton> btnList = new ArrayList<>();
+        final FloatingActionButton fabReveal = (FloatingActionButton)getActivity().findViewById(R.id.fab_reveal);
+        fabMenu = (FABRevealMenu)getActivity().findViewById(R.id.reveal);
+        if(fabReveal!=null && fabMenu!=null){
+            View customView = View.inflate(getActivity(), R.layout.preferences_layout,null);
+            fabMenuView = customView;
+            fabMenu.setCustomView(customView);
+            fabMenu.bindAncherView(fabReveal); }
+        IconicsImageView closeButton = (IconicsImageView)getActivity().findViewById(R.id.exit_icon);
+
+        FancyButton musicFancyButton = (FancyButton) fabMenuView.findViewById(R.id.btn_music);
+        FancyButton sportsButton = (FancyButton) fabMenuView.findViewById(R.id.btn_sports);
+        FancyButton foodButton = (FancyButton) fabMenuView.findViewById(R.id.btn_food);
+        FancyButton outdoorButton = (FancyButton) fabMenuView.findViewById(R.id.btn_outdoors);
+        FancyButton healthButton = (FancyButton) fabMenuView.findViewById(R.id.btn_health);
+        FancyButton entertainmentButton = (FancyButton) fabMenuView.findViewById(R.id.btn_entertainment);
+        FancyButton charityButton = (FancyButton) fabMenuView.findViewById(R.id.btn_charity);
+        FancyButton retailButton = (FancyButton) fabMenuView.findViewById(R.id.btn_retail);
+        FancyButton familyButton = (FancyButton) fabMenuView.findViewById(R.id.btn_family);
+
+        btnList = new ArrayList();
+        btnList.add(musicFancyButton);btnList.add(foodButton); btnList.add(sportsButton);
+        btnList.add(outdoorButton); btnList.add(healthButton); btnList.add(familyButton);
+        btnList.add(retailButton); btnList.add(charityButton); btnList.add(entertainmentButton);
+        setupPreferences(btnList);
+        closeButton.setOnClickListener(new View.OnClickListener() {
+            @Override public void onClick(View v) {
+                fabMenu.closeMenu();
+                Handler handler = new Handler();
+                handler.postDelayed(new Runnable() {
+                    public void run() {
+                        refresh();} }, 800);} });
+
+    }
+
+    private void refresh(){
+        if(touched) {
+            Fragment fragment = getFragmentManager().findFragmentById(R.id.fragment_container);
+            FragmentTransaction ft = getFragmentManager().beginTransaction();
+            ft.detach(fragment); ft.attach(fragment); ft.commitNow();
+        }touched=false; }
+
+
+
+    public void setupPreferences(final List<FancyButton> btnList) {
+        try {
+            preferences = new JSONObject();
+            JSONObject removed = new JSONObject();
+            preferences.put("user_id", userId);
+            removed.put("user_id", userId);
+            ArrayList<JSONObject> prefList = new QueryEventList(getString(R.string.PULL_USER_PREFERENCES), userId).execute().get();
+
+            for (int i = 0; i < prefList.size(); i++) {
+                if (Integer.parseInt(prefList.get(i).getString("preference_id")) > 0) {
+                    btnList.get(Integer.parseInt(prefList.get(i).getString("preference_id")) - 1).setBackgroundColor(getActivity().getColor(R.color.livinPink));
+                    btnList.get(Integer.parseInt(prefList.get(i).getString("preference_id")) - 1).setSelected(true);
+                    preferences.put("pref_id" + (Integer.parseInt(prefList.get(i).getString("preference_id"))), 1);} }
+
+        } catch (JSONException | InterruptedException | ExecutionException e) {e.printStackTrace(); }
+        for (int i = 0; i < btnList.size(); i++) {
+            final int finalI = i;
+            btnList.get(i).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    touched = true;
+                    if (!btnList.get(finalI).isSelected()) {
+                        btnList.get(finalI).setBackgroundColor(getActivity().getColor(R.color.livinPink));
+                        btnList.get(finalI).setSelected(true);
+                        try { preferences.put("pref_id" + (finalI + 1), 1); }
+                        catch (JSONException e) { e.printStackTrace(); }
+                        new RunQuery(getString(R.string.PUSH_USER_PREFERENCES)).execute(preferences);}
+                    else {
+                        btnList.get(finalI).setBackgroundColor(getActivity().getColor(R.color.transparentPink));
+                        btnList.get(finalI).setSelected(false);
+                        try { preferences.put("pref_id" + (finalI + 1), 0);
+                        } catch (JSONException e) { e.printStackTrace(); }
+                        new RunQuery(getString(R.string.PUSH_USER_PREFERENCES)).execute(preferences);} } }); }
+
+    }
+
+    public  boolean getTouchedValue(){
+        return touched;
     }
 
 
@@ -242,12 +331,5 @@ public class GridMainEventsFrag extends ProgressFragment {
                         break;}}});
 
     }
-
-
-    private void eneableRefreshing(){
-        FragmentTransaction ft = getFragmentManager().beginTransaction();
-        ft.detach(GridMainEventsFrag.this); ft.attach(GridMainEventsFrag.this);
-        ft.commit();}
-
 
 }

@@ -4,7 +4,6 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:background="#f1f1f1"
-
     android:layout_height="match_parent">
 
     <android.support.design.widget.AppBarLayout
@@ -20,7 +19,6 @@
             android:layout_height="match_parent"
             app:layout_scrollFlags="scroll|exitUntilCollapsed"
             app:contentScrim="?attr/colorPrimary"
-            app:title="Jaskarn Jagpal"
             app:titleEnabled="true"
             app:collapsedTitleTextAppearance="@anim/activity_close_enter"
             app:expandedTitleGravity="bottom"
@@ -42,7 +40,6 @@
                     android:id="@+id/user_name"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Jaskarn Jagpal"
                     android:textSize="25sp"
                     android:layout_marginTop="20dp"
                     android:textColor="@color/livinBlack"/>
@@ -51,7 +48,6 @@
                     android:id="@+id/user_email"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="jjagpal101@gmail.com"
                     android:textColor="@color/livinBlack"/>
 
                 <ImageView
@@ -457,7 +453,7 @@
 
                 <View
                     android:layout_width="match_parent"
-                    android:layout_height="1dp"
+                    android:layout_height="0.5dp"
                     android:layout_marginEnd="15dp"
                     android:layout_marginStart="15dp"
                     android:background="@color/livinBlack" />
@@ -536,25 +532,6 @@
                 android:layout_marginEnd="10dp"
                 android:layout_marginStart="10dp"
                 android:background="@color/livinPink" />
-            <RelativeLayout
-                android:id="@+id/clear_cache"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="20dp"
-                android:layout_marginEnd="20dp"
-                android:foreground="?android:attr/selectableItemBackground"
-                android:clickable="true">
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:layout_marginBottom="10dp"
-                    android:layout_marginStart="10dp"
-                    android:layout_marginEnd="10dp"
-                    android:text="Clear Cache"
-                    android:textSize="18sp"
-                    android:textColor="@color/livinBlack"/>
-            </RelativeLayout>
 
             <RelativeLayout
                 android:id="@+id/log_out"

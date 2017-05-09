@@ -49,29 +49,21 @@ public class CreateDrawer {
     private String fName, lName, pic, email, userId;
     private Bundle savedState;
     private Toolbar toolbar;
-    private Context context;
     private Activity activity;
-    private Bundle bundle;
-    Drawer result=null;
-    AccountHeader headerResult=null;
-    private FragmentManager fm;
-    private int livinPink, overlay;
-    private int livinBlack, livinWhite;
+    private AccountHeader headerResult=null;
+    private int livinPink;
+    private int livinWhite;
     private PrimaryDrawerItem gridEvents;
     private PrimaryDrawerItem mapEvents;
     private PrimaryDrawerItem archivedEvents;
     private PrimaryDrawerItem account;
     private PrimaryDrawerItem logOut;
-    GPSTracker gps;
-    LatLng latLng;
-    private Bitmap bitmap;
-    ArrayList<JSONObject> data;
-    SharedPreferences preferences;
+    private SharedPreferences preferences;
+    protected static final int REQUEST_CODE = 1;
 
 
 
     public CreateDrawer(Bundle savedState, Toolbar toolbar, Activity activity, String userId, FragmentManager fm) {
-
         preferences = PreferenceManager.getDefaultSharedPreferences(activity.getApplicationContext());
         this.pic=preferences.getString("user_image", null);
         this.fName=preferences.getString("fName", null);
@@ -80,22 +72,16 @@ public class CreateDrawer {
         this.userId=userId;
         this.savedState=savedState; this.toolbar=toolbar;
         this.activity=activity;
-        this.bundle = new Bundle();
-        this.fm=fm;
-
+        FragmentManager fm1 = fm;
 
         livinPink=activity.getColor(R.color.livinPink);
-        overlay=activity.getColor(R.color.black_overlay);
-        livinBlack=activity.getColor(R.color.livinBlack);
         livinWhite=activity.getColor(R.color.livinWhite);
         gridEvents = new PrimaryDrawerItem();
 
         archivedEvents = new PrimaryDrawerItem();
         account = new PrimaryDrawerItem();
         logOut = new PrimaryDrawerItem();
-        mapEvents = new PrimaryDrawerItem();
-
-    }
+        mapEvents = new PrimaryDrawerItem(); }
 
     public void loadDrawer() {
         DrawerImageLoader.init(new AbstractDrawerImageLoader() {
@@ -112,34 +98,17 @@ public class CreateDrawer {
                 .withProfileImagesClickable(true)
                 .withHeaderBackground(R.drawable.login_bg)
                 .withHeaderBackgroundScaleType(ImageView.ScaleType.CENTER_CROP)
-                .withOnAccountHeaderProfileImageListener(new AccountHeader.OnAccountHeaderProfileImageListener() {
-                    @Override
-                    public boolean onProfileImageClick(View view, IProfile iProfile, boolean b) {
-                        Intent intent = new Intent(activity, UserAccount.class);
-                        intent.putExtra("userId", userId);
-                        activity.startActivity(intent);
-                        return false;
-                    }
-
-                    @Override
-                    public boolean onProfileImageLongClick(View view, IProfile iProfile, boolean b) {
-                        return false;
-                    }
-                })
                 .withSavedInstance(savedState)
                 .build();
 
-        //create the drawer and remember the `Drawer` result object
-        result = new DrawerBuilder()
+           new DrawerBuilder()
                 .withActivity(activity)
                 .withToolbar(toolbar)
                 .withSliderBackgroundColor(activity.getColor(R.color.black_overlay))
-                //.withDelayDrawerClickEvent(150)
-                //.withDelayOnDrawerClose(50)
                 .withAccountHeader(headerResult)
                 .addDrawerItems(
                         gridEvents
-                                .withName("Upcoming Eventss")
+                                .withName("Upcoming Events")
                                 .withIcon(R.drawable.ic_home_white_48dp)
                                 .withIdentifier(1)
                                 .withTextColor(livinWhite)
@@ -189,34 +158,31 @@ public class CreateDrawer {
                                 .withSelectedIconColor(livinPink)
                                 .withSelectedColor(activity.getColor(R.color.translivinPink))
                                 .withSelectable(false),
-                        new DividerDrawerItem()
-
-                )
+                        new DividerDrawerItem())
                 .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
                     @Override
                     public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
-                        // do something with the clicked item :D
                         if (drawerItem != null) {
                             Intent intent = null;
-                            if (drawerItem.getIdentifier()==1)
+                            if (drawerItem.getIdentifier() == 1) {
                                 intent = new Intent(activity, MainActivity.class);
-                            else if(drawerItem.getIdentifier()==2)
+                            } else if (drawerItem.getIdentifier() == 2)
                                 intent = new Intent(activity, ArchivedEvents.class);
-                            else if(drawerItem.getIdentifier()==3) {
-                                intent = new Intent(activity,ClusterMap.class);
-                            }
-                            else if (drawerItem.getIdentifier()==4) {
+                            else if (drawerItem.getIdentifier() == 3) {
+                                intent = new Intent(activity, ClusterMap.class);
+                            } else if (drawerItem.getIdentifier() == 4) {
                                 intent = new Intent(activity, UserAccount.class);
                                 intent.putExtra("user_image", pic);
-                            }
-                            else if(drawerItem.getIdentifier()==5) {
+                                intent.putExtra("user_name", fName+" "+lName);
+                                intent.putExtra("user_email", email);
+                            } else if (drawerItem.getIdentifier() == 5) {
                                 preferences.edit().clear().apply();
                                 preferences.edit().putString("user_id", null).apply();
                                 preferences.edit().putString("user_image", null).apply();
                                 preferences.edit().putString("fName", null).apply();
                                 preferences.edit().putString("lName", null).apply();
                                 preferences.edit().putString("email", null).apply();
-                                if(LoginManager.getInstance()!=null)
+                                if (LoginManager.getInstance() != null)
                                     LoginManager.getInstance().logOut();
                                 else
                                     App.getGoogleApiHelper().mGoogleApiClient.disconnect();
@@ -227,8 +193,8 @@ public class CreateDrawer {
                                 intent.putExtra("userId", userId);
                                 activity.startActivity(intent);
                             }
-                            }
-                        return false; }
+                        }return false;
+                    }
                 })
                 .withSavedInstance(savedState)
                 .withShowDrawerOnFirstLaunch(false)
@@ -238,15 +204,5 @@ public class CreateDrawer {
     public void setBackground(Drawable headerBackground) {
         headerResult.getHeaderBackgroundView().setImageDrawable(headerBackground);
     }
-
-
-
-
-
-    public void setBundle(Bundle bundle){
-        this.bundle=bundle;
-    }
-
-
 
 }
