@@ -99,6 +99,8 @@
     <string name="more_details">More Details</string>
     <string name="restore">Restore</string>
     <string name="eventmessage">*Saved and removed events will be accessible up to 48 hours after the event date has passed</string>
+    <string name="t_member_since_nseptember_1_2017">Member Since September 1, 2017</string>
+    <string name="your_events">Your Events</string>
 
 
 </resources>

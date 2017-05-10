@@ -33,7 +33,7 @@
                 android:gravity="center"
                 android:background="@color/livinBlack"
                 android:orientation="vertical"
-                app:layout_collapseParallaxMultiplier="0.7">
+                app:layout_collapseParallaxMultiplier="0.9">
 
 
                 <TextView
@@ -63,7 +63,7 @@
                     android:id="@+id/join_date"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="\t Member Since\nSeptember 1, 2017"
+                    android:text="@string/t_member_since_nseptember_1_2017"
                     android:textColor="@color/livinWhite"/>
 
 
@@ -73,7 +73,8 @@
                 android:id="@+id/toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
-                app:layout_collapseMode="pin" />
+
+                app:layout_collapseMode="parallax" />
 
         </android.support.design.widget.CollapsingToolbarLayout>
 
@@ -99,7 +100,7 @@
                 android:layout_marginTop="5dp"
                 android:layout_marginBottom="5dp"
                 android:layout_gravity="center"
-                android:text="Your Events"
+                android:text="@string/your_events"
                 android:textAllCaps="true"
                 android:textColor="@color/livinPink"
                 android:textSize="20sp" />

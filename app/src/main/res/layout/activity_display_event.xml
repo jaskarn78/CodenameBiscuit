@@ -107,6 +107,7 @@
                     android:layout_height="45dp"
                     android:background="@color/transLivinBlack"
                     android:layout_marginBottom="20dp"
+                    app:layout_collapseParallaxMultiplier="0.75"
                     app:layout_collapseMode="parallax">
 
                     <TextView
