@@ -59,6 +59,7 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
     private int type;
     private Activity activity;
     private Bundle bundle;
+    private FancyShowCaseView fancyShowCaseView;
     private View rootView;
     private SharedPreferences sharedPreferences;
     ArrayList<Bundle> bundleList = new ArrayList<>();
@@ -348,7 +349,7 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
             eventAdapterViewHolder.gridCards.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    new FancyShowCaseView.Builder(activity)
+                  fancyShowCaseView =  new FancyShowCaseView.Builder(activity)
                             .customView(R.layout.reveal_layout, new OnViewInflateListener() {
                                 @Override
                                 public void onViewInflated(View view) {
@@ -376,13 +377,16 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
                                         public void onClick(View v) {
                                             Intent intent = new Intent(activity, DisplayEvent.class);
                                             intent.putExtras(eventInfo); activity.startActivity(intent); } });
-                                } }).closeOnTouch(true).title(finalEvent).focusOn(v).focusShape(FocusShape.ROUNDED_RECTANGLE).roundRectRadius(v.getWidth()).build().show(); } }); }
-        }
-
+                                } }).closeOnTouch(true).title(finalEvent).focusOn(v).focusShape(FocusShape.ROUNDED_RECTANGLE).roundRectRadius(v.getWidth()).build();
+                    fancyShowCaseView.show(); } }); }}
 
     private String parseDate(String dateString){
         dateString = dateString.replace('-', '/');
         return dateString.substring(5, 10);
+    }
+
+    public FancyShowCaseView getFancyShowCaseView(){
+        return fancyShowCaseView;
     }
 
 }

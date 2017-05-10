@@ -120,7 +120,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        if(!swipeEvents.isVisible() && !fabMenu.isShowing()) {
+        if(!swipeEvents.isVisible() && !fabMenu.isShowing() && eventsFrag!=null && !eventsFrag.fancyViewShowing()) {
             new FancyAlertDialog.Builder(this).setActivity(this)
                     .setPositiveColor(R.color.livinPink).setNegativeColor(R.color.black)
                     .setPositiveButtonText("Exit").setTextSubTitle("Are you sure you would like to exit?")
@@ -139,7 +139,6 @@ public class MainActivity extends AppCompatActivity {
                     dialog.dismiss();
                 }
             }).build().show();
-
         }else if(swipeEvents.isVisible() && !fabMenu.isShowing()){
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
             ft.setCustomAnimations(R.anim.slide_in_up, R.anim.slide_out_down);
@@ -154,7 +153,10 @@ public class MainActivity extends AppCompatActivity {
             handler.postDelayed(new Runnable() {
                 public void run() {
                     refresh();} }, 800);
-        }else fabMenu.closeMenu();
+        }else if(eventsFrag!=null && eventsFrag.fancyViewShowing())
+            eventsFrag.onBackPressed();
+        else
+            fabMenu.closeMenu();
     }
 
 

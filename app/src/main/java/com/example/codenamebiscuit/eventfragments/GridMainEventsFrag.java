@@ -251,6 +251,16 @@ public class GridMainEventsFrag extends ProgressFragment {
 
     }
 
+    public void onBackPressed(){
+        if(mAdapter!=null && mAdapter.getFancyShowCaseView()!=null && mAdapter.getFancyShowCaseView().isShowing()){
+            mAdapter.getFancyShowCaseView().hide();}
+    }
+    public boolean fancyViewShowing(){
+        if(mAdapter!=null && mAdapter.getFancyShowCaseView()!=null)
+            return mAdapter.getFancyShowCaseView().isShowing();
+        return false;
+    }
+
     private void refresh(){
         if(touched) {
             Fragment fragment = getFragmentManager().findFragmentById(R.id.fragment_container);
