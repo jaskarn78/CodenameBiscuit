@@ -326,18 +326,13 @@ public class ChooseLogin extends AppCompatActivity implements GoogleApiClient.On
                 .setTextSubTitle(first_name+" "+last_name)
                 .setBody("Turn on location services for accurate results")
                 .setPositiveButtonText("Continue")
+                .setPositiveColor(R.color.livinPink)
                 .setOnPositiveClicked(new FancyAlertDialog.OnPositiveClicked() {
                     @Override
                     public void OnClick(View view, Dialog dialog) {
                         startActivity(main);
                         dialog.dismiss(); } })
-                .setNegativeButtonText("Exit")
-                .setOnNegativeClicked(new FancyAlertDialog.OnNegativeClicked() {
-                    @Override
-                    public void OnClick(View view, Dialog dialog) {
-                        finish();
-                        System.exit(0); }
-                }) .build();
+                .build();
         alert.show(); }
 
     @Override
