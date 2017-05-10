@@ -23,6 +23,7 @@ import com.example.codenamebiscuit.MainActivity;
 import com.example.codenamebiscuit.Manifest;
 import com.example.codenamebiscuit.R;
 import com.example.codenamebiscuit.helper.App;
+import com.example.codenamebiscuit.requests.RunQuery;
 import com.facebook.AccessToken;
 import com.facebook.AccessTokenTracker;
 import com.facebook.CallbackManager;
@@ -75,6 +76,7 @@ public class ChooseLogin extends AppCompatActivity implements GoogleApiClient.On
     private TextView tvSigninInvoker;
     private LinearLayout llSignin;
     private SignInButton signInButton;
+    private String userid;
     private static final int RC_LOCATION_SERVICE=123;
 
     public ChooseLogin(){
@@ -108,6 +110,7 @@ public class ChooseLogin extends AppCompatActivity implements GoogleApiClient.On
             }
         });
         mLoginButton = (LoginButton) findViewById(R.id.btnFacebookSignup);
+
 
         mLoginButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -200,6 +203,7 @@ public class ChooseLogin extends AppCompatActivity implements GoogleApiClient.On
             obj.put("last_name", acct.getFamilyName());
             obj.put("user_email", acct.getEmail());
             pref.edit().putString("user_id", acct.getId()).apply();
+            userid = acct.getId();
             pref.edit().putString("user_image", String.valueOf(acct.getPhotoUrl())).apply();
             pref.edit().putString("fName", acct.getGivenName()).apply();
             pref.edit().putString("lName", acct.getFamilyName()).apply();
@@ -311,12 +315,8 @@ public class ChooseLogin extends AppCompatActivity implements GoogleApiClient.On
         // Initialize ProfileTracker
         mProfileTracker = new ProfileTracker() {
             @Override
-            protected void onCurrentProfileChanged(
-                    Profile oldProfile,
-                    Profile currentProfile) {
-            }};
-        mAccessTokenTracker.startTracking();
-    }
+            protected void onCurrentProfileChanged(Profile oldProfile, Profile currentProfile) { }};
+        mAccessTokenTracker.startTracking();}
 
     private void nextActivity() {
         final Intent main = new Intent(this, MainActivity.class);
@@ -330,20 +330,16 @@ public class ChooseLogin extends AppCompatActivity implements GoogleApiClient.On
                     @Override
                     public void OnClick(View view, Dialog dialog) {
                         startActivity(main);
-                        dialog.dismiss();
-                    }
-                })
+                        dialog.dismiss(); } })
                 .setNegativeButtonText("Exit")
                 .setOnNegativeClicked(new FancyAlertDialog.OnNegativeClicked() {
                     @Override
                     public void OnClick(View view, Dialog dialog) {
                         finish();
-                        System.exit(0);
-                    }
-                })
-                .build();
-        alert.show();
-    }
+                        System.exit(0); }
+                }) .build();
+        alert.show(); }
+
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
@@ -354,6 +350,7 @@ public class ChooseLogin extends AppCompatActivity implements GoogleApiClient.On
         try {
             JSONObject normalizedObj = new JSONObject();
             String id = object.getString("id");
+            userid = id;
             pref.edit().putString("user_id", id).apply();
             try {
                 URL profile_pic = new URL("https://graph.facebook.com/" + id + "/picture?width=200&height=150");

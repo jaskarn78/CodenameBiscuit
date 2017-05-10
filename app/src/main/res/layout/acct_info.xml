@@ -3,20 +3,20 @@
     xmlns:fancy="http://schemas.android.com/apk/res-auto"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:background="#f1f1f1"
     android:layout_height="match_parent">
 
     <android.support.design.widget.AppBarLayout
         android:id="@+id/app_bar_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="#f1f1f1">
+        android:background="@color/livinBlack">
 
 
         <android.support.design.widget.CollapsingToolbarLayout
             android:id="@+id/collapsing_toolbar"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:background="@color/livinBlack"
             app:layout_scrollFlags="scroll|exitUntilCollapsed"
             app:contentScrim="?attr/colorPrimary"
             app:titleEnabled="true"
@@ -31,7 +31,7 @@
                 android:layout_height="300dp"
                 app:layout_collapseMode="pin"
                 android:gravity="center"
-                android:background="#ffffff"
+                android:background="@color/livinBlack"
                 android:orientation="vertical"
                 app:layout_collapseParallaxMultiplier="0.7">
 
@@ -42,13 +42,13 @@
                     android:layout_height="wrap_content"
                     android:textSize="25sp"
                     android:layout_marginTop="20dp"
-                    android:textColor="@color/livinBlack"/>
+                    android:textColor="@color/livinWhite"/>
 
                 <TextView
                     android:id="@+id/user_email"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textColor="@color/livinBlack"/>
+                    android:textColor="@color/livinWhite"/>
 
                 <ImageView
                     android:id="@+id/user_image"
@@ -64,7 +64,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="\t Member Since\nSeptember 1, 2017"
-                    android:textColor="@color/livinBlack"/>
+                    android:textColor="@color/livinWhite"/>
 
 
             </LinearLayout>
@@ -83,7 +83,7 @@
     <android.support.v4.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/livinWhite"
+        android:background="@color/black"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
         <LinearLayout
@@ -98,6 +98,7 @@
                 android:layout_marginStart="10dp"
                 android:layout_marginTop="5dp"
                 android:layout_marginBottom="5dp"
+                android:layout_gravity="center"
                 android:text="Your Events"
                 android:textAllCaps="true"
                 android:textColor="@color/livinPink"
@@ -211,7 +212,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="10dp"
                 android:layout_marginTop="15dp"
-                android:textColor="@color/livinBlack"
+                android:textColor="@color/livinWhite"
                 android:textSize="12sp"
                 android:layout_gravity="center"
                 android:text="@string/eventmessage"/>
@@ -222,6 +223,7 @@
                 android:layout_marginStart="10dp"
                 android:layout_marginTop="25dp"
                 android:layout_marginBottom="5dp"
+                android:layout_gravity="center"
                 android:text="Preferences"
                 android:textAllCaps="true"
                 android:textColor="@color/livinPink"
@@ -248,6 +250,7 @@
                     android:layout_marginEnd="10dp"
                     android:layout_marginStart="10dp"
                     android:gravity="center"
+                    android:foreground="?android:attr/selectableItemBackground"
                     android:orientation="horizontal">
 
 
@@ -258,6 +261,7 @@
                         android:buttonTint="@color/livinPink"
                         android:drawableLeft="@drawable/musicnote"
                         android:drawableTint="@color/livinPink"
+                        android:textColor="@color/livinWhite"
                         android:gravity="center"
                         android:text="Music"
                         android:textSize="18sp" />
@@ -279,6 +283,8 @@
                     android:layout_marginStart="10dp"
                     android:layout_marginTop="10dp"
                     android:gravity="center"
+                    android:foreground="?android:attr/selectableItemBackground"
+                    android:clickable="true"
                     android:orientation="horizontal">
 
 
@@ -290,6 +296,7 @@
                         android:drawableLeft="@drawable/hamburger"
                         android:drawableTint="@color/livinPink"
                         android:gravity="center"
+                        android:textColor="@color/livinWhite"
                         android:text="Food and Drink"
                         android:textSize="18sp" />
 
@@ -310,6 +317,8 @@
                     android:layout_marginStart="10dp"
                     android:layout_marginTop="10dp"
                     android:gravity="center"
+                    android:foreground="?android:attr/selectableItemBackground"
+                    android:clickable="true"
                     android:orientation="horizontal">
 
 
@@ -320,6 +329,7 @@
                         android:buttonTint="@color/livinPink"
                         android:drawableLeft="@drawable/football"
                         android:drawableTint="@color/livinPink"
+                        android:textColor="@color/livinWhite"
                         android:gravity="center"
                         android:text="Sports"
                         android:textSize="18sp" />
@@ -341,6 +351,8 @@
                     android:layout_marginStart="10dp"
                     android:layout_marginTop="10dp"
                     android:gravity="center"
+                    android:foreground="?android:attr/selectableItemBackground"
+                    android:clickable="true"
                     android:orientation="horizontal">
 
 
@@ -351,6 +363,7 @@
                         android:buttonTint="@color/livinPink"
                         android:drawableLeft="@drawable/basecamp"
                         android:drawableTint="@color/livinPink"
+                        android:textColor="@color/livinWhite"
                         android:gravity="center"
                         android:text="Outdoor"
                         android:textSize="18sp" />
@@ -372,6 +385,8 @@
                     android:layout_marginStart="10dp"
                     android:layout_marginTop="10dp"
                     android:gravity="center"
+                    android:foreground="?android:attr/selectableItemBackground"
+                    android:clickable="true"
                     android:orientation="horizontal">
 
 
@@ -382,6 +397,7 @@
                         android:buttonTint="@color/livinPink"
                         android:drawableLeft="@drawable/bike"
                         android:drawableTint="@color/livinPink"
+                        android:textColor="@color/livinWhite"
                         android:gravity="center"
                         android:text="Health"
                         android:textSize="18sp" />
@@ -402,6 +418,8 @@
                     android:layout_marginStart="10dp"
                     android:layout_marginTop="10dp"
                     android:gravity="center"
+                    android:foreground="?android:attr/selectableItemBackground"
+                    android:clickable="true"
                     android:orientation="horizontal">
 
 
@@ -413,6 +431,7 @@
                         android:drawableLeft="@drawable/ic_face_black_24dp"
                         android:drawableTint="@color/livinPink"
                         android:gravity="center"
+                        android:textColor="@color/livinWhite"
                         android:text="Family"
                         android:textSize="18sp" />
 
@@ -433,6 +452,8 @@
                     android:layout_marginStart="10dp"
                     android:layout_marginTop="10dp"
                     android:gravity="center"
+                    android:foreground="?android:attr/selectableItemBackground"
+                    android:clickable="true"
                     android:orientation="horizontal">
 
 
@@ -444,6 +465,7 @@
                         android:drawableLeft="@drawable/cart"
                         android:drawablePadding="10dp"
                         android:drawableTint="@color/livinPink"
+                        android:textColor="@color/livinWhite"
                         android:gravity="center"
                         android:text="Retail"
                         android:textSize="18sp" />
@@ -465,6 +487,8 @@
                     android:layout_marginStart="10dp"
                     android:layout_marginTop="10dp"
                     android:gravity="center"
+                    android:foreground="?android:attr/selectableItemBackground"
+                    android:clickable="true"
                     android:orientation="horizontal">
 
 
@@ -476,6 +500,7 @@
                         android:drawableLeft="@drawable/volunteering"
                         android:drawablePadding="10dp"
                         android:drawableTint="@color/livinPink"
+                        android:textColor="@color/livinWhite"
                         android:gravity="center"
                         android:text="Charity"
                         android:textSize="18sp" />
@@ -497,6 +522,8 @@
                     android:layout_marginStart="10dp"
                     android:layout_marginTop="10dp"
                     android:gravity="center"
+                    android:foreground="?android:attr/selectableItemBackground"
+                    android:clickable="true"
                     android:orientation="horizontal">
 
                     <Switch
@@ -507,6 +534,7 @@
                         android:drawableLeft="@drawable/theater"
                         android:drawablePadding="10dp"
                         android:drawableTint="@color/livinPink"
+                        android:textColor="@color/livinWhite"
                         android:gravity="center"
                         android:text="Entertainment"
                         android:textSize="18sp" />
@@ -521,6 +549,7 @@
                 android:layout_marginStart="10dp"
                 android:layout_marginTop="25dp"
                 android:text="Account Actions"
+                android:layout_gravity="center"
                 android:layout_marginBottom="5dp"
                 android:textAllCaps="true"
                 android:textColor="@color/livinPink"
@@ -548,9 +577,10 @@
                     android:layout_marginBottom="10dp"
                     android:layout_marginStart="10dp"
                     android:layout_marginEnd="10dp"
+                    android:textColor="@color/livinWhite"
                     android:text="Log Out"
                     android:textSize="18sp"
-                    android:textColor="@color/livinBlack"/>
+                    />
             </RelativeLayout>
             <RelativeLayout
                 android:id="@+id/remove_pref"
@@ -569,7 +599,8 @@
                     android:layout_marginEnd="10dp"
                     android:text="Remove all Preferences"
                     android:textSize="18sp"
-                    android:textColor="@color/livinBlack"/>
+                    android:textColor="@color/livinWhite"
+                    />
             </RelativeLayout>
 
             <RelativeLayout
@@ -589,10 +620,9 @@
                     android:layout_marginEnd="10dp"
                     android:text="Delete Account"
                     android:textSize="18sp"
-                    android:textColor="@color/livinBlack"/>
+                    android:textColor="@color/livinWhite"
+                    />
             </RelativeLayout>
-
-
 
             <TextView
                 android:layout_width="wrap_content"
@@ -600,6 +630,7 @@
                 android:layout_marginStart="10dp"
                 android:layout_marginTop="25dp"
                 android:text="About"
+                android:layout_gravity="center"
                 android:layout_marginBottom="5dp"
                 android:textAllCaps="true"
                 android:textColor="@color/livinPink"
@@ -616,7 +647,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
-                android:textColor="@color/livinBlack"
+                android:textColor="@color/livinWhite"
                 android:textSize="20sp"
                 android:layout_gravity="center"
                 android:text="Joseph Lozoya"/>
@@ -625,7 +656,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="5dp"
-                android:textColor="@color/livinBlack"
+                android:textColor="@color/livinWhite"
                 android:textSize="15sp"
                 android:layout_gravity="center"
                 android:text="LIVIT v1.0.0"/>
@@ -634,7 +665,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="20dp"
-                android:textColor="@color/livinBlack"
+                android:textColor="@color/livinWhite"
                 android:textSize="15sp"
                 android:layout_gravity="center"
                 android:text="Made in Sacramento 2017"/>

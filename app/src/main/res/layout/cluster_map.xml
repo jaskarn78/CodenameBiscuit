@@ -39,10 +39,10 @@
             android:id="@+id/viewPagerMap"
             android:layout_width="match_parent"
             android:layout_height="350dp"
-            android:layout_margin="8dp"
+            android:layout_margin="10dp"
             android:paddingTop="4dp"
-            android:paddingLeft="5dp"
-            android:paddingRight="5dp"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
             android:clipToPadding="true"
             android:overScrollMode="never" />
 

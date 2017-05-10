@@ -140,7 +140,7 @@ public class MainActivity extends AppCompatActivity {
                 }
             }).build().show();
 
-        }else if(swipeEvents.isVisible()){
+        }else if(swipeEvents.isVisible() && !fabMenu.isShowing()){
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
             ft.setCustomAnimations(R.anim.slide_in_up, R.anim.slide_out_down);
             ft.addToBackStack("swipeEvents");
