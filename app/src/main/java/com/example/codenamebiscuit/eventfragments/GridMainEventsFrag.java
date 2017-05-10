@@ -61,6 +61,7 @@ public class GridMainEventsFrag extends ProgressFragment {
     private LinearLayout bgImage;
     private EventBundle eventsBundle;
     private JSONObject preferences;
+    private boolean showing;
     FABRevealMenu fabMenu;
     private boolean touched;
     private Runnable mShowContentRunnable = new Runnable() {
@@ -252,13 +253,16 @@ public class GridMainEventsFrag extends ProgressFragment {
     }
 
     public void onBackPressed(){
-        if(mAdapter!=null && mAdapter.getFancyShowCaseView()!=null && mAdapter.getFancyShowCaseView().isShowing()){
-            mAdapter.getFancyShowCaseView().hide();}
+        mAdapter.getFancyShowCaseView().hide();
     }
     public boolean fancyViewShowing(){
-        if(mAdapter!=null && mAdapter.getFancyShowCaseView()!=null)
-            return mAdapter.getFancyShowCaseView().isShowing();
-        return false;
+        if(mAdapter.getFancyShowCaseView()!=null){
+            if(mAdapter.getFancyShowCaseView().isShowing())
+                showing=true;
+            else
+                showing=false;
+        }
+        return showing;
     }
 
     private void refresh(){
@@ -267,7 +271,6 @@ public class GridMainEventsFrag extends ProgressFragment {
             FragmentTransaction ft = getFragmentManager().beginTransaction();
             ft.detach(fragment); ft.attach(fragment); ft.commitNow();
         }touched=false; }
-
 
 
     public void setupPreferences(final List<FancyButton> btnList) {

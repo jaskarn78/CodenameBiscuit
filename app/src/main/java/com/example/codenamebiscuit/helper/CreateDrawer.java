@@ -177,6 +177,7 @@ public class CreateDrawer {
                                 intent.putExtra("user_name", fName+" "+lName);
                                 intent.putExtra("user_email", email);
                             } else if (drawerItem.getIdentifier() == 5) {
+                                preferences.edit().clear().apply();
                                 if (LoginManager.getInstance() != null)
                                     LoginManager.getInstance().logOut();
                                 else

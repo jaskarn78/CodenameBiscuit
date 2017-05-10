@@ -209,6 +209,7 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
             super(view);
             rootView = view;
 
+
             mEventDistance = (TextView)view.findViewById(R.id.event_distance);
             mSwipeLayout = (SwipeLayout) itemView.findViewById(R.id.swipe);
 
@@ -246,7 +247,7 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
         String startTime = null;        String eventid = null;      String userId = null;
         String eventHoster = null;      String cost = null;         Double lat = 0.0;
         String eventWebsite = null;     int eventDistance = 0;      Double lng = 0.0;
-        String eventPhone = null;
+        String eventPhone = null;       int eventLikes = 0;
 
         final JSONObject restoreEvent = new JSONObject();
         final JSONObject eventObject = mEventData.get(position);
@@ -260,6 +261,7 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
             lat = eventObject.getDouble("lat");                         lng = eventObject.getDouble("lng");
             eventInfo = eventObject.getString("event_description");     eventWebsite = eventObject.getString("event_website");
             eventDistance = eventObject.getInt("event_distance");       eventPhone = eventObject.getString("event_phone");
+            eventLikes = eventObject.getInt("event_likes");
         } catch (JSONException e) { e.printStackTrace(); }
 
         final Bundle bundle = new Bundle();
@@ -270,7 +272,7 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
         bundle.putString("eventDistance",eventDistance + "");   bundle.putString("eventCost", cost);
         bundle.putString("eventId", eventid);                   bundle.putDouble("eventLat", lat);
         bundle.putDouble("eventLng", lng);                      bundle.putString("eventWebsite", eventWebsite);
-        bundle.putString("eventPhone", eventPhone);
+        bundle.putString("eventPhone", eventPhone);             bundle.putInt("eventLikes", eventLikes);
         setBundle(bundle);
 
         if (type == 1) {

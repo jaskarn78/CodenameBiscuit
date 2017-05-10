@@ -108,6 +108,8 @@ public class MainActivity extends AppCompatActivity {
         super.onResume();
         Log.i("resumed", getIntent().getBooleanExtra("touched", false)+"");
         if(eventsFrag!=null) {
+            if(eventsFrag.fancyViewShowing())
+                eventsFrag.onBackPressed();
             touched = true; refresh();
         }
 
@@ -120,7 +122,9 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        if(!swipeEvents.isVisible() && !fabMenu.isShowing() && eventsFrag!=null && !eventsFrag.fancyViewShowing()) {
+        if(eventsFrag!=null && eventsFrag.fancyViewShowing())
+            eventsFrag.onBackPressed();
+        else if(!swipeEvents.isVisible() && !fabMenu.isShowing() && eventsFrag!=null) {
             new FancyAlertDialog.Builder(this).setActivity(this)
                     .setPositiveColor(R.color.livinPink).setNegativeColor(R.color.black)
                     .setPositiveButtonText("Exit").setTextSubTitle("Are you sure you would like to exit?")

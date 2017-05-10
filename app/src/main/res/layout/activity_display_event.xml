@@ -455,7 +455,7 @@
 
                 <com.like.LikeButton
                     xmlns:app="http://schemas.android.com/apk/res-auto"
-                    android:id="@+id/like"
+                    android:id="@+id/likeButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_below="@id/rate"
@@ -471,7 +471,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_toEndOf="@+id/like"
+                    android:layout_toEndOf="@+id/likeButton"
                     android:layout_marginTop="60dp"
                     android:layout_marginStart="10dp"
                     android:layout_marginBottom="5dp"

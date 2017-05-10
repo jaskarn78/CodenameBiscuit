@@ -85,6 +85,16 @@
     <string name="RESTORE_ALL_SAVED_EVENTS">http://athena.ecs.csus.edu/~teamone/php/android/restore_all_saved_events.php</string>
     <string name="RESTORE_ALL_DELETED_EVENTS">http://athena.ecs.csus.edu/~teamone/php/android/restore_all_deleted_events.php</string>
     <string name="PULL_USER_JOIN_DATE">http://athena.ecs.csus.edu/~teamone/php/android/pull_user_join_date.php</string>
+    <string name="UPDATE_EVENT_LIKES">http://athena.ecs.csus.edu/~teamone/php/android/update_event_likes.php</string>
+    <string name="INSERT_USER_LIKES">http://athena.ecs.csus.edu/~teamone/php/android/insert_user_likes.php</string>
+    <string name="GET_EVENT_LIKES">http://athena.ecs.csus.edu/~teamone/php/android/get_event_likes.php</string>
+    <string name="REMOVE_EVENT_LIKES">http://athena.ecs.csus.edu/~teamone/php/android/remove_event_likes.php</string>
+    <string name="REMOVE_USER_LIKES">http://athena.ecs.csus.edu/~teamone/php/android/remove_user_likes.php</string>
+
+
+
+
+
 
 
 

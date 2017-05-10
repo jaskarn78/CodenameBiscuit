@@ -1,14 +1,18 @@
 package com.example.codenamebiscuit.eventfragments;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.PorterDuff;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.icu.text.SimpleDateFormat;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.NavUtils;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.preference.PreferenceManager;
 import android.support.v7.widget.Toolbar;
 import android.telephony.PhoneNumberUtils;
 import android.util.Log;
@@ -25,22 +29,31 @@ import android.widget.Toast;
 
 import com.example.codenamebiscuit.R;
 import com.example.codenamebiscuit.helper.ImageLoader;
+import com.example.codenamebiscuit.requests.QueryEventList;
+import com.example.codenamebiscuit.requests.RunQuery;
 import com.facebook.share.model.ShareLinkContent;
 import com.facebook.share.widget.ShareDialog;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
+import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.like.LikeButton;
+import com.like.OnLikeListener;
 import com.mikepenz.iconics.view.IconicsImageView;
 import com.thefinestartist.finestwebview.FinestWebView;
 import com.thefinestartist.finestwebview.FinestWebViewActivity;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.concurrent.ExecutionException;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -55,20 +68,23 @@ public class DisplayEvent extends AppCompatActivity{
     private TextView  displayEventStartDate, displayEventStartTIme;
     private TextView displayEventDesc, displayEventLocation, displayEventPref;
     private TextView displayEventDistance, displayEventCost, likeText, displayEventPHone;
-    private TextView displayEventHoster;
+    private TextView displayEventHoster, displayEventLikes;
     private String eventName, eventImage, eventDate, eventCost;
     private String eventTime, eventDescription, eventLocation;
     private String eventPreferences, eventHoster, eventDistance;
-    private String eventWebsite, eventPhone;
+    private String eventWebsite, eventPhone, eventLikes;
     private int mapImage;
     private LikeButton likeButton;
     private String eventId;
+    private String userId;
     private double eventLat, eventLng;
     private IconicsImageView webSite, navigate;
     private IconicsImageView phone, shareBtn;
+    private SharedPreferences preferences;
     private WebView webView;
     private Toolbar toolbar;
     private TextView toolbarTitle;
+    private ArrayList<JSONObject> eventLiked;
     MapView mapView;
     private GoogleMap googleMap;
 
@@ -79,6 +95,7 @@ public class DisplayEvent extends AppCompatActivity{
         this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
         setContentView(R.layout.activity_display_event);
+        MapsInitializer.initialize(this);
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         toolbarTitle = (TextView)findViewById(R.id.toolbar_title);
         setSupportActionBar(toolbar);
@@ -87,6 +104,9 @@ public class DisplayEvent extends AppCompatActivity{
         upArrow.setColorFilter(getResources().getColor(R.color.livinWhite), PorterDuff.Mode.SRC_ATOP);
         this.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         this.getSupportActionBar().setHomeAsUpIndicator(upArrow);
+        preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        eventLiked = new ArrayList<>();
+        userId = preferences.getString("user_id", null);
         bindViews(savedInstanceState);
         shareButton();
         setupMap();
@@ -111,8 +131,9 @@ public class DisplayEvent extends AppCompatActivity{
 
     public void bindViews(Bundle savedInstanceState) {
 
+
         likeText = (TextView)findViewById(R.id.currentRating);
-        likeButton = (LikeButton)findViewById(R.id.like);
+        likeButton = (LikeButton)findViewById(R.id.likeButton);
         shareBtn = (IconicsImageView)findViewById(R.id.event_share);
 
         phone = (IconicsImageView)findViewById(R.id.event_call);
@@ -155,6 +176,7 @@ public class DisplayEvent extends AppCompatActivity{
         mapImage = bundle.getInt("mapImage");
         eventWebsite = bundle.getString("eventWebsite");
         eventPhone = bundle.getString("eventPhone");
+        eventLikes = bundle.getInt("eventLikes")+"";
 
     }
 
@@ -180,9 +202,45 @@ public class DisplayEvent extends AppCompatActivity{
         displayEventStartDate.setText("Start Date: "+parseDate(eventDate));
         displayEventStartTIme.setText("Start Time: "+parseTime(eventTime));
         displayEventCost.setText("Entry Fee $"+ eventCost);
-        displayEventDesc.setText(eventDescription+ " Lorem ipsum dolor sit amet, consectetur adipisicing elit, " +
-                "sed do eiusmod ");
+        displayEventDesc.setText(eventDescription);
         displayEventPHone.setText(eventPhone);
+        likeText.setText(eventLikes+" Like(s)");
+        try {
+            eventLiked = new QueryEventList(getString(R.string.GET_EVENT_LIKES), userId, eventId).execute().get();
+            if(eventLiked.size()>0) likeButton.setLiked(true);
+        }catch (ExecutionException | InterruptedException e) { e.printStackTrace(); }
+        likeButton.setOnLikeListener(new OnLikeListener() {
+            @Override
+            public void liked(LikeButton likeButton) {
+                eventLikes = (Integer.parseInt(eventLikes)+1)+"";
+                likeText.setText(eventLikes + " Like(s)");
+                final JSONObject object = new JSONObject();
+                Handler handler = new Handler();
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            object.put("event_id", eventId); object.put("user_id", userId);
+                            new RunQuery(getString(R.string.UPDATE_EVENT_LIKES)).execute(object);
+                        } catch (JSONException e) {e.printStackTrace(); }} }, 200);
+
+            }
+
+            @Override
+            public void unLiked(LikeButton likeButton) {
+                eventLikes = (Integer.parseInt(eventLikes)-1)+"";
+                likeText.setText(eventLikes+ " Like(s)");
+                final JSONObject object = new JSONObject();
+                Handler handler = new Handler();
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            object.put("event_id", eventId); object.put("user_id", userId);
+                            new RunQuery(getString(R.string.REMOVE_EVENT_LIKES)).execute(object);
+                        } catch (JSONException e) {e.printStackTrace(); }} }, 200); }
+        });
+
 
         setupWebsiteBtn();
         setupNavigateBtn();
@@ -292,8 +350,7 @@ public class DisplayEvent extends AppCompatActivity{
     @Override
     public void onBackPressed()
     {
-        super.onBackPressed();
-    }
+        NavUtils.navigateUpFromSameTask(this);}
 
     private void shareButton(){
         shareBtn.setOnClickListener(new View.OnClickListener() {

@@ -36,6 +36,7 @@ public class EventBundle {
             bundle.putDouble("eventLng", data.get(position).getDouble("lng"));
             bundle.putString("eventWebsite", data.get(position).getString("event_website"));
             bundle.putString("eventPhone", data.get(position).getString("event_phone"));
+            bundle.putInt("eventLikes", data.get(position).getInt("event_likes"));
         } catch (JSONException e) { e.printStackTrace(); }
         return bundle;
     }

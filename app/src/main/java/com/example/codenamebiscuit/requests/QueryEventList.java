@@ -30,6 +30,7 @@ public class QueryEventList extends AsyncTask<Void, Void, ArrayList<JSONObject>>
     private ArrayList<JSONObject> eventList;
     private JSONObject userJSON;
     private String main_events;
+    private String event_id;
     private EventAdapter adapter;
     private Context context;
     private RecyclerView recyclerView;
@@ -45,6 +46,18 @@ public class QueryEventList extends AsyncTask<Void, Void, ArrayList<JSONObject>>
             e.printStackTrace();
         }
     }
+
+    public QueryEventList(String main_events, String userId, String event_id){
+        this.main_events=main_events;
+        userJSON = new JSONObject();
+        try {
+            userJSON.put("user_id", userId);
+            userJSON.put("event_id", event_id);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
 
 
     @Override
