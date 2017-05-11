@@ -108,7 +108,8 @@ public class GridMainEventsFrag extends ProgressFragment {
             setupBgImage();
             Events.fromJson(data, getActivity());
             mAdapter = new EventAdapter(getContext().getApplicationContext(), 2, "", getActivity());
-            mAdapter.setEventData(data);
+            mAdapter.setEventData(data); eventsBundle = new EventBundle(data);
+
         } catch (InterruptedException | ExecutionException e) { e.printStackTrace(); } }
 
 
@@ -148,13 +149,13 @@ public class GridMainEventsFrag extends ProgressFragment {
     private void setupSearchView(){
         searchView.setShouldKeepHistory(false);
         searchView.adjustTintAlpha(0.8f);
-        eventsBundle = new EventBundle(data);
         if(data.size()>0) {
             AsyncTask.execute(new Runnable() {
                 @Override
                 public void run() {
+                    searchView.clearSuggestions();
                     searchView.addSuggestions(eventsBundle.getEventStringList());} });
-        }else searchView.clearSuggestions();
+        }
         searchView.setCloseOnTintClick(true);
         searchView.setOnQueryTextListener(new MaterialSearchView.OnQueryTextListener() {
             @Override
@@ -259,9 +260,7 @@ public class GridMainEventsFrag extends ProgressFragment {
         if(mAdapter.getFancyShowCaseView()!=null){
             if(mAdapter.getFancyShowCaseView().isShowing())
                 showing=true;
-            else
-                showing=false;
-        }
+            else showing=false;}
         return showing;
     }
 
