@@ -366,7 +366,9 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventAdapter
                                     final ProgressBar progressBar3 = (ProgressBar)view.findViewById(R.id.reveal_progress);
 
                                     eventName.setText(eventInfo.getString("eventName"));
-                                    eventLocation.setText(eventInfo.getString("eventLocation"));
+                                    if(eventInfo.getString("eventLocation").contains(", United States")) {
+                                        eventLocation.setText(eventInfo.getString("eventLocation").replace(", United States", ""));
+                                    }else eventLocation.setText(eventInfo.getString("eventLocation"));
                                     eventPreferences.setText(eventInfo.getString("eventPreference").replace("|",  " · " ));
 
                                     eventDate.setText(parseDate(eventInfo.getString("eventDate")));

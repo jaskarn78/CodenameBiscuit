@@ -30,21 +30,7 @@
             android:textSize="22sp"
             android:textColor="@color/livinWhite"
             />
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="10dp"
-                android:ellipsize="marquee"
-                android:focusableInTouchMode="true"
-                android:focusable="true"
-                android:marqueeRepeatLimit="marquee_forever"
-                android:scrollHorizontally="true"
-                android:maxLines="2"
-                android:id="@+id/slideDate"
-                android:text="4/30"
-                android:textSize="15sp"
-                android:textColor="@color/livinWhite"
-                />
+
         </LinearLayout>
 
 
@@ -79,7 +65,7 @@
             android:text="Event Location"
             android:textColor="@color/livinWhite"
             />
-        <LinearLayout
+        <RelativeLayout
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_marginStart="10dp"
@@ -94,7 +80,24 @@
                 android:text="Preference1"
                 android:textColor="@color/livinPink"
                 />
-        </LinearLayout>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_alignParentEnd="true"
+                android:ellipsize="marquee"
+                android:focusableInTouchMode="true"
+                android:focusable="true"
+                android:marqueeRepeatLimit="marquee_forever"
+                android:scrollHorizontally="true"
+                android:maxLines="2"
+                android:id="@+id/slideDate"
+                android:text="4/30"
+                android:textSize="15sp"
+                android:textColor="@color/livinWhite"
+                />
+        </RelativeLayout>
     </LinearLayout>
 
 </LinearLayout>

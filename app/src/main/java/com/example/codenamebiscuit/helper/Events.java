@@ -178,6 +178,17 @@ public class Events implements Serializable{
         });
     }
 
+    public static void bestRating(ArrayList<JSONObject> eventList){
+        Collections.sort(eventList, new Comparator<JSONObject>() {
+            @Override
+            public int compare(JSONObject o1, JSONObject o2) {
+                if(getLikes(o1)==getLikes(o2))
+                    return 0;
+                else return getLikes(o2)-getLikes(o1);
+            }
+        });
+    }
+
     public static void toLatest(ArrayList<JSONObject>eventList){
         Collections.sort(eventList, new Comparator<JSONObject>() {
             @Override
@@ -211,6 +222,15 @@ public class Events implements Serializable{
             curLocation.setLongitude(gps.getLongitude());
         }
         return curLocation;
+    }
+
+    public static int getLikes(JSONObject object){
+        try {
+            return object.getInt("event_likes");
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return 0;
     }
 
     public static String getDate(JSONObject object){

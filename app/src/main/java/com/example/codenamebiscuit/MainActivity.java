@@ -274,7 +274,7 @@ public class MainActivity extends AppCompatActivity {
         }touched=false; }
 
     public void setupSpinner() {
-        toolbarSpinner.setItems("Nearest", "Furthest", "Earliest", "Latest"); }
+        toolbarSpinner.setItems("Nearest", "Furthest", "Earliest", "Latest", "Top Rated"); }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {

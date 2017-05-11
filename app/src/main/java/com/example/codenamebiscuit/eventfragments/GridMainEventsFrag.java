@@ -102,7 +102,7 @@ public class GridMainEventsFrag extends ProgressFragment {
     private void obtainData() {
         setContentShown(false);
         Handler mHandler = new Handler();
-        mHandler.postDelayed(mShowContentRunnable, 600);
+        mHandler.postDelayed(mShowContentRunnable, 800);
         try {
             data = new QueryEventList(getString(R.string.DATABASE_MAIN_EVENTS_PULLER), userId).execute().get();
             setupBgImage();
@@ -335,6 +335,11 @@ public class GridMainEventsFrag extends ProgressFragment {
                         break;
                     case 3:
                         Events.toLatest(data);
+                        mAdapter.setEventData(data); mAdapter.notifyDataSetChanged();
+                        mRecyclerView.smoothScrollToPosition(0);
+                        break;
+                    case 4:
+                        Events.bestRating(data);
                         mAdapter.setEventData(data); mAdapter.notifyDataSetChanged();
                         mRecyclerView.smoothScrollToPosition(0);
                         break;
